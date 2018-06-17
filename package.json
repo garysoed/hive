@@ -15,5 +15,15 @@
   "bugs": {
     "url": "https://github.com/garysoed/hive/issues"
   },
-  "homepage": "https://github.com/garysoed/hive#readme"
+  "homepage": "https://github.com/garysoed/hive#readme",
+  "devDependencies": {
+    "@types/jasmine": "^2.8.8",
+    "awesome-typescript-loader": "^5.0.0",
+    "jasmine-core": "^3.1.0",
+    "karma": "^2.0.3",
+    "karma-jasmine": "^1.1.2",
+    "karma-sourcemap-loader": "^0.3.7",
+    "typescript": "^2.9.2",
+    "webpack": "^4.12.0"
+  }
 }
