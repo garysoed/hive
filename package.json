@@ -18,6 +18,7 @@
   "homepage": "https://github.com/garysoed/hive#readme",
   "devDependencies": {
     "@types/jasmine": "^2.8.8",
+    "@types/yaml": "^1.0.2",
     "awesome-typescript-loader": "^5.0.0",
     "jasmine": "^3.5.0",
     "jasmine-core": "^3.1.0",
@@ -31,6 +32,7 @@
     "webpack": "^4.12.0"
   },
   "dependencies": {
-    "rxjs": "^6.5.3"
+    "rxjs": "^6.5.3",
+    "yaml": "^1.7.0"
   }
 }
