@@ -4,7 +4,7 @@ import { ConfigFile } from '../core/config-file';
 import { DeclarationRule } from '../core/declaration-rule';
 import { RenderRule } from '../core/render-rule';
 
-interface PartialDeclarationConfig {
+interface DeclarationRaw {
   declare?: string;
   inputs?: {[key: string]: string};
   output?: string;
@@ -39,7 +39,7 @@ export function parseConfig(content: string): ConfigFile {
   return {declarations, renders};
 }
 
-function parseDeclaration(obj: PartialDeclarationConfig): DeclarationRule|null {
+function parseDeclaration(obj: DeclarationRaw): DeclarationRule|null {
   return null;
 }
 
