@@ -2,7 +2,20 @@
   "commands": [
     {
       "command": "link",
-      "actions": ["npm link gs-tools gs-testing gs-types grapevine dev"]
+      "actions": ["npm link gs-tools gs-testing types dev moirai"]
+    },
+    {
+      "command": "peg",
+      "actions": [
+        "pegjs --plugin ./node_modules/ts-pegjs -o src/parser/grammar.ts src/parser/grammar.pegjs"
+      ]
+    },
+    {
+      "command": "test",
+      "actions": [
+        "dev peg",
+        "jasmine out/test.js"
+      ]
     }
   ]
 }
