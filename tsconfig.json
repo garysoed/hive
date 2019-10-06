@@ -13,9 +13,11 @@
     "noImplicitThis": true,
     "outDir": "out",
     "paths": {
-      "@gs-testing/*": ["node_modules/gs-testing/export/*"],
+      "@gs-testing": ["node_modules/gs-testing/export/index.ts"],
+      "@gs-tools/*": ["node_modules/gs-tools/export/*"],
       "@moirai": ["node_modules/moirai/export/index.ts"],
       "@rxjs": ["node_modules/rxjs"],
+      "@rxjs/operators": ["node_modules/rxjs/operators"],
     },
     "pretty": true,
     "sourceMap": true,

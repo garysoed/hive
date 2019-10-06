@@ -1,9 +1,9 @@
-import { assert, should, test } from '@gs-testing/main';
+import { assert, should, test } from '@gs-testing';
 
 import { parseProject } from './parse-project';
 
-test('@hive.parseProject', () => {
-  should.only(`parse the config correctly`, () => {
+test('@hive/project/parse-project', () => {
+  should(`parse the config correctly`, () => {
     const outdir = 'file/outdir';
     const content = `outdir: ${outdir}`;
     const config = parseProject(content);
@@ -11,7 +11,7 @@ test('@hive.parseProject', () => {
     assert(config.outdir).to.equal(outdir);
   });
 
-  should.only(`throw error if config is invalid`, () => {
+  should(`throw error if config is invalid`, () => {
     assert(() => {
       parseProject('a: b');
     }).to.throwErrorWithMessage(/project config file/);

@@ -18,6 +18,7 @@
   "homepage": "https://github.com/garysoed/hive#readme",
   "devDependencies": {
     "@types/jasmine": "^2.8.8",
+    "@types/node": "^12.7.11",
     "@types/yaml": "^1.0.2",
     "awesome-typescript-loader": "^5.0.0",
     "jasmine": "^3.5.0",

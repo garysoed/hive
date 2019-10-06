@@ -1,9 +1,9 @@
-import { assert, should, test } from '@gs-testing/main';
+import { assert, should, test } from '@gs-testing';
 
 import { parseConfig } from './parse-config';
 
-test('@hive.parseConfig', () => {
-  should.only(`throw error if a rule is invalid`, () => {
+test('@hive/config/parse-config', () => {
+  should(`throw error if a rule is invalid`, () => {
     const CONTENT = `
 invalid-rule:
     a: b
