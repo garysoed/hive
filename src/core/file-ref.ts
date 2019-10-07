@@ -1,10 +1,13 @@
-import * as nodePath from 'path';
+import * as path from 'path';
 
-import { Observable, of as observableOf } from '@rxjs';
+import { assertNonNull } from '@gs-tools/rxjs';
+import { Observable } from '@rxjs';
 import { map, switchMap } from '@rxjs/operators';
 
+import { findRoot } from '../project/find-root';
 import { loadProjectConfig } from '../project/load-project-config';
 import { readFile } from '../util/read-file';
+
 
 export class FileRef {
   readonly content$: Observable<string> = createContent(this.path);
@@ -19,18 +22,26 @@ function createContent(path: string): Observable<string> {
     switch (uri.protocol) {
       case 'out:':
         return loadContent(
-            loadProjectConfig().pipe(map(config => nodePath.join(config.outdir, uri.pathname))),
+            loadProjectConfig().pipe(map(config => config.outdir)),
+            uri.pathname,
         );
-        break;
       default:
-        throw new Error(`Invalid path: ${path}`);
+        // Treat it as a path.
+        return loadContent(findRoot().pipe(assertNonNull()), path);
     }
   } catch (e) {
     // Treat it as a path.
-    return loadContent(observableOf(path));
+    return loadContent(findRoot().pipe(assertNonNull()), path);
   }
 }
 
-function loadContent(path$: Observable<string>): Observable<string> {
-  return path$.pipe(switchMap(path => readFile(path)));
+/**
+ * @param root$ Emits the absolute path to the root.
+ * @param path The path relative to the root
+ */
+function loadContent(root$: Observable<string>, filepath: string): Observable<string> {
+  return root$.pipe(
+      map(root => path.join(root, filepath)),
+      switchMap(absolutePath => readFile(absolutePath)),
+  );
 }
