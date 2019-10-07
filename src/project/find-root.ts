@@ -5,7 +5,7 @@ import * as process from 'process';
 import { concat, fromEventPattern, Observable } from '@rxjs';
 import { find, map, take } from '@rxjs/operators';
 
-export const FILE_NAME = 'hive.yml';
+export const ROOT_FILE_NAME = 'hive.yml';
 
 export function findRoot(): Observable<string|null> {
   // Generate the paths to the root.
@@ -27,7 +27,7 @@ export function findRoot(): Observable<string|null> {
 function hasProjectConfig(dir: string): Observable<boolean> {
   return fromEventPattern<{}>(
       handler => fs.access(
-          path.join(dir, FILE_NAME),
+          path.join(dir, ROOT_FILE_NAME),
           fs.constants.R_OK,
           err => handler(err),
       ),

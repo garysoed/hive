@@ -6,10 +6,11 @@
     },
     {
       "command": "test",
-      "actions": [
-        "dev peg",
-        "jasmine out/test.js"
-      ]
+      "actions": ["jasmine out/test.js"]
+    },
+    {
+      "command": "testdbg",
+      "actions": ["node --inspect-brk /usr/local/lib/node_modules/jasmine/bin/jasmine.js out/test.js"]
     }
   ]
 }

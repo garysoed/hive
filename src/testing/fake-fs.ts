@@ -73,7 +73,7 @@ function mockReadFile(
       });
 }
 
-export  function addFile(path: fs.PathLike, file: FakeFile): void {
+export function addFile(path: fs.PathLike, file: FakeFile): void {
   files$.set(path, file);
 }
 

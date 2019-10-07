@@ -5,7 +5,7 @@ import { assert, setup, should, test } from '@gs-testing';
 import { addFile, mockFs } from '../testing/fake-fs';
 import { mockProcess, setCwd } from '../testing/fake-process';
 
-import { FILE_NAME, findRoot } from './find-root';
+import { findRoot, ROOT_FILE_NAME } from './find-root';
 
 test('@hive/project/find-root', () => {
   setup(() => {
@@ -16,7 +16,7 @@ test('@hive/project/find-root', () => {
   should(`return the correct project root`, () => {
     setCwd('/a/cwd');
 
-    addFile(path.join('/a', FILE_NAME), {content: ''});
+    addFile(path.join('/a', ROOT_FILE_NAME), {content: ''});
 
     assert(findRoot()).to.emitSequence(['/a']);
   });
@@ -24,7 +24,7 @@ test('@hive/project/find-root', () => {
   should(`handle current directory`, () => {
     setCwd('/a');
 
-    addFile(path.join('/a', FILE_NAME), {content: ''});
+    addFile(path.join('/a', ROOT_FILE_NAME), {content: ''});
 
     assert(findRoot()).to.emitSequence(['/a']);
   });
@@ -32,8 +32,8 @@ test('@hive/project/find-root', () => {
   should(`return the inner project root if two exists`, () => {
     setCwd('/a/cwd');
 
-    addFile(path.join('/a/cwd', FILE_NAME), {content: ''});
-    addFile(path.join('/a', FILE_NAME), {content: ''});
+    addFile(path.join('/a/cwd', ROOT_FILE_NAME), {content: ''});
+    addFile(path.join('/a', ROOT_FILE_NAME), {content: ''});
 
     assert(findRoot()).to.emitSequence(['/a/cwd']);
   });
