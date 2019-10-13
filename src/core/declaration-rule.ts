@@ -1,6 +1,6 @@
 import { FileRef } from './file-ref';
 import { Rule } from './rule';
-import { Type } from './type';
+import { Type } from './types/type';
 
 export interface DeclarationRule extends Rule {
   inputs: {[key: string]: Type};
