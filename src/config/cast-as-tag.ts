@@ -7,7 +7,7 @@ export interface HiveYamlTag<T> {
 
   resolve(doc: ast.Document, cstNode: cst.Node): T;
 
-  stringify(item: T): string;
+  stringify(item: {value: T}): string;
 }
 
 export function castAsTag<T>(hiveTag: HiveYamlTag<T>): Tag {

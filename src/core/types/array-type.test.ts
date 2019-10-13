@@ -26,4 +26,10 @@ test('@hive/core/types/array-type', () => {
       assert(BOOLEAN_ARRAY_TYPE.accepts(NUMBER_TYPE)).to .equal(AcceptanceLevel.UNACCEPTABLE);
     });
   });
+
+  test('stringify', () => {
+    should(`return the correct string`, () => {
+      assert(BOOLEAN_ARRAY_TYPE.stringify()).to.equal('boolean[]');
+    });
+  });
 });

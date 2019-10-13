@@ -14,6 +14,10 @@ function createArrayType(elementType: Type): Type {
           return AcceptanceLevel.UNACCEPTABLE;
       }
     },
+
+    stringify(): string {
+      return `${elementType.stringify()}[]`;
+    },
   };
   return instance;
 }
