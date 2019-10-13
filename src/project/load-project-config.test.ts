@@ -1,7 +1,6 @@
 import * as path from 'path';
 
 import { assert, match, setup, should, test } from '@gs-testing';
-import { debug } from '@gs-tools/rxjs';
 
 import { addFile, mockFs } from '../testing/fake-fs';
 import { mockProcess, setCwd } from '../testing/fake-process';
