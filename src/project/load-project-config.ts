@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import { Observable, throwError } from '@rxjs';
-import { map, switchMap } from '@rxjs/operators';
+import { map, share, switchMap } from '@rxjs/operators';
 
 import { readFile } from '../util/read-file';
 
@@ -21,5 +21,6 @@ export function loadProjectConfig(): Observable<ProjectConfig> {
       map(configStr => {
         return parseProject(configStr);
       }),
+      share(),
   );
 }
