@@ -14,7 +14,12 @@ export const TYPE_TAG: Tag = castAsTag({
   },
 
   resolve: (_doc: ast.Document, cstNode: cst.Node): Type => {
-    switch (cstNode.rawValue) {
+    if (cstNode.type !== 'PLAIN') {
+      throw new Error(`Invalid type: ${cstNode.rawValue}`);
+    }
+
+    const plainNode = cstNode as cst.PlainValue;
+    switch (plainNode.strValue) {
       case 'boolean':
         return BOOLEAN_TYPE;
       case 'number':
@@ -32,7 +37,8 @@ export const TYPE_TAG: Tag = castAsTag({
       case 'object[]':
         return OBJECT_ARRAY_TYPE;
       default:
-        throw new Error(`Invalid type: ${cstNode.rawValue}`);
+        debugger;
+        throw new Error(`Invalid type: ${plainNode.strValue}`);
     }
   },
 

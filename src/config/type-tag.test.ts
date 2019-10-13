@@ -3,7 +3,7 @@ import * as yaml from 'yaml';
 import { assert, should, test } from '@gs-testing';
 
 import { BOOLEAN_ARRAY_TYPE } from '../core/type/array-type';
-import { BOOLEAN_TYPE } from '../core/type/const-type';
+import { BOOLEAN_TYPE, OBJECT_TYPE } from '../core/type/const-type';
 
 import { TYPE_TAG } from './type-tag';
 
@@ -15,6 +15,10 @@ test('@hive/config/type-tag', () => {
 
     should(`parse array type correctly`, () => {
       assert(yaml.parse('!!hive/type boolean[]', {tags: [TYPE_TAG]})).to.equal(BOOLEAN_ARRAY_TYPE);
+    });
+
+    should(`handle white spaces`, () => {
+      assert(yaml.parse('!!hive/type object\n  ', {tags: [TYPE_TAG]})).to.equal(OBJECT_TYPE);
     });
 
     should(`throw error if an invalid type`, () => {

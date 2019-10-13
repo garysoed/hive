@@ -1,0 +1,55 @@
+import { DeclareRule } from '../core/declare-rule';
+import { isFileRef } from '../core/file-ref';
+import { isType, Type } from '../core/type/type';
+
+interface Inputs {
+  [key: string]: Type;
+}
+
+export interface DeclareRaw {
+  declare?: unknown;
+  inputs?: unknown;
+  output?: unknown;
+}
+
+export function parseDeclare(ruleName: string, obj: DeclareRaw): DeclareRule|null {
+  const {declare, inputs, output} = obj;
+  if (!isFileRef(declare)) {
+    return null;
+  }
+
+  if (!isType(output)) {
+    return null;
+  }
+
+  if (typeof inputs !== 'object' || !inputs) {
+    return null;
+  }
+
+  if (!isInputObject(inputs)) {
+    return null;
+  }
+
+  return {
+    name: ruleName,
+    processor: declare,
+    inputs,
+    output,
+  };
+}
+
+function isInputObject(inputs: object): inputs is Inputs {
+  const inputsObj = inputs as {[key: string]: unknown};
+
+  for (const key in inputs) {
+    if (!inputs.hasOwnProperty(key)) {
+      continue;
+    }
+
+    if (!isType(inputsObj[key])) {
+      return false;
+    }
+  }
+
+  return true;
+}
