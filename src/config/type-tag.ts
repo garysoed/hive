@@ -1,15 +1,13 @@
 import { ast, cst, Tag } from 'yaml';
 
-import { BOOLEAN_ARRAY_TYPE, NUMBER_ARRAY_TYPE, OBJECT_ARRAY_TYPE, STRING_ARRAY_TYPE } from '../core/types/array-type';
-import { BOOLEAN_TYPE, NUMBER_TYPE, OBJECT_TYPE, STRING_TYPE } from '../core/types/const-type';
-import { isType, Type } from '../core/types/type';
+import { BOOLEAN_ARRAY_TYPE, NUMBER_ARRAY_TYPE, OBJECT_ARRAY_TYPE, STRING_ARRAY_TYPE } from '../core/type/array-type';
+import { BOOLEAN_TYPE, NUMBER_TYPE, OBJECT_TYPE, STRING_TYPE } from '../core/type/const-type';
+import { isType, Type } from '../core/type/type';
 
 import { castAsTag } from './cast-as-tag';
 
-const TAG_NAME = 'tag:yaml.org,2002:hive/type';
-
 export const TYPE_TAG: Tag = castAsTag({
-  tag: TAG_NAME,
+  tag: 'tag:yaml.org,2002:hive/type',
 
   identify: (obj: unknown): boolean => {
     return isType(obj);

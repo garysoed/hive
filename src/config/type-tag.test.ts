@@ -2,8 +2,8 @@ import * as yaml from 'yaml';
 
 import { assert, should, test } from '@gs-testing';
 
-import { BOOLEAN_ARRAY_TYPE } from '../core/types/array-type';
-import { BOOLEAN_TYPE } from '../core/types/const-type';
+import { BOOLEAN_ARRAY_TYPE } from '../core/type/array-type';
+import { BOOLEAN_TYPE } from '../core/type/const-type';
 
 import { TYPE_TAG } from './type-tag';
 
