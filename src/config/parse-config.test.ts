@@ -2,11 +2,11 @@ import { assert, match, MatcherType, should, test } from '@gs-testing';
 
 import { DeclareRule } from '../core/declare-rule';
 import { FileRef } from '../core/file-ref';
+import { RootType } from '../core/root-type';
+import { BOOLEAN_TYPE, NUMBER_TYPE, OBJECT_TYPE, STRING_TYPE } from '../core/type/const-type';
 import { Type } from '../core/type/type';
 
 import { parseConfig } from './parse-config';
-import { RootType } from '../core/root-type';
-import { NUMBER_TYPE, BOOLEAN_TYPE, STRING_TYPE, OBJECT_TYPE } from '../core/type/const-type';
 
 function matchInputs(expected: {[key: string]: Type}): MatcherType<{[key: string]: Type}> {
   const matcherSpec: {[key: string]: Type} = {};

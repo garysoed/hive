@@ -37,7 +37,6 @@ export const TYPE_TAG: Tag = castAsTag({
       case 'object[]':
         return OBJECT_ARRAY_TYPE;
       default:
-        debugger;
         throw new Error(`Invalid type: ${plainNode.strValue}`);
     }
   },
