@@ -13,7 +13,12 @@ export const FILE_REF_TAG: Tag = castAsTag({
   },
 
   resolve(_doc: ast.Document, cstNode: cst.Node): FileRef {
-    const str = cstNode.rawValue;
+    if (cstNode.type !== 'PLAIN') {
+      throw new Error(`Invalid type: ${cstNode.rawValue}`);
+    }
+
+    const plainNode = cstNode as cst.PlainValue;
+    const str = plainNode.strValue;
     if (!str) {
       throw new Error(`Invalid file ref: ${str}`);
     }

@@ -51,6 +51,14 @@ test('@hive/config/file-ref-tag', () => {
       assert(() => yaml.parse('!!hive/file', {tags: [FILE_REF_TAG]})).to
           .throwErrorWithMessage(/Invalid file ref/);
     });
+
+    should(`handle white spaces`, () => {
+      assert(yaml.parse('!!hive/file root:path/to/file.txt\n    ', {tags: [FILE_REF_TAG]})).to
+          .equal(match.anyObjectThat().haveProperties({
+            rootType: RootType.PROJECT_ROOT,
+            path: 'path/to/file.txt',
+          }));
+    });
   });
 
   test('stringify', () => {
