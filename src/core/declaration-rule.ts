@@ -1,4 +1,4 @@
-import { FileRef } from './file-ref';
+import { FileRef } from './file-ref.backup';
 import { Rule } from './rule';
 import { Type } from './type/type';
 

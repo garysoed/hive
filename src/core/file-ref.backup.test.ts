@@ -6,7 +6,7 @@ import { ROOT_FILE_NAME } from '../project/find-root';
 import { addFile, mockFs } from '../testing/fake-fs';
 import { mockProcess, setCwd } from '../testing/fake-process';
 
-import { FileRef } from './file-ref';
+import { FileRef } from './file-ref.backup';
 
 test('@hive/core/file-ref', () => {
   setup(() => {
