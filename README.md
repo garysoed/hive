@@ -108,10 +108,11 @@ with type `string`. However, a render rule `R` gives input `A` an array of `stri
 
 Valid types are:
 
--   `number`
 -   `boolean`
+-   `number`
 -   `string`
 -   `object`
+-   `function`
 -   MIME types
 -   Array types of the above types, which are just the type suffixed with `[]`.
 
@@ -125,5 +126,16 @@ Valid types are:
 
 ---
 
-`INPUT` can be any `number`, `boolean`, `string`, `object`, the array types, any `FILE`, or any
-`RULE`.
+`INPUT` can be an object of any of the following types:
+
+-   `boolean`
+-   `number`
+-   `string`
+-   `object`
+-   `function`
+-   Array of the above types. The array elements cannot be mixed.
+-   `RULE`: The type used depends on which type of rule this refers to:
+
+    -   `load`: the rule's `output`
+    -   `declare`: `function`
+    -   `render`: the rule's `output`
