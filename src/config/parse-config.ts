@@ -6,10 +6,20 @@ import { RenderRule } from '../core/render-rule';
 
 import { FILE_REF_TAG } from './file-ref-tag';
 import { parseDeclare } from './parse-declare';
+import { parseRender } from './parse-render';
 import { TYPE_TAG } from './type-tag';
+import { FILE_PATTERN_TAG } from './file-pattern-tag';
+import { RULE_REF_TAG } from './rule-ref-tag';
+
+const CUSTOM_TAGS = [
+  FILE_PATTERN_TAG,
+  FILE_REF_TAG,
+  RULE_REF_TAG,
+  TYPE_TAG,
+];
 
 export function parseConfig(content: string): ConfigFile {
-  const yamlRaw = yaml.parse(content, {tags: [FILE_REF_TAG, TYPE_TAG]});
+  const yamlRaw = yaml.parse(content, {tags: CUSTOM_TAGS});
 
   if (!(yaml instanceof Object)) {
     throw new Error('Not an object');
@@ -28,7 +38,7 @@ export function parseConfig(content: string): ConfigFile {
     }
 
     const declaration = parseDeclare(key, entry);
-    const render = parseRender(entry);
+    const render = parseRender(key, entry);
     if (declaration) {
       declarations.add(declaration);
     } else if (render) {
@@ -39,8 +49,4 @@ export function parseConfig(content: string): ConfigFile {
   }
 
   return {declarations, renders};
-}
-
-function parseRender(obj: {}): RenderRule|null {
-  return null;
 }

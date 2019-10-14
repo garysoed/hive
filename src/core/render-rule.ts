@@ -1,10 +1,10 @@
 import { FilePattern } from './file-pattern';
+import { RenderInput } from './render-input';
 import { Rule } from './rule';
 import { RuleRef } from './rule-ref';
-import { Type } from './type/type';
 
 export interface RenderRule extends Rule {
-  inputs: {[key: string]: Type};
-  output: FilePattern;
-  processor: RuleRef;
+  readonly inputs: {readonly [key: string]: RenderInput};
+  readonly output: FilePattern;
+  readonly processor: RuleRef;
 }
