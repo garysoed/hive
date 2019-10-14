@@ -1,7 +1,13 @@
-import { Observable } from 'rxjs';
+import { FileRef, isFileRef } from './file-ref';
 
-import { Rule } from './rule';
+export interface RuleRef extends FileRef {
+  readonly ruleName: string;
+}
 
-export interface RuleRef<R extends Rule> {
-  readonly rule$: Observable<R>;
+export function isRuleRef(target: unknown): target is RuleRef {
+  if (!isFileRef(target)) {
+    return false;
+  }
+
+  return target.hasOwnProperty('ruleName');
 }

@@ -1,9 +1,9 @@
 import { RootType } from './root-type';
 
 export interface FilePattern {
-  pattern: string;
-  rootType: RootType;
-  substitutionKeys: Set<string>;
+  readonly pattern: string;
+  readonly rootType: RootType;
+  readonly substitutionKeys: ReadonlySet<string>;
 }
 
 export function isFilePattern(target: unknown): target is FilePattern {
