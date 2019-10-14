@@ -1,13 +1,19 @@
-import { FileRef, isFileRef } from './file-ref';
+import { HasPropertiesType, StringType, UnionType } from '@gs-types';
+
+import { FILE_REF_TYPE, FileRef, isFileRef } from './file-ref';
+
 
 export interface RuleRef extends FileRef {
   readonly ruleName: string;
 }
 
-export function isRuleRef(target: unknown): target is RuleRef {
-  if (!isFileRef(target)) {
-    return false;
-  }
+const RULE_TYPE = UnionType<RuleRef>([
+  HasPropertiesType<{ruleName: string}>({
+    ruleName: StringType,
+  }),
+  FILE_REF_TYPE,
+]);
 
-  return target.hasOwnProperty('ruleName');
+export function isRuleRef(target: unknown): target is RuleRef {
+  return RULE_TYPE.check(target);
 }

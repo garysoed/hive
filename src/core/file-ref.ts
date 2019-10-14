@@ -1,3 +1,5 @@
+import { EnumType, HasPropertiesType, StringType } from '@gs-types';
+
 import { RootType } from './root-type';
 
 export interface FileRef {
@@ -5,14 +7,11 @@ export interface FileRef {
   readonly rootType: RootType;
 }
 
+export const FILE_REF_TYPE = HasPropertiesType<FileRef>({
+  path: StringType,
+  rootType: EnumType(RootType),
+});
+
 export function isFileRef(target: unknown): target is FileRef {
-  if (typeof target !== 'object') {
-    return false;
-  }
-
-  if (!target) {
-    return false;
-  }
-
-  return target.hasOwnProperty('path') && target.hasOwnProperty('rootType');
+  return FILE_REF_TYPE.check(target);
 }

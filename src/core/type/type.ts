@@ -1,3 +1,5 @@
+import { HasPropertiesType, InstanceofType } from '@gs-types';
+
 import { AcceptanceLevel } from './acceptance-level';
 
 export interface Type {
@@ -6,14 +8,11 @@ export interface Type {
   stringify(): string;
 }
 
+const TYPE_TYPE = HasPropertiesType<Type>({
+  accepts: InstanceofType<(other: Type) => AcceptanceLevel>(Function),
+  stringify: InstanceofType<() => string>(Function),
+});
+
 export function isType(obj: unknown): obj is Type {
-  if (typeof obj !== 'object') {
-    return false;
-  }
-
-  if (!obj) {
-    return false;
-  }
-
-  return obj.hasOwnProperty('accepts') && obj.hasOwnProperty('stringify');
+  return TYPE_TYPE.check(obj);
 }
