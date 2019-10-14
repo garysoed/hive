@@ -1,16 +1,17 @@
-import { FilePattern } from 'src/core/file-pattern';
-import { RenderRule } from 'src/core/render-rule';
+import { StringType } from 'gs-types/export';
 
 import { assert, match, MatcherType, should, test } from '@gs-testing';
 
 import { DeclareRule } from '../core/declare-rule';
+import { FilePattern } from '../core/file-pattern';
 import { FileRef } from '../core/file-ref';
 import { RenderInput } from '../core/render-input';
+import { RenderRule } from '../core/render-rule';
 import { RootType } from '../core/root-type';
 import { RuleRef } from '../core/rule-ref';
-import { OBJECT_TYPE, STRING_TYPE } from '../core/type/const-type';
 import { InputType } from '../core/type/input-type';
 
+import { OBJECT_TYPE } from './output-type-tag';
 import { parseConfig } from './parse-config';
 
 
@@ -75,7 +76,7 @@ function matchDeclareRule(expected: DeclareRule): MatcherType<DeclareRule> {
     name: expected.name,
     processor: matchFileRef(expected.processor),
     inputs: matchInputs(expected.inputs),
-    output: expected.output,
+    output: match.anyObjectThat().haveProperties(expected.output),
   });
 }
 
@@ -96,13 +97,13 @@ test('@hive/config/parse-config', () => {
           inputs:
               paramA: !!hive/i_type number
               paramB: !!hive/i_type boolean
-          output: !!hive/type string
+          output: !!hive/o_type string
 
       ruleB:
           declare: !!hive/file out:path/to/scriptB
           inputs:
               param: !!hive/i_type boolean
-          output: !!hive/type object
+          output: !!hive/o_type object[]
     `;
 
     assert([...parseConfig(CONTENT).declarations]).to.haveExactElements([
@@ -113,7 +114,7 @@ test('@hive/config/parse-config', () => {
           paramA: {matcher: /number/},
           paramB: {matcher: /boolean/},
         },
-        output: STRING_TYPE,
+        output: {baseType: StringType, isArray: false},
       }),
       matchDeclareRule({
         name: 'ruleB',
@@ -121,7 +122,7 @@ test('@hive/config/parse-config', () => {
         inputs: {
           param: {matcher: /boolean/},
         },
-        output: OBJECT_TYPE,
+        output: {baseType: OBJECT_TYPE, isArray: true},
       }),
     ]);
   });

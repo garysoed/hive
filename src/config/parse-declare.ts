@@ -1,7 +1,7 @@
 import { DeclareRule } from '../core/declare-rule';
 import { isFileRef } from '../core/file-ref';
 import { InputType, isInputType } from '../core/type/input-type';
-import { isType } from '../core/type/type';
+import { isOutputType } from '../core/type/output-type';
 
 interface Inputs {
   [key: string]: InputType;
@@ -19,7 +19,7 @@ export function parseDeclare(ruleName: string, obj: DeclareRaw): DeclareRule|nul
     return null;
   }
 
-  if (!isType(output)) {
+  if (!isOutputType(output)) {
     return null;
   }
 
