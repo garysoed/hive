@@ -121,8 +121,10 @@ Valid types are:
 `I_TYPE` specifies the type of input. This takes in a regex string:
 
 ```yaml
-!!i_type number|boolean|string
+!!i_type number|boolean|string:flags
 ```
+
+`flags` contains regex flags.
 
 ---
 

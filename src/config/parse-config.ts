@@ -4,16 +4,18 @@ import { ConfigFile } from '../core/config-file';
 import { DeclareRule } from '../core/declare-rule';
 import { RenderRule } from '../core/render-rule';
 
+import { FILE_PATTERN_TAG } from './file-pattern-tag';
 import { FILE_REF_TAG } from './file-ref-tag';
+import { INPUT_TYPE_TAG } from './input-type-tag';
 import { parseDeclare } from './parse-declare';
 import { parseRender } from './parse-render';
-import { TYPE_TAG } from './type-tag';
-import { FILE_PATTERN_TAG } from './file-pattern-tag';
 import { RULE_REF_TAG } from './rule-ref-tag';
+import { TYPE_TAG } from './type-tag';
 
 const CUSTOM_TAGS = [
   FILE_PATTERN_TAG,
   FILE_REF_TAG,
+  INPUT_TYPE_TAG,
   RULE_REF_TAG,
   TYPE_TAG,
 ];

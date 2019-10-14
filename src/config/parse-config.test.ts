@@ -8,23 +8,34 @@ import { FileRef } from '../core/file-ref';
 import { RenderInput } from '../core/render-input';
 import { RootType } from '../core/root-type';
 import { RuleRef } from '../core/rule-ref';
-import { BOOLEAN_TYPE, NUMBER_TYPE, OBJECT_TYPE, STRING_TYPE } from '../core/type/const-type';
-import { Type } from '../core/type/type';
+import { OBJECT_TYPE, STRING_TYPE } from '../core/type/const-type';
+import { InputType } from '../core/type/input-type';
 
 import { parseConfig } from './parse-config';
 
-function matchInputs(expected: {[key: string]: Type}): MatcherType<{[key: string]: Type}> {
-  const matcherSpec: {[key: string]: Type} = {};
+
+interface InputTypes {
+  [key: string]: InputType;
+}
+
+function matchInputs(expected: InputTypes): MatcherType<InputTypes> {
+  const matcherSpec: InputTypes = {};
 
   for (const key in expected) {
     if (!expected.hasOwnProperty(key)) {
       continue;
     }
 
-    matcherSpec[key] = expected[key];
+    const expectedType = expected[key];
+    matcherSpec[key] = match.anyObjectThat<InputType>().haveProperties({
+      matcher: match.anyObjectThat<RegExp>().haveProperties({
+        source: expectedType.matcher.source,
+        flags: expectedType.matcher.flags,
+      }),
+    });
   }
 
-  return match.anyObjectThat<{[key: string]: Type}>().haveProperties(matcherSpec);
+  return match.anyObjectThat<InputTypes>().haveProperties(matcherSpec);
 }
 
 function matchRenderInputs(
@@ -83,14 +94,14 @@ test('@hive/config/parse-config', () => {
       ruleA:
           declare: !!hive/file /:path/to/scriptA
           inputs:
-              paramA: !!hive/type number
-              paramB: !!hive/type boolean
+              paramA: !!hive/i_type number
+              paramB: !!hive/i_type boolean
           output: !!hive/type string
 
       ruleB:
           declare: !!hive/file out:path/to/scriptB
           inputs:
-              param: !!hive/type boolean
+              param: !!hive/i_type boolean
           output: !!hive/type object
     `;
 
@@ -99,8 +110,8 @@ test('@hive/config/parse-config', () => {
         name: 'ruleA',
         processor: {rootType: RootType.SYSTEM_ROOT, path: 'path/to/scriptA'},
         inputs: {
-          paramA: NUMBER_TYPE,
-          paramB: BOOLEAN_TYPE,
+          paramA: {matcher: /number/},
+          paramB: {matcher: /boolean/},
         },
         output: STRING_TYPE,
       }),
@@ -108,7 +119,7 @@ test('@hive/config/parse-config', () => {
         name: 'ruleB',
         processor: {rootType: RootType.OUT_DIR, path: 'path/to/scriptB'},
         inputs: {
-          param: BOOLEAN_TYPE,
+          param: {matcher: /boolean/},
         },
         output: OBJECT_TYPE,
       }),

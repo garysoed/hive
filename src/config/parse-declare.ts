@@ -1,9 +1,10 @@
 import { DeclareRule } from '../core/declare-rule';
 import { isFileRef } from '../core/file-ref';
-import { isType, Type } from '../core/type/type';
+import { InputType, isInputType } from '../core/type/input-type';
+import { isType } from '../core/type/type';
 
 interface Inputs {
-  [key: string]: Type;
+  [key: string]: InputType;
 }
 
 export interface DeclareRaw {
@@ -46,7 +47,7 @@ function isInputObject(inputs: object): inputs is Inputs {
       continue;
     }
 
-    if (!isType(inputsObj[key])) {
+    if (!isInputType(inputsObj[key])) {
       return false;
     }
   }
