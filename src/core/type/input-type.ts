@@ -1,7 +1,7 @@
 import { HasPropertiesType, InstanceofType } from '@gs-types';
 
 export interface InputType {
-  matcher: RegExp;
+  readonly matcher: RegExp;
 }
 
 const INPUT_TYPE_TYPE = HasPropertiesType<InputType>({
