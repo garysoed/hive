@@ -1,5 +1,3 @@
-import { isFileRef } from 'src/core/file-ref';
-
 import { isFilePattern } from '../core/file-pattern';
 import { RenderInput } from '../core/render-input';
 import { RenderRule } from '../core/render-rule';
@@ -11,6 +9,7 @@ const RENDER_INPUT_TYPES = new Set([
   'number',
   'string',
   'object',
+  'function',
 ]);
 
 interface Inputs {
@@ -66,10 +65,6 @@ function isInputObject(inputs: object): inputs is Inputs {
 }
 
 function isRenderInput(input: unknown): input is RenderInput {
-  if (isFileRef(input)) {
-    return true;
-  }
-
   if (isRuleRef(input)) {
     return true;
   }

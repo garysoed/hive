@@ -1,5 +1,4 @@
-import { FileRef } from './file-ref';
 import { RuleRef } from './rule-ref';
 
-export type RenderInput = boolean|number|string|object|boolean[]|number[]|string[]|object[]|
-    FileRef|RuleRef;
+export type RenderInput = boolean|number|string|Function|object|
+    boolean[]|number[]|string[]|Function[]|object[]|RuleRef;
