@@ -1,10 +1,11 @@
-import { StringType } from 'gs-types/export';
+import { NumberType, StringType } from 'gs-types/export';
 
 import { assert, match, MatcherType, should, test } from '@gs-testing';
 
 import { DeclareRule } from '../core/declare-rule';
 import { FilePattern } from '../core/file-pattern';
 import { FileRef } from '../core/file-ref';
+import { LoadRule } from '../core/load-rule';
 import { RenderInput } from '../core/render-input';
 import { RenderRule } from '../core/render-rule';
 import { RootType } from '../core/root-type';
@@ -55,10 +56,6 @@ function matchRenderInputs(
   return match.anyObjectThat<{[key: string]: RenderInput}>().haveProperties(matcherSpec);
 }
 
-function matchFileRef(expected: FileRef): MatcherType<FileRef> {
-  return match.anyObjectThat<FileRef>().haveProperties(expected);
-}
-
 function matchRuleRef(expected: RuleRef): MatcherType<RuleRef> {
   return match.anyObjectThat<RuleRef>().haveProperties(expected);
 }
@@ -74,9 +71,17 @@ function matchFilePattern(expected: FilePattern): MatcherType<FilePattern> {
 function matchDeclareRule(expected: DeclareRule): MatcherType<DeclareRule> {
   return match.anyObjectThat<DeclareRule>().haveProperties({
     name: expected.name,
-    processor: matchFileRef(expected.processor),
+    processor: match.anyObjectThat<FileRef>().haveProperties(expected.processor),
     inputs: matchInputs(expected.inputs),
     output: match.anyObjectThat().haveProperties(expected.output),
+  });
+}
+
+function matchLoadRule(expected: LoadRule): MatcherType<LoadRule> {
+  return match.anyObjectThat<LoadRule>().haveProperties({
+    name: expected.name,
+    srcs: match.anyObjectThat().haveProperties(expected.srcs),
+    type: match.anyObjectThat().haveProperties(expected.type),
   });
 }
 
@@ -123,6 +128,31 @@ test('@hive/config/parse-config', () => {
           param: {matcher: /boolean/},
         },
         output: {baseType: OBJECT_TYPE, isArray: true},
+      }),
+    ]);
+  });
+
+  should(`parse load rules correctly`, () => {
+    const CONTENT = `
+      ruleA:
+          load: !!hive/glob out:glob/path/*.txt
+          as: !!hive/o_type number
+
+      ruleB:
+          load: !!hive/file out:path/out.txt
+          as: !!hive/o_type string[]
+    `;
+
+    assert([...parseConfig(CONTENT).loads]).to.haveExactElements([
+      matchLoadRule({
+        name: 'ruleA',
+        srcs: {rootType: RootType.OUT_DIR, globPattern: 'glob/path/*.txt'},
+        type: {baseType: NumberType, isArray: false},
+      }),
+      matchLoadRule({
+        name: 'ruleB',
+        srcs: {rootType: RootType.OUT_DIR, path: 'path/out.txt'},
+        type: {baseType: StringType, isArray: true},
       }),
     ]);
   });
