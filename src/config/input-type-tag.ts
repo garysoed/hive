@@ -24,12 +24,18 @@ export const INPUT_TYPE_TAG: Tag = castAsTag({
     }
 
     const [pattern, flags] = str.split(':');
+    if ((flags || '').endsWith('[]')) {
+      return {isArray: true, matcher: new RegExp(pattern, flags.substr(0, flags.length - 2))};
+    }
 
-    return {matcher: new RegExp(pattern, flags)};
+    return {isArray: false, matcher: new RegExp(pattern, flags)};
   },
 
-  stringify: (item: {value: InputType}): string => {
-    const matcher = item.value.matcher;
+  stringify: ({value}: {value: InputType}): string => {
+    const matcher = value.matcher;
+    if (value.isArray) {
+      return `${matcher.source}:${matcher.flags}[]`;
+    }
     return `${matcher.source}:${matcher.flags}`;
   },
 });

@@ -9,6 +9,7 @@ test('@hive/config/input-type-tag', () => {
     should(`parse valid regex correctly`, () => {
       assert(yaml.parse('!!hive/i_type abc:gi', {tags: [INPUT_TYPE_TAG]})).to
           .equal(match.anyObjectThat().haveProperties({
+            isArray: false,
             matcher: match.anyObjectThat().haveProperties({
               source: 'abc',
               flags: 'gi',
@@ -19,6 +20,29 @@ test('@hive/config/input-type-tag', () => {
     should(`parse valid regex without flags correctly`, () => {
       assert(yaml.parse('!!hive/i_type abc', {tags: [INPUT_TYPE_TAG]})).to
           .equal(match.anyObjectThat().haveProperties({
+            isArray: false,
+            matcher: match.anyObjectThat().haveProperties({
+              source: 'abc',
+              flags: '',
+            }),
+          }));
+    });
+
+    should(`parse valid regex array correctly`, () => {
+      assert(yaml.parse('!!hive/i_type abc:gi[]', {tags: [INPUT_TYPE_TAG]})).to
+          .equal(match.anyObjectThat().haveProperties({
+            isArray: true,
+            matcher: match.anyObjectThat().haveProperties({
+              source: 'abc',
+              flags: 'gi',
+            }),
+          }));
+    });
+
+    should(`parse valid regex array without flags correctly`, () => {
+      assert(yaml.parse('!!hive/i_type abc:[]', {tags: [INPUT_TYPE_TAG]})).to
+          .equal(match.anyObjectThat().haveProperties({
+            isArray: true,
             matcher: match.anyObjectThat().haveProperties({
               source: 'abc',
               flags: '',
@@ -44,8 +68,13 @@ test('@hive/config/input-type-tag', () => {
 
   test('stringify', () => {
     should(`stringify correctly`, () => {
-      assert(yaml.stringify({matcher: /abc/gi}, {tags: [INPUT_TYPE_TAG]})).to
+      assert(yaml.stringify({isArray: false, matcher: /abc/gi}, {tags: [INPUT_TYPE_TAG]})).to
           .match(/^!!hive\/i_type abc:gi/);
+    });
+
+    should(`stringify arrays correctly`, () => {
+      assert(yaml.stringify({isArray: true, matcher: /abc/gi}, {tags: [INPUT_TYPE_TAG]})).to
+          .match(/^!!hive\/i_type abc:gi\[\]/);
     });
   });
 });

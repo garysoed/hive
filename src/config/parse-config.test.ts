@@ -116,8 +116,8 @@ test('@hive/config/parse-config', () => {
         name: 'ruleA',
         processor: {rootType: RootType.SYSTEM_ROOT, path: 'path/to/scriptA'},
         inputs: {
-          paramA: {matcher: /number/},
-          paramB: {matcher: /boolean/},
+          paramA: {isArray: false, matcher: /number/},
+          paramB: {isArray: false, matcher: /boolean/},
         },
         output: {baseType: StringType, isArray: false},
       }),
@@ -125,7 +125,7 @@ test('@hive/config/parse-config', () => {
         name: 'ruleB',
         processor: {rootType: RootType.OUT_DIR, path: 'path/to/scriptB'},
         inputs: {
-          param: {matcher: /boolean/},
+          param: {isArray: false, matcher: /boolean/},
         },
         output: {baseType: OBJECT_TYPE, isArray: true},
       }),

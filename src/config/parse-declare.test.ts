@@ -11,7 +11,10 @@ test('@hive/config/parse-declare', () => {
     should(`return the correct declare object`, () => {
       const ruleName = 'ruleName';
       const processor = {rootType: RootType.SYSTEM_ROOT, path: 'path'};
-      const inputs = {a: {matcher: /boolean/}, b: {matcher: /number/}};
+      const inputs = {
+        a: {isArray: false, matcher: /boolean/},
+        b: {isArray: true, matcher: /number/},
+      };
       const output = {baseType: StringType, isArray: false};
       const declareRule = parseDeclare(ruleName, {
         declare: processor,
@@ -60,7 +63,10 @@ test('@hive/config/parse-declare', () => {
     should(`return null if output is not a Type`, () => {
       const declareRule = parseDeclare('ruleName', {
         declare: {rootType: RootType.SYSTEM_ROOT, path: 'path'},
-        inputs: {a: {matcher: /boolean/}, b: {matcher: /number/}},
+        inputs: {
+          a: {isArray: false, matcher: /boolean/},
+          b: {isArray: true, matcher: /number/},
+        },
         output: 123,
       });
 
@@ -70,7 +76,10 @@ test('@hive/config/parse-declare', () => {
     should(`return null if declare is not a FileRef`, () => {
       const declareRule = parseDeclare('ruleName', {
         declare: {},
-        inputs: {a: {matcher: /boolean/}, b: {matcher: /number/}},
+        inputs: {
+          a: {isArray: false, matcher: /boolean/},
+          b: {isArray: true, matcher: /number/},
+        },
         output: {baseType: StringType, isArray: false},
       });
 
@@ -80,7 +89,10 @@ test('@hive/config/parse-declare', () => {
 
   test('isInputObject', () => {
     should(`detect valid input objects`, () => {
-      const inputs = {a: {matcher: /boolean/}, b: {matcher: /number/}};
+      const inputs = {
+        a: {isArray: false, matcher: /boolean/},
+        b: {isArray: true, matcher: /number/},
+      };
       const declareRule = parseDeclare('ruleName', {
         declare: {rootType: RootType.SYSTEM_ROOT, path: 'path'},
         inputs,
@@ -92,7 +104,7 @@ test('@hive/config/parse-declare', () => {
   });
 
   should(`detect input object with a non Type entry`, () => {
-    const inputs = {a: 123, b: {matcher: /number/}};
+    const inputs = {a: 123, b: {isArray: false, matcher: /number/}};
     const declareRule = parseDeclare('ruleName', {
       declare: {rootType: RootType.SYSTEM_ROOT, path: 'path'},
       inputs,
