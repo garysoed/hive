@@ -1,6 +1,5 @@
-import { RuleType } from './rule-type';
+import { DeclareRule } from './declare-rule';
+import { LoadRule } from './load-rule';
+import { RenderRule } from './render-rule';
 
-export interface Rule {
-  readonly name: string;
-  readonly type: RuleType;
-}
+export type Rule = DeclareRule|LoadRule|RenderRule;

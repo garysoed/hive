@@ -1,8 +1,7 @@
-import { NumberType, StringType } from 'gs-types/export';
-import { RuleType } from 'src/core/rule-type';
-
 import { assert, match, MatcherType, should, test } from '@gs-testing';
+import { NumberType, StringType } from '@gs-types';
 
+import { BaseRule } from '../core/base-rule';
 import { DeclareRule } from '../core/declare-rule';
 import { FilePattern } from '../core/file-pattern';
 import { FileRef } from '../core/file-ref';
@@ -12,10 +11,12 @@ import { RenderRule } from '../core/render-rule';
 import { RootType } from '../core/root-type';
 import { Rule } from '../core/rule';
 import { RuleRef } from '../core/rule-ref';
+import { RuleType } from '../core/rule-type';
 import { InputType } from '../core/type/input-type';
 
 import { OBJECT_TYPE } from './output-type-tag';
 import { parseConfig } from './parse-config';
+
 
 type RuleWithoutType<R extends Rule> = {[K in Exclude<keyof R, 'type'>]: R[K]};
 
