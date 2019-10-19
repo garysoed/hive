@@ -43,14 +43,22 @@ test('@hive/config/parse-declare', () => {
       assert(declareRule).to.beNull();
     });
 
-    should(`return null if input object is null`, () => {
-      const declareRule = parseDeclare('ruleName', {
-        declare: {rootType: RootType.SYSTEM_ROOT, path: 'path'},
+    should(`handle empty objects`, () => {
+      const ruleName = 'ruleName';
+      const processor = {rootType: RootType.SYSTEM_ROOT, path: 'path'};
+      const output = {baseType: ConstType.STRING, isArray: false};
+      const declareRule = parseDeclare(ruleName, {
+        declare: processor,
         inputs: null,
-        output: {baseType: ConstType.STRING, isArray: false},
+        output,
       });
 
-      assert(declareRule).to.beNull();
+      assert(declareRule).to.equal(match.anyObjectThat().haveProperties({
+        name: ruleName,
+        processor,
+        inputs: match.anyMapThat().beEmpty(),
+        output: match.anyObjectThat().haveProperties(output),
+      }));
     });
 
     should(`return null if input object is not an object`, () => {

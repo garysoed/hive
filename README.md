@@ -140,4 +140,4 @@ Valid types are:
 
     -   `load`: the rule's `output`
     -   `declare`: `function`
-    -   `render`: the rule's `output`
+    -   `render`: the rule's processor's `output`

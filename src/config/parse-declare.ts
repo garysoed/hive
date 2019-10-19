@@ -14,7 +14,7 @@ export interface DeclareRaw {
 }
 
 export function parseDeclare(ruleName: string, obj: DeclareRaw): DeclareRule|null {
-  const {declare, inputs, output} = obj;
+  const {declare, output} = obj;
   if (!isFileRef(declare)) {
     return null;
   }
@@ -23,6 +23,7 @@ export function parseDeclare(ruleName: string, obj: DeclareRaw): DeclareRule|nul
     return null;
   }
 
+  const inputs = obj.inputs || {};
   if (typeof inputs !== 'object' || !inputs) {
     return null;
   }

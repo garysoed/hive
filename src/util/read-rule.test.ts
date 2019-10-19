@@ -1,3 +1,5 @@
+import * as path from 'path';
+
 import { assert, match, setup, should, test } from '@gs-testing';
 
 import { LoadRule } from '../core/load-rule';
@@ -6,7 +8,7 @@ import { ConstType } from '../core/type/const-type';
 import { addFile, mockFs } from '../testing/fake-fs';
 import { mockProcess, setCwd } from '../testing/fake-process';
 
-import { readRule } from './read-rule';
+import { readRule, RULE_FILE_NAME } from './read-rule';
 
 
 test('@hive/util/read-rule', () => {
@@ -23,7 +25,7 @@ test('@hive/util/read-rule', () => {
     `;
 
     setCwd('cwd');
-    addFile('cwd/a/b', {content});
+    addFile(path.join('cwd/a/b', RULE_FILE_NAME), {content});
 
     assert(readRule({path: 'a/b', rootType: RootType.CURRENT_DIR, ruleName: 'rule'})).to
         .emitSequence([
@@ -49,7 +51,7 @@ test('@hive/util/read-rule', () => {
     `;
 
     setCwd('cwd');
-    addFile('cwd/a/b', {content});
+    addFile(path.join('cwd/a/b', RULE_FILE_NAME), {content});
 
     assert(readRule({path: 'a/b', rootType: RootType.CURRENT_DIR, ruleName: 'otherRule'})).to
         .emitErrorWithMessage(/Cannot find rule/);

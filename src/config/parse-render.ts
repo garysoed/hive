@@ -22,7 +22,7 @@ export interface RenderRaw {
 }
 
 export function parseRender(ruleName: string, obj: RenderRaw): RenderRule|null {
-  const {render, inputs, processor} = obj;
+  const {render, processor} = obj;
   if (!isFilePattern(render)) {
     return null;
   }
@@ -31,6 +31,7 @@ export function parseRender(ruleName: string, obj: RenderRaw): RenderRule|null {
     return null;
   }
 
+  const inputs = obj.inputs || {};
   if (typeof inputs !== 'object' || !inputs) {
     return null;
   }

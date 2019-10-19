@@ -46,19 +46,23 @@ test('@hive/config/parse-render', () => {
       assert(renderRule).to.beNull();
     });
 
-    should(`return null if the inputs is null`, () => {
+    should(`handle empty inputs`, () => {
       const ruleName = 'ruleName';
       const processor = {rootType: RootType.OUT_DIR, path: 'path/to/rule', ruleName: 'rule'};
-      const inputs = null;
       const render = {
         rootType: RootType.SYSTEM_ROOT,
         pattern: 'path/to/{out}',
         substitutionKeys: new Set(['out']),
       };
 
-      const renderRule = parseRender(ruleName, {inputs, processor, render});
+      const renderRule = parseRender(ruleName, {inputs: null, processor, render});
 
-      assert(renderRule).to.beNull();
+      assert(renderRule).to.equal(match.anyObjectThat().haveProperties({
+        name: ruleName,
+        processor,
+        inputs: match.anyMapThat().beEmpty(),
+        output: render,
+      }));
     });
 
     should(`return null if the inputs is not an object`, () => {
