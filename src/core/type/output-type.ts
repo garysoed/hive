@@ -1,10 +1,10 @@
-import { BooleanType, HasPropertiesType, InstanceofType, Type } from '@gs-types';
+import { BooleanType, EnumType, HasPropertiesType, InstanceofType, UnionType } from '@gs-types';
 
+import { ConstType } from './const-type';
 import { MediaTypeType } from './media-type-type';
 
 
-export type BaseType =
-    Type<boolean>|Type<number>|Type<string>|Type<Object>|Type<Function>|MediaTypeType;
+export type BaseType = ConstType|MediaTypeType;
 
 export interface OutputType {
   readonly baseType: BaseType;
@@ -12,10 +12,10 @@ export interface OutputType {
 }
 
 const OUTPUT_TYPE_TYPE = HasPropertiesType<OutputType>({
-  baseType: HasPropertiesType<Type<any>>({
-    check: InstanceofType<(target: any) => target is any>(Function),
-    toString: InstanceofType<() => string>(Function),
-  }),
+  baseType: UnionType<BaseType>([
+    EnumType(ConstType),
+    InstanceofType(MediaTypeType),
+  ]),
   isArray: BooleanType,
 });
 

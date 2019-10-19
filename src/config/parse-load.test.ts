@@ -1,7 +1,7 @@
 import { assert, match, should, test } from '@gs-testing';
-import { NumberType } from '@gs-types';
 
 import { RootType } from '../core/root-type';
+import { ConstType } from '../core/type/const-type';
 
 import { parseLoad } from './parse-load';
 
@@ -10,7 +10,7 @@ test('@hive/config/parse-load', () => {
   test('parseLoad', () => {
     should(`parse load rule with glob ref correctly`, () => {
       const ruleName = 'ruleName';
-      const as = {baseType: NumberType, isArray: true};
+      const as = {baseType: ConstType.NUMBER, isArray: true};
       const load = {rootType: RootType.SYSTEM_ROOT, globPattern: 'glob/pattern'};
 
       assert(parseLoad(ruleName, {as, load})).to.equal(match.anyObjectThat().haveProperties({
@@ -22,7 +22,7 @@ test('@hive/config/parse-load', () => {
 
     should(`parse load rule with file ref correctly`, () => {
       const ruleName = 'ruleName';
-      const as = {baseType: NumberType, isArray: true};
+      const as = {baseType: ConstType.NUMBER, isArray: true};
       const load = {rootType: RootType.SYSTEM_ROOT, path: 'file/pattern'};
 
       assert(parseLoad(ruleName, {as, load})).to.equal(match.anyObjectThat().haveProperties({
@@ -34,7 +34,7 @@ test('@hive/config/parse-load', () => {
 
     should(`return null if load is missing`, () => {
       const ruleName = 'ruleName';
-      const as = {baseType: NumberType, isArray: true};
+      const as = {baseType: ConstType.NUMBER, isArray: true};
 
       assert(parseLoad(ruleName, {as})).to.beNull();
     });

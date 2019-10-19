@@ -1,12 +1,13 @@
 import { assert, match, setup, should, test } from '@gs-testing';
-import { NumberType } from '@gs-types';
 
 import { LoadRule } from '../core/load-rule';
 import { RootType } from '../core/root-type';
+import { ConstType } from '../core/type/const-type';
 import { addFile, mockFs } from '../testing/fake-fs';
 import { mockProcess, setCwd } from '../testing/fake-process';
 
 import { readRule } from './read-rule';
+
 
 test('@hive/util/read-rule', () => {
   setup(() => {
@@ -33,7 +34,7 @@ test('@hive/util/read-rule', () => {
               rootType: RootType.OUT_DIR,
             }),
             outputType: match.anyObjectThat().haveProperties({
-              baseType: NumberType,
+              baseType: ConstType.NUMBER,
               isArray: false,
             }),
           }),

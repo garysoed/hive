@@ -1,7 +1,6 @@
-import { assert, match, MatcherType, should, test } from '@gs-testing';
-import { NumberType, StringType } from '@gs-types';
 
-import { BaseRule } from '../core/base-rule';
+import { assert, match, MatcherType, should, test } from '@gs-testing';
+
 import { DeclareRule } from '../core/declare-rule';
 import { FilePattern } from '../core/file-pattern';
 import { FileRef } from '../core/file-ref';
@@ -12,9 +11,9 @@ import { RootType } from '../core/root-type';
 import { Rule } from '../core/rule';
 import { RuleRef } from '../core/rule-ref';
 import { RuleType } from '../core/rule-type';
+import { ConstType } from '../core/type/const-type';
 import { InputType } from '../core/type/input-type';
 
-import { OBJECT_TYPE } from './output-type-tag';
 import { parseConfig } from './parse-config';
 
 
@@ -111,7 +110,7 @@ test('@hive/config/parse-config', () => {
             ['paramA', {isArray: false, matcher: /number/}],
             ['paramB', {isArray: false, matcher: /boolean/}],
           ]),
-          output: {baseType: StringType, isArray: false},
+          output: {baseType: ConstType.STRING, isArray: false},
         }),
       ],
       [
@@ -122,7 +121,7 @@ test('@hive/config/parse-config', () => {
           inputs: new Map([
             ['param', {isArray: false, matcher: /boolean/}],
           ]),
-          output: {baseType: OBJECT_TYPE, isArray: true},
+          output: {baseType: ConstType.OBJECT, isArray: true},
         }),
       ],
     ]);
@@ -145,7 +144,7 @@ test('@hive/config/parse-config', () => {
         matchLoadRule({
           name: 'ruleA',
           srcs: {rootType: RootType.OUT_DIR, globPattern: 'glob/path/*.txt'},
-          outputType: {baseType: NumberType, isArray: false},
+          outputType: {baseType: ConstType.NUMBER, isArray: false},
         }),
       ],
       [
@@ -153,7 +152,7 @@ test('@hive/config/parse-config', () => {
         matchLoadRule({
           name: 'ruleB',
           srcs: {rootType: RootType.OUT_DIR, path: 'path/out.txt'},
-          outputType: {baseType: StringType, isArray: true},
+          outputType: {baseType: ConstType.STRING, isArray: true},
         }),
       ],
     ]);

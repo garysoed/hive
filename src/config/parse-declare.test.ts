@@ -1,7 +1,7 @@
 import { assert, match, should, test } from '@gs-testing';
-import { StringType } from '@gs-types';
 
 import { RootType } from '../core/root-type';
+import { ConstType } from '../core/type/const-type';
 
 import { parseDeclare } from './parse-declare';
 
@@ -15,7 +15,7 @@ test('@hive/config/parse-declare', () => {
         a: {isArray: false, matcher: /boolean/},
         b: {isArray: true, matcher: /number/},
       };
-      const output = {baseType: StringType, isArray: false};
+      const output = {baseType: ConstType.STRING, isArray: false};
       const declareRule = parseDeclare(ruleName, {
         declare: processor,
         inputs,
@@ -37,7 +37,7 @@ test('@hive/config/parse-declare', () => {
       const declareRule = parseDeclare('ruleName', {
         declare: {rootType: RootType.SYSTEM_ROOT, path: 'path'},
         inputs: {a: 1},
-        output: {baseType: StringType, isArray: false},
+        output: {baseType: ConstType.STRING, isArray: false},
       });
 
       assert(declareRule).to.beNull();
@@ -47,7 +47,7 @@ test('@hive/config/parse-declare', () => {
       const declareRule = parseDeclare('ruleName', {
         declare: {rootType: RootType.SYSTEM_ROOT, path: 'path'},
         inputs: null,
-        output: {baseType: StringType, isArray: false},
+        output: {baseType: ConstType.STRING, isArray: false},
       });
 
       assert(declareRule).to.beNull();
@@ -57,7 +57,7 @@ test('@hive/config/parse-declare', () => {
       const declareRule = parseDeclare('ruleName', {
         declare: {rootType: RootType.SYSTEM_ROOT, path: 'path'},
         inputs: 123,
-        output: {baseType: StringType, isArray: false},
+        output: {baseType: ConstType.STRING, isArray: false},
       });
 
       assert(declareRule).to.beNull();
@@ -83,7 +83,7 @@ test('@hive/config/parse-declare', () => {
           a: {isArray: false, matcher: /boolean/},
           b: {isArray: true, matcher: /number/},
         },
-        output: {baseType: StringType, isArray: false},
+        output: {baseType: ConstType.STRING, isArray: false},
       });
 
       assert(declareRule).to.beNull();
@@ -99,7 +99,7 @@ test('@hive/config/parse-declare', () => {
       const declareRule = parseDeclare('ruleName', {
         declare: {rootType: RootType.SYSTEM_ROOT, path: 'path'},
         inputs,
-        output: {baseType: StringType, isArray: false},
+        output: {baseType: ConstType.STRING, isArray: false},
       });
 
       assert(declareRule).to.equal(match.anyObjectThat().haveProperties({
@@ -116,7 +116,7 @@ test('@hive/config/parse-declare', () => {
     const declareRule = parseDeclare('ruleName', {
       declare: {rootType: RootType.SYSTEM_ROOT, path: 'path'},
       inputs,
-      output: {baseType: StringType, isArray: false},
+      output: {baseType: ConstType.STRING, isArray: false},
     });
 
     assert(declareRule).to.beNull();
@@ -127,7 +127,7 @@ test('@hive/config/parse-declare', () => {
     const declareRule = parseDeclare('ruleName', {
       declare: {rootType: RootType.SYSTEM_ROOT, path: 'path'},
       inputs,
-      output: {baseType: StringType, isArray: false},
+      output: {baseType: ConstType.STRING, isArray: false},
     });
 
     assert(declareRule).to.beNull();

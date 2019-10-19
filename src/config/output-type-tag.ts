@@ -1,7 +1,6 @@
 import { ast, cst, Tag } from 'yaml';
 
-import { BooleanType, InstanceofType, NumberType, StringType } from '@gs-types';
-
+import { ConstType } from '../core/type/const-type';
 import { MediaTypeType } from '../core/type/media-type-type';
 import { BaseType, isOutputType, OutputType } from '../core/type/output-type';
 
@@ -54,21 +53,18 @@ export const OUTPUT_TYPE_TAG: Tag = castAsTag({
   },
 });
 
-export const FUNCTION_TYPE = InstanceofType(Function);
-export const OBJECT_TYPE = InstanceofType(Object);
-
 function getBaseType(typeStr: string): BaseType|null {
   switch (typeStr) {
     case 'boolean':
-      return BooleanType;
+      return ConstType.BOOLEAN;
     case 'number':
-      return NumberType;
+      return ConstType.NUMBER;
     case 'string':
-      return StringType;
+      return ConstType.STRING;
     case 'function':
-      return FUNCTION_TYPE;
+      return ConstType.FUNCTION;
     case 'object':
-      return OBJECT_TYPE;
+      return ConstType.OBJECT;
     default:
       // Check for MediaType.
       const [type, subtype] = typeStr.split('/');
@@ -85,19 +81,5 @@ function stringifyBaseType(baseType: BaseType): string {
     return baseType.stringify();
   }
 
-  switch (baseType) {
-    case BooleanType:
-      return 'boolean';
-    case NumberType:
-      return 'number';
-    case StringType:
-      return 'string';
-    case FUNCTION_TYPE:
-      return 'function';
-    case OBJECT_TYPE:
-      return 'object';
-    default:
-      throw new Error(`Unrecognized type: ${baseType}. If using 'function' or 'object', make` +
-          ` sure to use the available global type`);
-  }
+  return baseType;
 }
