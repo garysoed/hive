@@ -94,24 +94,30 @@ test('@hive/config/parse-config', () => {
           output: !!hive/o_type object[]
     `;
 
-    assert([...parseConfig(CONTENT).declarations]).to.haveExactElements([
-      matchDeclareRule({
-        name: 'ruleA',
-        processor: {rootType: RootType.SYSTEM_ROOT, path: 'path/to/scriptA'},
-        inputs: new Map([
-          ['paramA', {isArray: false, matcher: /number/}],
-          ['paramB', {isArray: false, matcher: /boolean/}],
-        ]),
-        output: {baseType: StringType, isArray: false},
-      }),
-      matchDeclareRule({
-        name: 'ruleB',
-        processor: {rootType: RootType.OUT_DIR, path: 'path/to/scriptB'},
-        inputs: new Map([
-          ['param', {isArray: false, matcher: /boolean/}],
-        ]),
-        output: {baseType: OBJECT_TYPE, isArray: true},
-      }),
+    assert(parseConfig(CONTENT)).to.haveElements([
+      [
+        'ruleA',
+        matchDeclareRule({
+          name: 'ruleA',
+          processor: {rootType: RootType.SYSTEM_ROOT, path: 'path/to/scriptA'},
+          inputs: new Map([
+            ['paramA', {isArray: false, matcher: /number/}],
+            ['paramB', {isArray: false, matcher: /boolean/}],
+          ]),
+          output: {baseType: StringType, isArray: false},
+        }),
+      ],
+      [
+        'ruleB',
+        matchDeclareRule({
+          name: 'ruleB',
+          processor: {rootType: RootType.OUT_DIR, path: 'path/to/scriptB'},
+          inputs: new Map([
+            ['param', {isArray: false, matcher: /boolean/}],
+          ]),
+          output: {baseType: OBJECT_TYPE, isArray: true},
+        }),
+      ],
     ]);
   });
 
@@ -126,17 +132,23 @@ test('@hive/config/parse-config', () => {
           as: !!hive/o_type string[]
     `;
 
-    assert([...parseConfig(CONTENT).loads]).to.haveExactElements([
-      matchLoadRule({
-        name: 'ruleA',
-        srcs: {rootType: RootType.OUT_DIR, globPattern: 'glob/path/*.txt'},
-        type: {baseType: NumberType, isArray: false},
-      }),
-      matchLoadRule({
-        name: 'ruleB',
-        srcs: {rootType: RootType.OUT_DIR, path: 'path/out.txt'},
-        type: {baseType: StringType, isArray: true},
-      }),
+    assert(parseConfig(CONTENT)).to.haveElements([
+      [
+        'ruleA',
+        matchLoadRule({
+          name: 'ruleA',
+          srcs: {rootType: RootType.OUT_DIR, globPattern: 'glob/path/*.txt'},
+          type: {baseType: NumberType, isArray: false},
+        }),
+      ],
+      [
+        'ruleB',
+        matchLoadRule({
+          name: 'ruleB',
+          srcs: {rootType: RootType.OUT_DIR, path: 'path/out.txt'},
+          type: {baseType: StringType, isArray: true},
+        }),
+      ],
     ]);
   });
 
@@ -156,32 +168,38 @@ test('@hive/config/parse-config', () => {
           processor: !!hive/rule root:path:processor2
     `;
 
-    assert([...parseConfig(CONTENT).renders]).to.haveExactElements([
-      matchRenderRule({
-        name: 'ruleA',
-        output: {
-          rootType: RootType.OUT_DIR,
-          pattern: 'path/{paramA}_{paramB}.txt',
-          substitutionKeys: new Set(['paramA', 'paramB']),
-        },
-        inputs: new Map<string, RenderInput>([
-          ['paramA', match.anyArrayThat().haveExactElements([1, 2, 3])],
-          ['paramB', 'stringValue'],
-        ]),
-        processor: {rootType: RootType.PROJECT_ROOT, path: 'path', ruleName: 'processor'},
-      }),
-      matchRenderRule({
-        name: 'ruleB',
-        output: {
-          rootType: RootType.OUT_DIR,
-          pattern: 'path/out.txt',
-          substitutionKeys: new Set(),
-        },
-        inputs: new Map([
-          ['param', false],
-        ]),
-        processor: {rootType: RootType.PROJECT_ROOT, path: 'path', ruleName: 'processor2'},
-      }),
+    assert(parseConfig(CONTENT)).to.haveElements([
+      [
+        'ruleA',
+        matchRenderRule({
+          name: 'ruleA',
+          output: {
+            rootType: RootType.OUT_DIR,
+            pattern: 'path/{paramA}_{paramB}.txt',
+            substitutionKeys: new Set(['paramA', 'paramB']),
+          },
+          inputs: new Map<string, RenderInput>([
+            ['paramA', match.anyArrayThat().haveExactElements([1, 2, 3])],
+            ['paramB', 'stringValue'],
+          ]),
+          processor: {rootType: RootType.PROJECT_ROOT, path: 'path', ruleName: 'processor'},
+        }),
+      ],
+      [
+        'ruleB',
+        matchRenderRule({
+          name: 'ruleB',
+          output: {
+            rootType: RootType.OUT_DIR,
+            pattern: 'path/out.txt',
+            substitutionKeys: new Set(),
+          },
+          inputs: new Map([
+            ['param', false],
+          ]),
+          processor: {rootType: RootType.PROJECT_ROOT, path: 'path', ruleName: 'processor2'},
+        }),
+      ],
     ]);
   });
 
