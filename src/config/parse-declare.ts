@@ -3,9 +3,8 @@ import { isFileRef } from '../core/file-ref';
 import { InputType, isInputType } from '../core/type/input-type';
 import { isOutputType } from '../core/type/output-type';
 
-interface Inputs {
-  [key: string]: InputType;
-}
+import { objectToMap } from './object-to-map';
+
 
 export interface DeclareRaw {
   declare?: unknown;
@@ -34,12 +33,12 @@ export function parseDeclare(ruleName: string, obj: DeclareRaw): DeclareRule|nul
   return {
     name: ruleName,
     processor: declare,
-    inputs,
+    inputs: objectToMap(inputs),
     output,
   };
 }
 
-function isInputObject(inputs: object): inputs is Inputs {
+function isInputObject(inputs: object): inputs is {[key: string]: InputType} {
   const inputsObj = inputs as {[key: string]: unknown};
 
   for (const key in inputs) {

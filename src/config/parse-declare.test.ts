@@ -25,7 +25,10 @@ test('@hive/config/parse-declare', () => {
       assert(declareRule).to.equal(match.anyObjectThat().haveProperties({
         name: ruleName,
         processor,
-        inputs,
+        inputs: match.anyMapThat().haveExactElements(new Map([
+          ['a', match.anyObjectThat().haveProperties(inputs.a)],
+          ['b', match.anyObjectThat().haveProperties(inputs.b)],
+        ])),
         output: match.anyObjectThat().haveProperties(output),
       }));
     });
@@ -99,7 +102,12 @@ test('@hive/config/parse-declare', () => {
         output: {baseType: StringType, isArray: false},
       });
 
-      assert(declareRule).to.equal(match.anyObjectThat().haveProperties({inputs}));
+      assert(declareRule).to.equal(match.anyObjectThat().haveProperties({
+        inputs: match.anyMapThat().haveExactElements(new Map([
+          ['a', match.anyObjectThat().haveProperties(inputs.a)],
+          ['b', match.anyObjectThat().haveProperties(inputs.b)],
+        ])),
+      }));
     });
   });
 

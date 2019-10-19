@@ -4,7 +4,7 @@ import { InputType } from './type/input-type';
 import { OutputType } from './type/output-type';
 
 export interface DeclareRule extends Rule {
-  readonly inputs: {readonly [key: string]: InputType};
+  readonly inputs: ReadonlyMap<string, InputType>;
   readonly output: OutputType;
   readonly processor: FileRef;
 }

@@ -4,7 +4,7 @@ import { Rule } from './rule';
 import { RuleRef } from './rule-ref';
 
 export interface RenderRule extends Rule {
-  readonly inputs: {readonly [key: string]: RenderInput};
+  readonly inputs: ReadonlyMap<string, RenderInput>;
   readonly output: FilePattern;
   readonly processor: RuleRef;
 }

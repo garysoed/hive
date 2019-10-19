@@ -1,8 +1,10 @@
 import { assert, match, should, test } from '@gs-testing';
 
+import { RenderInput } from '../core/render-input';
 import { RootType } from '../core/root-type';
 
 import { parseRender } from './parse-render';
+
 
 test('@hive/config/parse-render', () => {
   test('parseRender', () => {
@@ -21,7 +23,10 @@ test('@hive/config/parse-render', () => {
       assert(renderRule).to.equal(match.anyObjectThat().haveProperties({
         name: ruleName,
         processor,
-        inputs,
+        inputs: match.anyMapThat().haveExactElements(new Map<string, RenderInput>([
+          ['inputA', 1],
+          ['inputB', 'two'],
+        ])),
         output: render,
       }));
     });
@@ -110,7 +115,15 @@ test('@hive/config/parse-render', () => {
             render: {rootType: RootType.SYSTEM_ROOT, pattern: 'path', substitutionKeys: new Set()},
           });
 
-      assert(renderRule).to.equal(match.anyObjectThat().haveProperties({inputs}));
+
+      assert(renderRule).to.equal(
+          match.anyObjectThat().haveProperties({
+            inputs: match.anyMapThat().haveExactElements(new Map<string, RenderInput>([
+              ['inputA', 1],
+              ['inputB', 'two'],
+            ])),
+          }),
+      );
     });
 
     should(`handle invalid input objects`, () => {
@@ -140,7 +153,19 @@ test('@hive/config/parse-render', () => {
             render: {rootType: RootType.SYSTEM_ROOT, pattern: 'path', substitutionKeys: new Set()},
           });
 
-      assert(renderRule).to.equal(match.anyObjectThat().haveProperties({inputs}));
+      assert(renderRule).to.equal(
+          match.anyObjectThat().haveProperties({
+            inputs: match.anyMapThat().haveExactElements(new Map([
+              [
+                'input',
+                match.anyObjectThat().haveProperties({
+                  rootType: RootType.OUT_DIR,
+                  path: 'path',
+                }),
+              ],
+            ])),
+          }),
+      );
     });
 
     should(`handle rule ref`, () => {
@@ -154,7 +179,20 @@ test('@hive/config/parse-render', () => {
             render: {rootType: RootType.SYSTEM_ROOT, pattern: 'path', substitutionKeys: new Set()},
           });
 
-      assert(renderRule).to.equal(match.anyObjectThat().haveProperties({inputs}));
+      assert(renderRule).to.equal(
+          match.anyObjectThat().haveProperties({
+            inputs: match.anyMapThat().haveExactElements(new Map([
+              [
+                'input',
+                match.anyObjectThat().haveProperties({
+                  rootType: RootType.OUT_DIR,
+                  path: 'path',
+                  ruleName: 'rule',
+                }),
+              ],
+            ])),
+          }),
+      );
     });
 
     should(`handle array with correct element type`, () => {
@@ -168,7 +206,13 @@ test('@hive/config/parse-render', () => {
             render: {rootType: RootType.SYSTEM_ROOT, pattern: 'path', substitutionKeys: new Set()},
           });
 
-      assert(renderRule).to.equal(match.anyObjectThat().haveProperties({inputs}));
+      assert(renderRule).to.equal(
+          match.anyObjectThat().haveProperties({
+            inputs: match.anyMapThat().haveExactElements(new Map([
+              ['input', match.anyArrayThat().haveExactElements([1])],
+            ])),
+          }),
+      );
     });
 
     should(`handle empty arrays`, () => {
@@ -182,7 +226,13 @@ test('@hive/config/parse-render', () => {
             render: {rootType: RootType.SYSTEM_ROOT, pattern: 'path', substitutionKeys: new Set()},
           });
 
-      assert(renderRule).to.equal(match.anyObjectThat().haveProperties({inputs}));
+      assert(renderRule).to.equal(
+          match.anyObjectThat().haveProperties({
+            inputs: match.anyMapThat().haveExactElements(new Map([
+              ['input', match.anyArrayThat().beEmpty()],
+            ])),
+          }),
+      );
     });
 
     should(`reject array with incorrect element type`, () => {
@@ -210,7 +260,13 @@ test('@hive/config/parse-render', () => {
             render: {rootType: RootType.SYSTEM_ROOT, pattern: 'path', substitutionKeys: new Set()},
           });
 
-      assert(renderRule).to.equal(match.anyObjectThat().haveProperties({inputs}));
+      assert(renderRule).to.equal(
+          match.anyObjectThat().haveProperties({
+            inputs: match.anyMapThat().haveExactElements(new Map([
+              ['input', 'abc'],
+            ])),
+          }),
+      );
     });
 
     should(`handle unsupported simple types`, () => {

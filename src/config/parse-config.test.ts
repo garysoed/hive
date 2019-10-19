@@ -16,44 +16,27 @@ import { OBJECT_TYPE } from './output-type-tag';
 import { parseConfig } from './parse-config';
 
 
-interface InputTypes {
-  [key: string]: InputType;
-}
+type InputTypes = ReadonlyMap<string, InputType>;
+function matchInputs(expected: InputTypes): MatcherType<Map<string, InputType>> {
+  const matcherSpec = new Map<string, InputType>();
 
-function matchInputs(expected: InputTypes): MatcherType<InputTypes> {
-  const matcherSpec: InputTypes = {};
-
-  for (const key in expected) {
-    if (!expected.hasOwnProperty(key)) {
-      continue;
-    }
-
-    const expectedType = expected[key];
-    matcherSpec[key] = match.anyObjectThat<InputType>().haveProperties({
+  for (const [key, value] of expected) {
+    const matcherValue = match.anyObjectThat<InputType>().haveProperties({
       matcher: match.anyObjectThat<RegExp>().haveProperties({
-        source: expectedType.matcher.source,
-        flags: expectedType.matcher.flags,
+        source: value.matcher.source,
+        flags: value.matcher.flags,
       }),
     });
+    matcherSpec.set(key, matcherValue);
   }
 
-  return match.anyObjectThat<InputTypes>().haveProperties(matcherSpec);
+  return match.anyMapThat<string, InputType>().haveExactElements(matcherSpec);
 }
 
 function matchRenderInputs(
-    expected: {[key: string]: RenderInput},
-): MatcherType<{[key: string]: RenderInput}> {
-  const matcherSpec: {[key: string]: RenderInput} = {};
-
-  for (const key in expected) {
-    if (!expected.hasOwnProperty(key)) {
-      continue;
-    }
-
-    matcherSpec[key] = expected[key];
-  }
-
-  return match.anyObjectThat<{[key: string]: RenderInput}>().haveProperties(matcherSpec);
+    expected: ReadonlyMap<string, RenderInput>,
+): MatcherType<Map<string, RenderInput>> {
+  return match.anyMapThat<string, RenderInput>().haveExactElements(expected);
 }
 
 function matchRuleRef(expected: RuleRef): MatcherType<RuleRef> {
@@ -115,18 +98,18 @@ test('@hive/config/parse-config', () => {
       matchDeclareRule({
         name: 'ruleA',
         processor: {rootType: RootType.SYSTEM_ROOT, path: 'path/to/scriptA'},
-        inputs: {
-          paramA: {isArray: false, matcher: /number/},
-          paramB: {isArray: false, matcher: /boolean/},
-        },
+        inputs: new Map([
+          ['paramA', {isArray: false, matcher: /number/}],
+          ['paramB', {isArray: false, matcher: /boolean/}],
+        ]),
         output: {baseType: StringType, isArray: false},
       }),
       matchDeclareRule({
         name: 'ruleB',
         processor: {rootType: RootType.OUT_DIR, path: 'path/to/scriptB'},
-        inputs: {
-          param: {isArray: false, matcher: /boolean/},
-        },
+        inputs: new Map([
+          ['param', {isArray: false, matcher: /boolean/}],
+        ]),
         output: {baseType: OBJECT_TYPE, isArray: true},
       }),
     ]);
@@ -181,10 +164,10 @@ test('@hive/config/parse-config', () => {
           pattern: 'path/{paramA}_{paramB}.txt',
           substitutionKeys: new Set(['paramA', 'paramB']),
         },
-        inputs: {
-          paramA: match.anyArrayThat().haveExactElements([1, 2, 3]),
-          paramB: 'stringValue',
-        },
+        inputs: new Map<string, RenderInput>([
+          ['paramA', match.anyArrayThat().haveExactElements([1, 2, 3])],
+          ['paramB', 'stringValue'],
+        ]),
         processor: {rootType: RootType.PROJECT_ROOT, path: 'path', ruleName: 'processor'},
       }),
       matchRenderRule({
@@ -194,9 +177,9 @@ test('@hive/config/parse-config', () => {
           pattern: 'path/out.txt',
           substitutionKeys: new Set(),
         },
-        inputs: {
-          param: false,
-        },
+        inputs: new Map([
+          ['param', false],
+        ]),
         processor: {rootType: RootType.PROJECT_ROOT, path: 'path', ruleName: 'processor2'},
       }),
     ]);

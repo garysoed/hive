@@ -3,6 +3,8 @@ import { RenderInput } from '../core/render-input';
 import { RenderRule } from '../core/render-rule';
 import { isRuleRef } from '../core/rule-ref';
 
+import { objectToMap } from './object-to-map';
+
 
 const RENDER_INPUT_TYPES = new Set([
   'boolean',
@@ -11,10 +13,6 @@ const RENDER_INPUT_TYPES = new Set([
   'object',
   'function',
 ]);
-
-interface Inputs {
-  [key: string]: RenderInput;
-}
 
 export interface RenderRaw {
   inputs?: unknown;
@@ -43,12 +41,12 @@ export function parseRender(ruleName: string, obj: RenderRaw): RenderRule|null {
   return {
     name: ruleName,
     processor,
-    inputs,
+    inputs: objectToMap(inputs),
     output: render,
   };
 }
 
-function isInputObject(inputs: object): inputs is Inputs {
+function isInputObject(inputs: object): inputs is {[key: string]: RenderInput} {
   const inputsObj = inputs as {[key: string]: unknown};
 
   for (const key in inputs) {
