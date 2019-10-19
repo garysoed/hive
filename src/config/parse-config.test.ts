@@ -1,4 +1,5 @@
 import { NumberType, StringType } from 'gs-types/export';
+import { RuleType } from 'src/core/rule-type';
 
 import { assert, match, MatcherType, should, test } from '@gs-testing';
 
@@ -9,12 +10,14 @@ import { LoadRule } from '../core/load-rule';
 import { RenderInput } from '../core/render-input';
 import { RenderRule } from '../core/render-rule';
 import { RootType } from '../core/root-type';
+import { Rule } from '../core/rule';
 import { RuleRef } from '../core/rule-ref';
 import { InputType } from '../core/type/input-type';
 
 import { OBJECT_TYPE } from './output-type-tag';
 import { parseConfig } from './parse-config';
 
+type RuleWithoutType<R extends Rule> = {[K in Exclude<keyof R, 'type'>]: R[K]};
 
 type InputTypes = ReadonlyMap<string, InputType>;
 function matchInputs(expected: InputTypes): MatcherType<Map<string, InputType>> {
@@ -51,29 +54,32 @@ function matchFilePattern(expected: FilePattern): MatcherType<FilePattern> {
   });
 }
 
-function matchDeclareRule(expected: DeclareRule): MatcherType<DeclareRule> {
+function matchDeclareRule(expected: RuleWithoutType<DeclareRule>): MatcherType<DeclareRule> {
   return match.anyObjectThat<DeclareRule>().haveProperties({
     name: expected.name,
     processor: match.anyObjectThat<FileRef>().haveProperties(expected.processor),
     inputs: matchInputs(expected.inputs),
     output: match.anyObjectThat().haveProperties(expected.output),
+    type: RuleType.DECLARE,
   });
 }
 
-function matchLoadRule(expected: LoadRule): MatcherType<LoadRule> {
+function matchLoadRule(expected: RuleWithoutType<LoadRule>): MatcherType<LoadRule> {
   return match.anyObjectThat<LoadRule>().haveProperties({
     name: expected.name,
     srcs: match.anyObjectThat().haveProperties(expected.srcs),
-    type: match.anyObjectThat().haveProperties(expected.type),
+    outputType: match.anyObjectThat().haveProperties(expected.outputType),
+    type: RuleType.LOAD,
   });
 }
 
-function matchRenderRule(expected: RenderRule): MatcherType<RenderRule> {
+function matchRenderRule(expected: RuleWithoutType<RenderRule>): MatcherType<RenderRule> {
   return match.anyObjectThat<RenderRule>().haveProperties({
     name: expected.name,
     processor: matchRuleRef(expected.processor),
     inputs: matchRenderInputs(expected.inputs),
     output: matchFilePattern(expected.output),
+    type: RuleType.RENDER,
   });
 }
 
@@ -138,7 +144,7 @@ test('@hive/config/parse-config', () => {
         matchLoadRule({
           name: 'ruleA',
           srcs: {rootType: RootType.OUT_DIR, globPattern: 'glob/path/*.txt'},
-          type: {baseType: NumberType, isArray: false},
+          outputType: {baseType: NumberType, isArray: false},
         }),
       ],
       [
@@ -146,7 +152,7 @@ test('@hive/config/parse-config', () => {
         matchLoadRule({
           name: 'ruleB',
           srcs: {rootType: RootType.OUT_DIR, path: 'path/out.txt'},
-          type: {baseType: StringType, isArray: true},
+          outputType: {baseType: StringType, isArray: true},
         }),
       ],
     ]);

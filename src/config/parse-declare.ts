@@ -1,5 +1,6 @@
 import { DeclareRule } from '../core/declare-rule';
 import { isFileRef } from '../core/file-ref';
+import { RuleType } from '../core/rule-type';
 import { InputType, isInputType } from '../core/type/input-type';
 import { isOutputType } from '../core/type/output-type';
 
@@ -35,6 +36,7 @@ export function parseDeclare(ruleName: string, obj: DeclareRaw): DeclareRule|nul
     processor: declare,
     inputs: objectToMap(inputs),
     output,
+    type: RuleType.DECLARE,
   };
 }
 

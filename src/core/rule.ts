@@ -1,3 +1,6 @@
+import { RuleType } from './rule-type';
+
 export interface Rule {
-  name: string;
+  readonly name: string;
+  readonly type: RuleType;
 }

@@ -16,7 +16,7 @@ test('@hive/config/parse-load', () => {
       assert(parseLoad(ruleName, {as, load})).to.equal(match.anyObjectThat().haveProperties({
         name: ruleName,
         srcs: load,
-        type: as,
+        outputType: as,
       }));
     });
 
@@ -28,7 +28,7 @@ test('@hive/config/parse-load', () => {
       assert(parseLoad(ruleName, {as, load})).to.equal(match.anyObjectThat().haveProperties({
         name: ruleName,
         srcs: load,
-        type: as,
+        outputType: as,
       }));
     });
 

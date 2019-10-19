@@ -2,6 +2,7 @@ import { isFilePattern } from '../core/file-pattern';
 import { RenderInput } from '../core/render-input';
 import { RenderRule } from '../core/render-rule';
 import { isRuleRef } from '../core/rule-ref';
+import { RuleType } from '../core/rule-type';
 
 import { objectToMap } from './object-to-map';
 
@@ -43,6 +44,7 @@ export function parseRender(ruleName: string, obj: RenderRaw): RenderRule|null {
     processor,
     inputs: objectToMap(inputs),
     output: render,
+    type: RuleType.RENDER,
   };
 }
 

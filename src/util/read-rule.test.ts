@@ -32,7 +32,7 @@ test('@hive/util/read-rule', () => {
               path: 'filename',
               rootType: RootType.OUT_DIR,
             }),
-            type: match.anyObjectThat().haveProperties({
+            outputType: match.anyObjectThat().haveProperties({
               baseType: NumberType,
               isArray: false,
             }),
