@@ -1,6 +1,6 @@
 import { HasPropertiesType, StringType, UnionType } from '@gs-types';
 
-import { FILE_REF_TYPE, FileRef, isFileRef } from './file-ref';
+import { FILE_REF_TYPE, FileRef } from './file-ref';
 
 
 export interface RuleRef extends FileRef {
