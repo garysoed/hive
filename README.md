@@ -31,7 +31,7 @@ There are three kinds of rules.
         output: O_TYPE
     ```
 
-    The JS file will be executed with a global object called `_hive`. This contains the inputs,
+    The JS file will be executed with a global object called `$hive`. This contains the inputs,
     keyed by the input keys. The JS file is expected to return the output with the correct type.
 
 -   `load`: Takes a file, or group of files and declares their type.
