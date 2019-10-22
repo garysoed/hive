@@ -1,6 +1,3 @@
-import { Observable } from '@rxjs';
-
-
 export function runProcessor(
     processorContent: string,
     resolvedInputs: Map<string, unknown>,
