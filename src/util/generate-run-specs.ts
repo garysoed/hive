@@ -5,7 +5,7 @@ export interface RunSpec {
 
 export function generateRunSpecs(
     validatedInputs: ReadonlyMap<string, unknown>,
-    repeatedKeys: Set<string>,
+    repeatedKeys: ReadonlySet<string>,
     outputPattern: string,
 ): RunSpec[] {
   const resultList: RunSpec[] = [

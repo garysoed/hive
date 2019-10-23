@@ -1,6 +1,6 @@
 export function runProcessor(
     processorContent: string,
-    resolvedInputs: Map<string, unknown>,
+    resolvedInputs: ReadonlyMap<string, unknown>,
 ): string {
   const $hive: {[key: string]: unknown} = {};
   for (const [key, value] of resolvedInputs) {
@@ -8,5 +8,5 @@ export function runProcessor(
   }
 
   // tslint:disable-next-line: no-eval
-  return eval(processorContent);
+  return `${eval(processorContent)}`;
 }
