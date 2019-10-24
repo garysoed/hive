@@ -19,7 +19,7 @@ import { validateInputs } from './validate-inputs';
 
 export function runRender(
     rule: RenderRule,
-    resolveRuleFn: (rule: Rule) => Observable<unknown>,
+    runRuleFn: (rule: Rule) => Observable<unknown>,
 ): Observable<ReadonlyMap<string, string>> {
   const outputPattern$ = resolveRoot(rule.output.rootType)
       .pipe(map(root => path.join(root, rule.output.pattern)));
@@ -37,7 +37,7 @@ export function runRender(
 
         return combineLatest([
           validateInputs(rule.inputs, processor.inputs),
-          resolveInputs(rule.inputs, resolveRuleFn),
+          resolveInputs(rule.inputs, runRuleFn),
           processorContent$,
         ])
         .pipe(
