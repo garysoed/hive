@@ -1,9 +1,11 @@
+import * as chalk from 'chalk';
+
 import { CommandType } from './command-type';
 
 export const CLI = {
   title: 'Hive: Help',
   body: () => ({
-    header: 'Commands',
+    header: 'COMMANDS',
     content: [
     ],
   }),

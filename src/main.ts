@@ -1,3 +1,5 @@
+import chalk from 'chalk';
+
 import { formatMessage, MessageType } from '@gs-tools/cli';
 import { Observable, of as observableOf } from '@rxjs';
 
@@ -7,9 +9,8 @@ import { printSummary } from './cli/print-summary';
 
 const CLI = {
   body: HELP_CLI.body,
-  title: 'Hive',
-  summary: 'Manages a chain of rendering processes to render your documents.',
-  synopsis: '$ hive {underline command} [command options]',
+  summary: `{bold hive} - Manages a chain of rendering processes to render your documents.`,
+  synopsis: `$ {bold hive} {underline command} [command options]`,
 };
 
 /**
