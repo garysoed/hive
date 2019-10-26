@@ -11,7 +11,6 @@ import { resolveRoot } from './resolve-root';
 
 
 export function runLoad(rule: LoadRule): Observable<string|string[]> {
-  debugger;
   if (isFileRef(rule.srcs)) {
     return resolveFileRef(rule.srcs).pipe(
         switchMap(path => readFile(path)),

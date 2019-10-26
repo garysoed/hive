@@ -4,7 +4,6 @@ import { combineLatest, Observable } from '@rxjs';
 import { map, switchMap } from '@rxjs/operators';
 
 import { RenderRule } from '../core/render-rule';
-import { Rule } from '../core/rule';
 import { RuleType } from '../core/rule-type';
 
 import { generateRunSpecs } from './generate-run-specs';
@@ -14,12 +13,13 @@ import { resolveFileRef } from './resolve-file-ref';
 import { resolveInputs } from './resolve-inputs';
 import { resolveRoot } from './resolve-root';
 import { runProcessor } from './run-processor';
+import { RunRuleFn } from './run-rule-fn';
 import { validateInputs } from './validate-inputs';
 
 
 export function runRender(
     rule: RenderRule,
-    runRuleFn: (rule: Rule) => Observable<unknown>,
+    runRuleFn: RunRuleFn,
 ): Observable<ReadonlyMap<string, string>> {
   const outputPattern$ = resolveRoot(rule.output.rootType)
       .pipe(map(root => path.join(root, rule.output.pattern)));

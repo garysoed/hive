@@ -3,6 +3,7 @@ import * as path from 'path';
 import { assert, createSpy, match, setup, should, test } from '@gs-testing';
 import { Observable } from '@rxjs';
 
+import { DeclareRule } from '../core/declare-rule';
 import { RenderRule } from '../core/render-rule';
 import { RootType } from '../core/root-type';
 import { Rule } from '../core/rule';
@@ -56,9 +57,9 @@ test('@hive/util/run-render', () => {
       type: RuleType.RENDER,
     };
 
-    const mockResolveRuleFn = createSpy<Observable<unknown>, [Rule]>('ResolveRuleFn');
+    const mockResolveRuleFn = createSpy<Observable<ReadonlyMap<string, string>>, [RenderRule]>('ResolveRuleFn');
 
-    assert(runRender(rule, mockResolveRuleFn)).to.emitSequence([
+    assert(runRender(rule, mockResolveRuleFn as any)).to.emitSequence([
       match.anyMapThat<string, string>().haveExactElements(new Map([
         ['/out/0_0.txt', '0'],
         ['/out/0_3.txt', '3'],
@@ -97,8 +98,8 @@ test('@hive/util/run-render', () => {
       type: RuleType.RENDER,
     };
 
-    const mockResolveRuleFn = createSpy<Observable<unknown>, [Rule]>('ResolveRuleFn');
+    const mockResolveRuleFn = createSpy<Observable<ReadonlyMap<string, string>>, [RenderRule]>('ResolveRuleFn');
 
-    assert(runRender(rule, mockResolveRuleFn)).to.emitErrorWithMessage(/should be a declare rule/);
+    assert(runRender(rule, mockResolveRuleFn as any)).to.emitErrorWithMessage(/should be a declare rule/);
   });
 });

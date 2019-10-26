@@ -9,7 +9,7 @@ import { RuleType } from '../core/rule-type';
 import { DeclareFn, runDeclare } from './run-declare';
 import { runLoad } from './run-load';
 import { runRender } from './run-render';
-
+import { RunRuleFn } from './run-rule-fn';
 
 export function runRule(renderRule: RenderRule): Observable<ReadonlyMap<string, string>>;
 export function runRule(declareRule: DeclareRule): Observable<DeclareFn>;
@@ -21,6 +21,6 @@ export function runRule(rule: Rule): Observable<unknown> {
     case RuleType.LOAD:
       return runLoad(rule);
     case RuleType.RENDER:
-      return runRender(rule, runRule as (rule: Rule) => Observable<unknown>);
+      return runRender(rule, runRule as RunRuleFn);
   }
 }
