@@ -60,13 +60,13 @@ test('@hive/util/run-render', () => {
     const mockResolveRuleFn = createSpy<Observable<ReadonlyMap<string, string>>, [RenderRule]>('ResolveRuleFn');
 
     assert(runRender(rule, mockResolveRuleFn as any)).to.emitSequence([
-      match.anyMapThat<string, string>().haveExactElements(new Map([
-        ['/out/0_0.txt', '0'],
-        ['/out/0_3.txt', '3'],
-        ['/out/1_0.txt', '1'],
-        ['/out/1_3.txt', '4'],
-        ['/out/2_0.txt', '2'],
-        ['/out/2_3.txt', '5'],
+      match.anyMapThat<string, number>().haveExactElements(new Map([
+        ['/out/0_0.txt', 0],
+        ['/out/0_3.txt', 3],
+        ['/out/1_0.txt', 1],
+        ['/out/1_3.txt', 4],
+        ['/out/2_0.txt', 2],
+        ['/out/2_3.txt', 5],
       ])),
     ]);
   });

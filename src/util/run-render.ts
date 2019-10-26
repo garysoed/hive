@@ -20,7 +20,7 @@ import { validateInputs } from './validate-inputs';
 export function runRender(
     rule: RenderRule,
     runRuleFn: RunRuleFn,
-): Observable<ReadonlyMap<string, string>> {
+): Observable<ReadonlyMap<string, unknown>> {
   const outputPattern$ = resolveRoot(rule.output.rootType)
       .pipe(map(root => path.join(root, rule.output.pattern)));
   return combineLatest([
@@ -42,7 +42,7 @@ export function runRender(
         ])
         .pipe(
             map(([repeatedKeys, validatedInputs, processorContent]) => {
-              const results: Array<[string, string]> = generateRunSpecs(
+              const results: Array<[string, unknown]> = generateRunSpecs(
                   validatedInputs,
                   repeatedKeys,
                   outputPattern,

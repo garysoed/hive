@@ -8,7 +8,7 @@ import { resolveFileRef } from './resolve-file-ref';
 import { runProcessor } from './run-processor';
 
 
-export type DeclareFn = (inputs: ReadonlyMap<string, unknown>) => string;
+export type DeclareFn = (inputs: ReadonlyMap<string, unknown>) => unknown;
 
 export function runDeclare(rule: DeclareRule): Observable<DeclareFn> {
   return resolveFileRef(rule.processor).pipe(
