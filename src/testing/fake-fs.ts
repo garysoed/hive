@@ -2,13 +2,14 @@ import * as fs from 'fs';
 
 import { fake, spy } from '@gs-testing';
 import { MapSubject, scanMap } from '@gs-tools/rxjs';
-import { take } from '@rxjs/operators';
+import { Observable } from '@rxjs';
+import { map, take } from '@rxjs/operators';
 
 interface FakeFile {
   content: string;
 }
 
-const files$ = new MapSubject<fs.PathLike, FakeFile>();
+let files$ = new MapSubject<fs.PathLike, FakeFile>();
 
 type AccessHandler = (err: NodeJS.ErrnoException|null) => void;
 function mockAccess(path: fs.PathLike, callback: AccessHandler): void;
@@ -73,6 +74,34 @@ function mockReadFile(
       });
 }
 
+type WriteFileHandler = (err: NodeJS.ErrnoException | null) => void;
+function mockWriteFile(
+    path: fs.PathLike|number,
+    data: any,
+    options: fs.WriteFileOptions,
+    callback: WriteFileHandler,
+): void;
+function mockWriteFile(
+    path: fs.PathLike|number,
+    data: any,
+    callback: WriteFileHandler,
+): void;
+function mockWriteFile(
+    path: fs.PathLike|number,
+    data: any,
+    optionsOrCallback: fs.WriteFileOptions|WriteFileHandler,
+    callback?: WriteFileHandler,
+): void {
+  if (typeof path === 'number') {
+    throw new Error('File descriptor not supported');
+  }
+
+  const normalizedCallback = callback || (optionsOrCallback as WriteFileHandler);
+  files$.set(path, {content: data});
+  normalizedCallback(null);
+}
+
+
 export function addFile(path: fs.PathLike, file: FakeFile): void {
   files$.set(path, file);
 }
@@ -81,8 +110,14 @@ export function deleteFile(path: fs.PathLike): void {
   files$.delete(path);
 }
 
+export function getFile(path: fs.PathLike): Observable<FakeFile|null> {
+  return files$.pipe(scanMap(), map(fileMap => fileMap.get(path) || null));
+}
+
 export function mockFs(): void {
-  files$.next({type: 'init', value: new Map()});
+  files$.complete();
+  files$ = new MapSubject<fs.PathLike, FakeFile>();
   fake(spy(fs, 'access')).always().call(mockAccess);
   fake(spy(fs, 'readFile')).always().call(mockReadFile);
+  fake(spy(fs, 'writeFile')).always().call(mockWriteFile);
 }

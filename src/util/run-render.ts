@@ -1,7 +1,7 @@
 import * as path from 'path';
 
-import { combineLatest, Observable } from '@rxjs';
-import { map, switchMap } from '@rxjs/operators';
+import { combineLatest, Observable, of as observableOf } from '@rxjs';
+import { map, mapTo, switchMap } from '@rxjs/operators';
 
 import { RenderRule } from '../core/render-rule';
 import { RuleType } from '../core/rule-type';
@@ -15,6 +15,7 @@ import { resolveRoot } from './resolve-root';
 import { runProcessor } from './run-processor';
 import { RunRuleFn } from './run-rule-fn';
 import { validateInputs } from './validate-inputs';
+import { writeFile } from './write-file';
 
 
 export function runRender(
@@ -41,20 +42,23 @@ export function runRender(
           processorContent$,
         ])
         .pipe(
-            map(([repeatedKeys, validatedInputs, processorContent]) => {
-              const results: Array<[string, unknown]> = generateRunSpecs(
+            switchMap(([repeatedKeys, validatedInputs, processorContent]) => {
+              const results: Array<Observable<[string, unknown]>> = generateRunSpecs(
                   validatedInputs,
                   repeatedKeys,
                   outputPattern,
               )
               .map(runSpec => {
-                return [
-                  runSpec.outputPath,
-                  runProcessor(processorContent, runSpec.inputs),
-                ];
+                const result = runProcessor(processorContent, runSpec.inputs);
+                return writeFile(runSpec.outputPath, `${result}`)
+                    .pipe(mapTo([runSpec.outputPath, result]));
               });
 
-              return new Map(results);
+              if (results.length === 0) {
+                return observableOf(new Map());
+              }
+
+              return combineLatest(results).pipe(map(results => new Map<string, unknown>(results)));
             }),
         );
       }),

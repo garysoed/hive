@@ -7,4 +7,4 @@ module.exports = (new WebpackBuilder(__dirname))
     .addTypeScript()
     .addHtml()
     .setAsNode()
-    .buildForDevelopment('Thoth');
+    .buildForDevelopment('Hive');

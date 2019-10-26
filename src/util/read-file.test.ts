@@ -18,7 +18,7 @@ test('@hive/util/read-file', () => {
     assert(readFile(path)).to.emitSequence([content]);
   });
 
-  should(`throw on error`, () => {
+  should(`emit error on error`, () => {
     assert(readFile('path')).to.emitErrorWithMessage(/not found/);
   });
 });
