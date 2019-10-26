@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import { combineLatest, Observable, of as observableOf } from '@rxjs';
+import { combineLatest, from as observableFrom, Observable, of as observableOf } from '@rxjs';
 import { map, mapTo, switchMap } from '@rxjs/operators';
 
 import { RenderRule } from '../core/render-rule';
@@ -49,9 +49,16 @@ export function runRender(
                   outputPattern,
               )
               .map(runSpec => {
-                const result = runProcessor(processorContent, runSpec.inputs);
-                return writeFile(runSpec.outputPath, `${result}`)
-                    .pipe(mapTo([runSpec.outputPath, result]));
+                const resultRaw = runProcessor(processorContent, runSpec.inputs);
+                const result$ = resultRaw instanceof Promise ?
+                    observableFrom(resultRaw) : observableOf(resultRaw);
+                return result$.pipe(
+                    switchMap(result => {
+                      return writeFile(runSpec.outputPath, `${result}`).pipe(
+                          mapTo([runSpec.outputPath, result] as [string, unknown]),
+                      );
+                    }),
+                );
               });
 
               if (results.length === 0) {
