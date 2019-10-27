@@ -1,10 +1,9 @@
 import { ast, cst, Tag } from 'yaml';
 
-import { FileRef } from '../core/file-ref';
 import { isRuleRef, RuleRef } from '../core/rule-ref';
 
 import { castAsTag } from './cast-as-tag';
-import { FILE_REF_TAG } from './file-ref-tag';
+import { parseRuleRef } from './parse-rule-ref';
 
 
 export const RULE_REF_TAG: Tag = castAsTag({
@@ -24,14 +23,7 @@ export const RULE_REF_TAG: Tag = castAsTag({
     if (!str) {
       throw new Error(`Invalid rule ref: ${str}`);
     }
-    const [, , ruleName] = str.split(':');
-
-    if (!ruleName) {
-      throw new Error(`Invalid rule ref: ${str}`);
-    }
-
-    const fileRef = FILE_REF_TAG.resolve(_doc, cstNode) as unknown as FileRef;
-    return {...fileRef, ruleName};
+    return parseRuleRef(str);
   },
 
   stringify: ({value}: {value: RuleRef}): string => {
