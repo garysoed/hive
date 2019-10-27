@@ -1,5 +1,7 @@
 import * as commandLineArgs from 'command-line-args';
 
+import { Observable } from '@rxjs';
+
 import { CommandType } from './command-type';
 import { printSummary } from './print-summary';
 
@@ -23,7 +25,7 @@ export const CLI = {
   synopsis: `$ hive ${CommandType.HELP} <command>`,
 };
 
-export function help(argv: string[]): string {
+export function help(argv: string[]): Observable<unknown> {
   const options = commandLineArgs(OPTIONS, {argv, stopAtFirstUnknown: true});
   switch (options[COMMAND_OPTION]) {
     // case CommandType.ANALYZE:

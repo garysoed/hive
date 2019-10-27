@@ -1,0 +1,1 @@
+$hive.a + $hive.b

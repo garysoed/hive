@@ -1,12 +1,24 @@
-import chalk from 'chalk';
 import * as commandLineArgs from 'command-line-args';
 
 import { formatMessage, MessageType } from '@gs-tools/cli';
-import { Observable, of as observableOf } from '@rxjs';
+import { EMPTY, Observable } from '@rxjs';
+import { catchError } from '@rxjs/operators';
+import { Entry, logDestination } from '@santa';
 
 import { CommandType } from './cli/command-type';
 import { CLI as HELP_CLI, help } from './cli/help';
+import { LOGGER } from './cli/logger';
 import { printSummary } from './cli/print-summary';
+import { render } from './cli/render';
+
+
+logDestination.set({
+  log(entry: Entry): void {
+    // tslint:disable-next-line: no-console
+    console.log('log');
+    console.log(entry.value);
+  },
+});
 
 const COMMAND_OPTION = 'command';
 const OPTIONS = [
@@ -23,24 +35,27 @@ const CLI = {
 
 const options = commandLineArgs(OPTIONS, {stopAtFirstUnknown: true});
 
-/**
- * Returns observable that emits messages to print
- */
-function run(): Observable<string> {
+function run(): Observable<unknown> {
   switch (options[COMMAND_OPTION]) {
     // case CommandType.ANALYZE:
     //   return analyze(options._unknown || []);
     case CommandType.HELP:
-      return observableOf(help(options._unknown || []));
+      return help(options._unknown || []);
     // case CommandType.INIT:
     //   return init(options._unknown || []);
+    case CommandType.RENDER:
+      return render(options._unknown || []);
     default:
-      return observableOf(printSummary(CLI));
+      return printSummary(CLI);
   }
 }
 
-// tslint:disable: no-console
-run().subscribe(
-    results => console.log(results),
-    (e: Error) => console.log(formatMessage(MessageType.FAILURE, e.stack || e.message)),
-);
+// tslint:disable:no-console
+run()
+    .pipe(
+        catchError(e => {
+          LOGGER.info('', formatMessage(MessageType.FAILURE, e.stack || e.message));
+          return EMPTY;
+        }),
+    )
+    .subscribe();

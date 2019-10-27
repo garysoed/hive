@@ -24,6 +24,7 @@ export function runRender(
 ): Observable<ReadonlyMap<string, unknown>> {
   const outputPattern$ = resolveRoot(rule.output.rootType)
       .pipe(map(root => path.join(root, rule.output.pattern)));
+
   return combineLatest([
     readRule(rule.processor),
     outputPattern$,

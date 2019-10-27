@@ -15,17 +15,14 @@ test('@hive/config/parse-rule-ref', () => {
   });
 
   should(`throw error if rule name is missing`, () => {
-    assert(() => parseRuleRef('/:path/to/dir:')).to
-        .throwErrorWithMessage(/Invalid rule ref/);
+    assert(() => parseRuleRef('/:path/to/dir:')).to.throwErrorWithMessage(/Invalid rule ref/);
   });
 
   should(`throw error if path is missing`, () => {
-    assert(() => parseRuleRef('/::ruleName')).to
-        .throwErrorWithMessage(/Invalid file ref/);
+    assert(() => parseRuleRef('/::ruleName')).to.throwErrorWithMessage(/Invalid file ref/);
   });
 
   should(`throw error if root type is missing`, () => {
-    assert(() => parseRuleRef(':path:ruleName')).to
-        .throwErrorWithMessage(/Invalid file ref/);
+    assert(() => parseRuleRef(':path:ruleName')).to.throwErrorWithMessage(/Invalid file ref/);
   });
 });

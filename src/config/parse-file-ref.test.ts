@@ -35,12 +35,10 @@ test('@hive/config/parse-file-ref', () => {
   });
 
   should(`throw error if path is missing`, () => {
-    assert(() => parseFileRef('/:')).to
-        .throwErrorWithMessage(/Invalid file ref/);
+    assert(() => parseFileRef('/:')).to.throwErrorWithMessage(/Invalid file ref/);
   });
 
   should(`throw error if root type is missing`, () => {
-    assert(() => parseFileRef(':path/to/file.txt')).to
-        .throwErrorWithMessage(/Invalid file ref/);
+    assert(() => parseFileRef(':path/to/file.txt')).to.throwErrorWithMessage(/Invalid file ref/);
   });
 });

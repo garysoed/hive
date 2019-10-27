@@ -1,0 +1,21 @@
+a:
+    load: !!hive/file .:a.txt
+    as: !!hive/o_type number
+
+b:
+    load: !!hive/file .:b.txt
+    as: !!hive/o_type number
+
+plus:
+    declare: !!hive/file .:process.js
+    inputs:
+        a: !!hive/i_type number
+        b: !!hive/i_type number
+    output: !!hive/o_type number
+
+render:
+    render: !!hive/pattern .:output.txt
+    processor: !!hive/rule .:.:plus
+    inputs:
+        a: !!hive/rule .:.:a
+        b: !!hive/rule .:.:b
