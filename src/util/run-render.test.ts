@@ -23,6 +23,8 @@ test('@hive/util/run-render', () => {
   should(`emit map of file names to their content`, () => {
     const configContent = `
     outdir: /out
+    globals:
+        g: 4
     `;
     addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
 
@@ -36,7 +38,7 @@ test('@hive/util/run-render', () => {
     `;
     addFile(path.join('/src/declarations', RULE_FILE_NAME), {content: declarationContent});
 
-    const processorContent = `$hive.a + $hive.b`;
+    const processorContent = `$hive.a + $hive.b + $hiveGlobals.g`;
     addFile('/src/processors/plus.js', {content: processorContent});
 
     const rule: RenderRule = {
@@ -63,26 +65,26 @@ test('@hive/util/run-render', () => {
 
     assert(runRender(rule, mockResolveRuleFn as any)).to.emitSequence([
       match.anyMapThat<string, number>().haveExactElements(new Map([
-        ['/out/0_0.txt', 0],
-        ['/out/0_3.txt', 3],
-        ['/out/1_0.txt', 1],
-        ['/out/1_3.txt', 4],
-        ['/out/2_0.txt', 2],
-        ['/out/2_3.txt', 5],
+        ['/out/0_0.txt', 4],
+        ['/out/0_3.txt', 7],
+        ['/out/1_0.txt', 5],
+        ['/out/1_3.txt', 8],
+        ['/out/2_0.txt', 6],
+        ['/out/2_3.txt', 9],
       ])),
     ]);
     assert(getFile('/out/0_0.txt').pipe(filterNonNull(), map(({content}) => content)))
-        .to.emitSequence(['0']);
-    assert(getFile('/out/0_3.txt').pipe(filterNonNull(), map(({content}) => content)))
-        .to.emitSequence(['3']);
-    assert(getFile('/out/1_0.txt').pipe(filterNonNull(), map(({content}) => content)))
-        .to.emitSequence(['1']);
-    assert(getFile('/out/1_3.txt').pipe(filterNonNull(), map(({content}) => content)))
         .to.emitSequence(['4']);
-    assert(getFile('/out/2_0.txt').pipe(filterNonNull(), map(({content}) => content)))
-        .to.emitSequence(['2']);
-    assert(getFile('/out/2_3.txt').pipe(filterNonNull(), map(({content}) => content)))
+    assert(getFile('/out/0_3.txt').pipe(filterNonNull(), map(({content}) => content)))
+        .to.emitSequence(['7']);
+    assert(getFile('/out/1_0.txt').pipe(filterNonNull(), map(({content}) => content)))
         .to.emitSequence(['5']);
+    assert(getFile('/out/1_3.txt').pipe(filterNonNull(), map(({content}) => content)))
+        .to.emitSequence(['8']);
+    assert(getFile('/out/2_0.txt').pipe(filterNonNull(), map(({content}) => content)))
+        .to.emitSequence(['6']);
+    assert(getFile('/out/2_3.txt').pipe(filterNonNull(), map(({content}) => content)))
+        .to.emitSequence(['9']);
   });
 
   should(`handle processing results that are Promises`, async () => {

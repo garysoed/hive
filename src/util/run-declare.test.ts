@@ -1,3 +1,5 @@
+import * as path from 'path';
+
 import { assert, setup, should, test } from '@gs-testing';
 import { map } from '@rxjs/operators';
 
@@ -5,6 +7,7 @@ import { DeclareRule } from '../core/declare-rule';
 import { RootType } from '../core/root-type';
 import { RuleType } from '../core/rule-type';
 import { ConstType } from '../core/type/const-type';
+import { ROOT_FILE_NAME } from '../project/find-root';
 import { addFile, mockFs } from '../testing/fake-fs';
 
 import { runDeclare } from './run-declare';
@@ -16,6 +19,9 @@ test('@hive/util/run-declare', () => {
   });
 
   should(`emit function that runs the processor correctly`, () => {
+    const configContent = `outdir: out`;
+    addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
+
     // tslint:disable-next-line: no-invalid-template-strings
     const content = '`${$hive.a + $hive.b}`';
     addFile('/a/b.js', {content});

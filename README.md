@@ -34,6 +34,9 @@ There are three kinds of rules.
     The JS file will be executed with a global object called `$hive`. This contains the inputs,
     keyed by the input keys. The JS file is expected to return the output with the correct type.
 
+    The JS file also have access to `$hiveGlobals`. This has a similar structure to `$hive` except
+    it contains values defined in the project's configuration file.
+
 -   `load`: Takes a file, or group of files and declares their type.
 
     ```yaml

@@ -2,9 +2,7 @@ import * as yaml from 'yaml';
 
 import { ProjectConfig } from './project-config';
 
-interface ProjectConfigRaw {
-  outdir?: string;
-}
+type ProjectConfigRaw = {[K in keyof ProjectConfig]: unknown};
 
 export function parseProject(content: string): ProjectConfig {
   const yamlRaw = yaml.parse(content);
@@ -13,7 +11,7 @@ export function parseProject(content: string): ProjectConfig {
     throw new Error('Not an object');
   }
 
-  const config = createConfig(yamlRaw);
+  const config = parseConfig(yamlRaw);
   if (!config) {
     throw new Error('Invalid project config file');
   }
@@ -21,10 +19,14 @@ export function parseProject(content: string): ProjectConfig {
   return config;
 }
 
-function createConfig(obj: ProjectConfigRaw): ProjectConfig|null {
+function parseConfig(obj: ProjectConfigRaw): ProjectConfig|null {
   if (typeof obj.outdir !== 'string') {
     return null;
   }
 
-  return {outdir: obj.outdir};
+  if (!!obj.globals && typeof obj.globals !== 'object') {
+    return null;
+  }
+
+  return {outdir: obj.outdir, globals: (obj.globals || {}) as {[key: string]: any}};
 }

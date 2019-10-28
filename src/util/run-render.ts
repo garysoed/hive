@@ -5,6 +5,7 @@ import { map, mapTo, switchMap } from '@rxjs/operators';
 
 import { RenderRule } from '../core/render-rule';
 import { RuleType } from '../core/rule-type';
+import { loadProjectConfig } from '../project/load-project-config';
 
 import { generateRunSpecs } from './generate-run-specs';
 import { readFile } from './read-file';
@@ -41,16 +42,21 @@ export function runRender(
           validateInputs(rule.inputs, processor.inputs),
           resolveInputs(rule.inputs, runRuleFn),
           processorContent$,
+          loadProjectConfig(),
         ])
         .pipe(
-            switchMap(([repeatedKeys, validatedInputs, processorContent]) => {
+            switchMap(([repeatedKeys, validatedInputs, processorContent, projectConfig]) => {
               const results: Array<Observable<[string, unknown]>> = generateRunSpecs(
                   validatedInputs,
                   repeatedKeys,
                   outputPattern,
               )
               .map(runSpec => {
-                const resultRaw = runProcessor(processorContent, runSpec.inputs);
+                const resultRaw = runProcessor(
+                    processorContent,
+                    runSpec.inputs,
+                    projectConfig.globals,
+                );
                 const result$ = resultRaw instanceof Promise ?
                     observableFrom(resultRaw) : observableOf(resultRaw);
                 return result$.pipe(

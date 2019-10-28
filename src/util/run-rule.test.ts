@@ -51,6 +51,9 @@ test('@hive/util/run-rule', () => {
   });
 
   should(`run declare rules correctly`, () => {
+    const configContent = `outdir: out`;
+    addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
+
     // tslint:disable-next-line: no-invalid-template-strings
     const content = '`${$hive.a + $hive.b}`';
     addFile('/a/b.js', {content});
