@@ -14,8 +14,7 @@ import { render } from './cli/render';
 
 logDestination.set({
   log(entry: Entry): void {
-    // tslint:disable-next-line: no-console
-    console.log('log');
+    // tslint:disable-next-line:no-console
     console.log(entry.value);
   },
 });
