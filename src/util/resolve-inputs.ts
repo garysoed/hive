@@ -1,6 +1,7 @@
 import { combineLatest, Observable, of as observableOf } from '@rxjs';
 import { map, switchMap } from '@rxjs/operators';
 
+import { parseContent } from '../contentparser/parse-content';
 import { RenderInput } from '../core/render-input';
 import { isRuleRef } from '../core/rule-ref';
 import { RuleType } from '../core/rule-type';
@@ -26,7 +27,20 @@ export function resolveInputs(
             case RuleType.DECLARE:
               return resolveRuleFn(rule);
             case RuleType.LOAD:
-              return resolveRuleFn(rule);
+              return resolveRuleFn(rule).pipe(
+                  switchMap(content => {
+                    if (content instanceof Array) {
+                      const entries = content.map(entry => parseContent(entry, rule.outputType));
+                      if (entries.length <= 0) {
+                        return observableOf([]);
+                      }
+
+                      return combineLatest(entries);
+                    }
+
+                    return parseContent(content, rule.outputType);
+                  }),
+              );
             case RuleType.RENDER:
               return resolveRuleFn(rule).pipe(
                   map(resultsMap => [...resultsMap.values()]),

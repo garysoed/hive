@@ -1,4 +1,6 @@
 import * as path from 'path';
+import { RuleType } from 'src/core/rule-type';
+import { ConstType } from 'src/core/type/const-type';
 
 import { assert, createSpy, fake, match, setup, should, Spy, test } from '@gs-testing';
 import { Observable, of as observableOf } from '@rxjs';
@@ -42,9 +44,17 @@ test('@hive/util/resolve-inputs', () => {
     ]);
   });
 
-  should(`resolve load rule reference inputs correctly`, () => {
+  should(`resolve single file load rule reference inputs correctly`, () => {
     fake(mockResolveRule).always().call(rule => {
-      return observableOf((rule as LoadRule).outputType.baseType);
+      const loadRule = rule as LoadRule;
+      switch (loadRule.outputType.baseType) {
+        case ConstType.NUMBER:
+          return observableOf('123');
+        case ConstType.STRING:
+          return observableOf('randomString');
+        default:
+          throw new Error('Unsupported');
+      }
     });
 
     const contentA = `
@@ -68,8 +78,31 @@ test('@hive/util/resolve-inputs', () => {
 
     assert(resolveInputs(inputs, fakeRunRule)).to.emitSequence([
       match.anyMapThat<string, unknown>().haveExactElements(new Map<string, unknown>([
-        ['a', 'number'],
-        ['b', 'string'],
+        ['a', 123],
+        ['b', 'randomString'],
+      ])),
+    ]);
+  });
+
+  should(`resolve glob file load rule reference inputs correctly`, () => {
+    fake(mockResolveRule).always().call(rule => {
+      return observableOf(['123', '456']);
+    });
+
+    const contentA = `
+    ruleA:
+        load: !!hive/glob /:*.txt
+        as: !!hive/o_type number
+    `;
+    addFile(path.join('/a', RULE_FILE_NAME), {content: contentA});
+
+    const inputs = new Map<string, RenderInput>([
+      ['a', {rootType: RootType.SYSTEM_ROOT, path: 'a', ruleName: 'ruleA'}],
+    ]);
+
+    assert(resolveInputs(inputs, fakeRunRule)).to.emitSequence([
+      match.anyMapThat<string, unknown>().haveExactElements(new Map<string, unknown>([
+        ['a', match.anyArrayThat().haveExactElements([123, 456])],
       ])),
     ]);
   });

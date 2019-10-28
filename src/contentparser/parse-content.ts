@@ -10,6 +10,7 @@ export function parseContent(content: string, expectedType: OutputType): Observa
   if (expectedType.isArray) {
     return observableOf(parseArray(content));
   }
+
   if (expectedType.baseType instanceof MediaTypeType) {
     throw new Error('Unimplemented');
   }
