@@ -1,6 +1,4 @@
 import * as path from 'path';
-import { RuleType } from 'src/core/rule-type';
-import { ConstType } from 'src/core/type/const-type';
 
 import { assert, createSpy, fake, match, setup, should, Spy, test } from '@gs-testing';
 import { Observable, of as observableOf } from '@rxjs';
@@ -11,6 +9,7 @@ import { RenderInput } from '../core/render-input';
 import { RenderRule } from '../core/render-rule';
 import { RootType } from '../core/root-type';
 import { Rule } from '../core/rule';
+import { ConstType } from '../core/type/const-type';
 import { addFile, mockFs } from '../testing/fake-fs';
 
 import { RULE_FILE_NAME } from './read-rule';

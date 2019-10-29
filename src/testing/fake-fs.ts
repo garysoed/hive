@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 
-import { fake, spy } from '@gs-testing';
+import { fake, spy, SpyObj } from '@gs-testing';
 import { MapSubject, scanMap } from '@gs-tools/rxjs';
-import { Observable } from '@rxjs';
+import { Observable, Subject } from '@rxjs';
 import { map, take } from '@rxjs/operators';
 
 interface FakeFile {
@@ -74,6 +74,38 @@ function mockReadFile(
       });
 }
 
+const watch$Map: Map<fs.PathLike, Subject<void>> = new Map();
+function mockWatch(
+    path: fs.PathLike,
+    handler?: (event: string, filename: string) => any,
+): SpyObj<fs.FSWatcher> {
+  const subject = getWatcherSubject(path);
+  const subscription = subject.subscribe(() => {
+    if (handler) {
+      handler('', path.toString());
+    }
+  });
+
+  const watcher = Object.assign(
+    {}, {
+    close(): void {
+      subscription.unsubscribe();
+    },
+  });
+  return watcher as any;
+}
+
+export function getWatcherSubject(path: fs.PathLike): Subject<void> {
+  const subject = watch$Map.get(path);
+  if (subject) {
+    return subject;
+  }
+
+  const newSubject = new Subject<void>();
+  watch$Map.set(path, newSubject);
+  return newSubject;
+}
+
 type WriteFileHandler = (err: NodeJS.ErrnoException | null) => void;
 function mockWriteFile(
     path: fs.PathLike|number,
@@ -118,6 +150,9 @@ export function mockFs(): void {
   files$.complete();
   files$ = new MapSubject<fs.PathLike, FakeFile>();
   fake(spy(fs, 'access')).always().call(mockAccess);
+
+  watch$Map.clear();
+  fake(spy(fs, 'watch')).always().call(mockWatch);
   fake(spy(fs, 'readFile')).always().call(mockReadFile);
   fake(spy(fs, 'writeFile')).always().call(mockWriteFile);
 }

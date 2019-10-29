@@ -2,7 +2,7 @@
 
 Hive offers a pipeline that chains together processes to process documents.
 
-Hive is configured using `hive.yml` files. A `hive.yml` file consists of `rule`s, keyed by their
+Hive is configured using `hive.yaml` files. A `hive.yaml` file consists of `rule`s, keyed by their
 names. A Hive operation chains together these rules to produce the pipeline.
 
 ## Rule
@@ -57,10 +57,10 @@ There are three kinds of rules.
 
 `ROOT` specifies where the path is relative from. This can be the following:
 
--   `root`: Relative to the root of the project, i.e.: where the `hive_project.yml`  file is
+-   `root`: Relative to the root of the project, i.e.: where the `hive_project.yaml`  file is
     located.
--   `out`: Out directory as specified in `hive_project.yml`.
--   `.`: The current directory, or the directory where the current `hive.yml` is located.
+-   `out`: Out directory as specified in `hive_project.yaml`.
+-   `.`: The current directory, or the directory where the current `hive.yaml` is located.
 -   `/`: The root directory of the system.
 
 ---
@@ -85,7 +85,7 @@ with type `string`. However, a render rule `R` gives input `A` an array of `stri
 
 ---
 
-`RULE` is also similar to `FILE`. It refers to a rule in a `hive.yml` file. It looks like:
+`RULE` is also similar to `FILE`. It refers to a rule in a `hive.yaml` file. It looks like:
 
 ```yaml
 !!hive/rule ROOT:path/relative/from/root:rule_name
