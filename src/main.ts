@@ -1,23 +1,18 @@
 import * as commandLineArgs from 'command-line-args';
 
-import { formatMessage, MessageType } from '@gs-tools/cli';
-import { EMPTY, Observable } from '@rxjs';
+import { EMPTY, Observable, throwError } from '@rxjs';
 import { catchError } from '@rxjs/operators';
-import { Entry, logDestination } from '@santa';
+import { logDestination } from '@santa';
 
 import { CommandType } from './cli/command-type';
+import { ConsoleDestination } from './cli/console-destination';
 import { CLI as HELP_CLI, help } from './cli/help';
 import { LOGGER } from './cli/logger';
 import { printSummary } from './cli/print-summary';
 import { render } from './cli/render';
 
 
-logDestination.set({
-  log(entry: Entry): void {
-    // tslint:disable-next-line:no-console
-    console.log(entry.value);
-  },
-});
+logDestination.set(new ConsoleDestination());
 
 const COMMAND_OPTION = 'command';
 const OPTIONS = [
@@ -53,7 +48,7 @@ function run(): Observable<unknown> {
 run()
     .pipe(
         catchError(e => {
-          LOGGER.info('', formatMessage(MessageType.FAILURE, e.stack || e.message));
+          LOGGER.error(e);
           return EMPTY;
         }),
     )

@@ -1,9 +1,10 @@
 import { assert, setup, should, test } from '@gs-testing';
+import { ReplaySubject } from '@rxjs';
 
-import { addFile, mockFs, getWatcherSubject } from '../testing/fake-fs';
+import { addFile, getWatcherSubject, mockFs } from '../testing/fake-fs';
 
 import { readFile } from './read-file';
-import { ReplaySubject } from 'rxjs';
+
 
 test('@hive/util/read-file', () => {
   setup(() => {
