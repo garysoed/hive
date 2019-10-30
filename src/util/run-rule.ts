@@ -11,6 +11,7 @@ import { runLoad } from './run-load';
 import { runRender } from './run-render';
 import { RunRuleFn } from './run-rule-fn';
 
+
 export function runRule(renderRule: RenderRule): Observable<ReadonlyMap<string, unknown>>;
 export function runRule(declareRule: DeclareRule): Observable<DeclareFn>;
 export function runRule(loadRule: LoadRule): Observable<string|string[]>;

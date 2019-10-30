@@ -1,7 +1,8 @@
 import * as path from 'path';
+import { LOGGER } from 'src/cli/logger';
 
 import { combineLatest, from as observableFrom, Observable, of as observableOf } from '@rxjs';
-import { map, mapTo, switchMap } from '@rxjs/operators';
+import { map, mapTo, switchMap, tap } from '@rxjs/operators';
 
 import { RenderRule } from '../core/render-rule';
 import { RuleType } from '../core/rule-type';
@@ -62,6 +63,7 @@ export function runRender(
                 return result$.pipe(
                     switchMap(result => {
                       return writeFile(runSpec.outputPath, `${result}`).pipe(
+                          tap(() => LOGGER.success('', `Updated: ${runSpec.outputPath}`)),
                           mapTo([runSpec.outputPath, result] as [string, unknown]),
                       );
                     }),

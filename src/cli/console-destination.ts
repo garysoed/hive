@@ -1,4 +1,4 @@
-import { formatMessage, MessageType } from '@gs-tools/cli';
+import { formatMessage } from '@gs-tools/cli';
 import { Destination, Entry, LogLevel } from '@santa';
 
 export class ConsoleDestination implements Destination {
@@ -9,18 +9,11 @@ export class ConsoleDestination implements Destination {
 }
 
 function getFormattedMessage(entry: Entry): string {
-  switch (entry.level) {
-    case LogLevel.ERROR:
-      return formatMessage(MessageType.FAILURE, getErrorMessage(entry.value));
-    case LogLevel.DEBUG:
-      return formatMessage(MessageType.DEBUG, `${entry.value}`);
-    case LogLevel.INFO:
-      return formatMessage(MessageType.INFO, `${entry.value}`);
-    case LogLevel.LOG:
-      return formatMessage(MessageType.PROGRESS, `${entry.value}`);
-    case LogLevel.WARNING:
-      return formatMessage(MessageType.WARNING, `${entry.value}`);
+  if (entry.level === LogLevel.ERROR) {
+    return formatMessage(entry.level, getErrorMessage(entry.value));
   }
+
+  return formatMessage(entry.level, `${entry.value}`);
 }
 
 function getErrorMessage(value: unknown): string {
