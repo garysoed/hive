@@ -22,10 +22,6 @@ const OPTIONS = [
 export const CLI = {
   title: 'Hive: Render',
   body: () => ({
-    header: 'COMMANDS',
-    content: [
-      {name: CommandType.RENDER, summary: CLI.summary},
-    ],
   }),
   summary: 'Renders the given render rule',
   synopsis: `$ hive ${CommandType.RENDER} <path_to_render_rule>`,

@@ -4,6 +4,7 @@ import { Observable } from '@rxjs';
 
 import { CommandType } from './command-type';
 import { printSummary } from './print-summary';
+import { CLI as RENDER_CLI } from './render';
 
 const COMMAND_OPTION = 'command';
 const OPTIONS = [
@@ -19,6 +20,7 @@ export const CLI = {
     header: 'COMMANDS',
     content: [
       {name: CommandType.HELP, summary: CLI.summary},
+      {name: CommandType.RENDER, summary: RENDER_CLI.summary},
     ],
   }),
   summary: 'Display help on commands',
@@ -34,8 +36,8 @@ export function help(argv: string[]): Observable<unknown> {
       return printSummary(CLI);
     // case CommandType.INIT:
     //   return printSummary(INIT_CLI);
-    // case CommandType.RENDER:
-    //   return printSummary(RENDER_CLI);
+    case CommandType.RENDER:
+      return printSummary(RENDER_CLI);
     default:
       return printSummary(CLI);
   }
