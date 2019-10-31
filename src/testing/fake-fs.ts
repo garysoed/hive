@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 
 import { fake, spy, SpyObj } from '@gs-testing';
-import { MapSubject, scanMap } from '@gs-tools/rxjs';
+import { MapSubject, scanMap, scanSet, SetSubject } from '@gs-tools/rxjs';
 import { Observable, Subject } from '@rxjs';
 import { map, take } from '@rxjs/operators';
 
@@ -9,6 +9,7 @@ interface FakeFile {
   content: string;
 }
 
+const dirs$ = new SetSubject<fs.PathLike>();
 let files$ = new MapSubject<fs.PathLike, FakeFile>();
 
 type AccessHandler = (err: NodeJS.ErrnoException|null) => void;
@@ -38,7 +39,27 @@ function mockAccess(
       });
 }
 
-type ReadFileHandler = (err: NodeJS.ErrnoException | null, data: Buffer) => void;
+type MkDirHandler = (err: NodeJS.ErrnoException|null) => void;
+function mockMkDir(
+    path: fs.PathLike,
+    options: number|string|fs.MakeDirectoryOptions|undefined|null,
+    callback: MkDirHandler,
+): void;
+function mockMkDir(
+    path: fs.PathLike,
+    callback: MkDirHandler,
+): void;
+function mockMkDir(
+    path: fs.PathLike,
+    optionsOrCallback: number|string|fs.MakeDirectoryOptions|undefined|null|MkDirHandler,
+    callback?: MkDirHandler,
+): void {
+  dirs$.add(path);
+  const normalizedCallback = callback || (optionsOrCallback as MkDirHandler);
+  normalizedCallback(null);
+}
+
+type ReadFileHandler = (err: NodeJS.ErrnoException|null, data: Buffer) => void;
 function mockReadFile(
     path: fs.PathLike|number,
     options: {}|undefined|null,
@@ -146,6 +167,10 @@ export function getFile(path: fs.PathLike): Observable<FakeFile|null> {
   return files$.pipe(scanMap(), map(fileMap => fileMap.get(path) || null));
 }
 
+export function hasDir(path: fs.PathLike): Observable<boolean> {
+  return dirs$.pipe(scanSet(), map(dirSet => dirSet.has(path)));
+}
+
 export function mockFs(): void {
   files$.complete();
   files$ = new MapSubject<fs.PathLike, FakeFile>();
@@ -155,4 +180,6 @@ export function mockFs(): void {
   fake(spy(fs, 'watch')).always().call(mockWatch);
   fake(spy(fs, 'readFile')).always().call(mockReadFile);
   fake(spy(fs, 'writeFile')).always().call(mockWriteFile);
+
+  fake(spy(fs, 'mkdir')).always().call(mockMkDir);
 }

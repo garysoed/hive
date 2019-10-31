@@ -5,6 +5,7 @@ bazel-gs-tools
 bazel-out
 bazel-testlogs
 npm-debug.log
+.hive/
 bin/
 bower_components/
 doc/

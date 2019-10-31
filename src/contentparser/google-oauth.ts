@@ -1,17 +1,23 @@
-import { OAuth2Client } from 'google-auth-library';
+import { Credentials, OAuth2Client } from 'google-auth-library';
 import { google } from 'googleapis';
+import * as path from 'path';
 import * as process from 'process';
 import * as readline from 'readline';
+import { writeFile } from 'src/util/write-file';
 
 import { cache } from '@gs-tools/data';
-import { BehaviorSubject, from as observableFrom, Observable, SchedulerLike, Subject } from '@rxjs';
-import { bufferTime, filter, map, mapTo, switchMap, tap, withLatestFrom } from '@rxjs/operators';
+import { assertNonNull } from '@gs-tools/rxjs';
+import { BehaviorSubject, from as observableFrom, Observable, of as observableOf, ReplaySubject, SchedulerLike, Subject } from '@rxjs';
+import { bufferTime, catchError, filter, map, mapTo, skipUntil, switchMap, take, tap, withLatestFrom } from '@rxjs/operators';
 
 import { LOGGER } from '../cli/logger';
+import { getProjectTmpDir } from '../project/get-project-tmp-dir';
+import { readFile } from '../util/read-file';
 
 
 const REDIRECT_URI = 'urn:ietf:wg:oauth:2.0:oob';
 const SCOPE_CHANGE_DEBOUNCE_MS = 50;
+export const OAUTH_FILE = 'google_oauth.json';
 
 export interface GoogleAuth {
   client: OAuth2Client;
@@ -22,10 +28,16 @@ type OauthClientFactory = (clientId: string, clientSecret: string) => OAuth2Clie
 const DEFAULT_OAUTH_FACTORY = (clientId: string, clientSecret: string) =>
     new google.auth.OAuth2(clientId, clientSecret, REDIRECT_URI);
 
+export interface CredentialsFile extends Credentials {
+  scope: string;
+}
+
 export class GoogleOauth {
   private readonly addedScopes$ = new BehaviorSubject<ReadonlySet<string>>(new Set());
   private readonly oauth2Client: OAuth2Client;
+  private readonly onInitialized$ = new ReplaySubject<void>(1);
   private readonly onScopeAdded$ = new Subject<string>();
+  private readonly onUpdateTmpDir$ = new Subject<Credentials>();
 
   constructor(
       clientId: string,
@@ -34,7 +46,9 @@ export class GoogleOauth {
       private readonly scheduler?: SchedulerLike,
   ) {
     this.oauth2Client = createOauth2Client(clientId, clientSecret);
+    this.initializeAddedScopes();
     this.setupOnScopeChange();
+    this.setupOnUpdateTmpDir();
   }
 
   addScope(scope: string): void {
@@ -48,14 +62,49 @@ export class GoogleOauth {
     );
   }
 
+  private initializeAddedScopes(): void {
+    getProjectTmpDir()
+        .pipe(
+            switchMap(tmpDir => {
+              if (!tmpDir) {
+                return observableOf(null);
+              }
+
+              return readFile(path.join(tmpDir, OAUTH_FILE)).pipe(
+                  catchError(() => observableOf(null)),
+              );
+            }),
+        )
+        .subscribe(oauthContent => {
+          if (oauthContent) {
+            const credentials: CredentialsFile = JSON.parse(oauthContent);
+            this.oauth2Client.setCredentials(credentials);
+            this.addedScopes$.next(new Set(credentials.scope.split(' ')));
+          }
+
+          this.onInitialized$.next();
+        });
+  }
+
   private setupOnScopeChange(): void {
     this.onScopeAdded$.pipe(
+        skipUntil(this.onInitialized$),
         bufferTime(SCOPE_CHANGE_DEBOUNCE_MS, this.scheduler),
-        filter(newScopes => newScopes.length > 0),
+        withLatestFrom(this.addedScopes$),
+        map(([newScopes, addedScopes]) => {
+          const scopeToAdd = new Set<string>();
+          for (const newScope of newScopes) {
+            if (!addedScopes.has(newScope)) {
+              scopeToAdd.add(newScope);
+            }
+          }
+          return scopeToAdd;
+        }),
+        filter(toAdd => toAdd.size > 0),
         switchMap(newScopes => {
           const authUrl = this.oauth2Client.generateAuthUrl({
             access_type: 'offline',
-            scope: newScopes,
+            scope: [...newScopes],
           });
 
           LOGGER.info('', `Please visit:\n\n${authUrl}\n\nand paste the auth code below:`);
@@ -73,11 +122,10 @@ export class GoogleOauth {
           .pipe(
               switchMap(code => observableFrom(this.oauth2Client.getToken(code))),
               map(response => response.tokens),
-              // TODO: Cache the token.
-              // switchMap(response => {
-              //   return writeFile('oauthtoken', JSON.stringify(response.tokens)).pipe(mapTo(response.tokens));
-              // }),
-              tap(tokens => this.oauth2Client.setCredentials(tokens)),
+              tap(tokens => {
+                this.onUpdateTmpDir$.next(tokens);
+                this.oauth2Client.setCredentials(tokens);
+              }),
               mapTo(newScopes),
           );
         }),
@@ -86,5 +134,21 @@ export class GoogleOauth {
     .subscribe(([newScopes, addedScopes]) => {
       this.addedScopes$.next(new Set([...newScopes, ...addedScopes]));
     });
+  }
+
+  private setupOnUpdateTmpDir(): void {
+    this.onUpdateTmpDir$
+        .pipe(
+            switchMap(tokens => {
+              return getProjectTmpDir().pipe(
+                  assertNonNull('Root project cannot be found'),
+                  switchMap(tmpDir => {
+                    return writeFile(path.join(tmpDir, OAUTH_FILE), JSON.stringify(tokens));
+                  }),
+                  take(1),
+              );
+            }),
+        )
+        .subscribe();
   }
 }
