@@ -9,8 +9,8 @@ interface FakeFile {
   content: string;
 }
 
-const dirs$ = new SetSubject<fs.PathLike>();
-let files$ = new MapSubject<fs.PathLike, FakeFile>();
+const dirs = new Set<fs.PathLike>();
+const files = new Map<fs.PathLike, FakeFile>();
 
 type AccessHandler = (err: NodeJS.ErrnoException|null) => void;
 function mockAccess(path: fs.PathLike, callback: AccessHandler): void;
@@ -24,19 +24,12 @@ function mockAccess(
     modeOrCallback: number|AccessHandler|undefined,
     callback?: AccessHandler): void {
   const normalizedCallback = callback || (modeOrCallback as AccessHandler);
-  files$
-      .pipe(
-          scanMap(),
-          take(1),
-      )
-      .subscribe(map => {
-        if (map.get(path)) {
-          normalizedCallback(null);
-          return;
-        }
+  if (files.get(path)) {
+    normalizedCallback(null);
+    return;
+  }
 
-        normalizedCallback(new Error(`File ${path} not found`));
-      });
+  normalizedCallback(new Error(`File ${path} not found`));
 }
 
 type MkDirHandler = (err: NodeJS.ErrnoException|null) => void;
@@ -54,7 +47,7 @@ function mockMkDir(
     optionsOrCallback: number|string|fs.MakeDirectoryOptions|undefined|null|MkDirHandler,
     callback?: MkDirHandler,
 ): void {
-  dirs$.add(path);
+  dirs.add(path);
   const normalizedCallback = callback || (optionsOrCallback as MkDirHandler);
   normalizedCallback(null);
 }
@@ -79,20 +72,13 @@ function mockReadFile(
   }
 
   const normalizedCallback = callback || (optionsOrCallback as ReadFileHandler);
-  files$
-      .pipe(
-          scanMap(),
-          take(1),
-      )
-      .subscribe(map => {
-        const file = map.get(path);
-        if (file) {
-          normalizedCallback(null, file.content as any);
-          return;
-        }
+  const file = files.get(path);
+  if (file) {
+    normalizedCallback(null, file.content as any);
+    return;
+  }
 
-        normalizedCallback(new Error(`File ${path} not found`), null as any);
-      });
+  normalizedCallback(new Error(`File ${path} not found`), null as any);
 }
 
 const watch$Map: Map<fs.PathLike, Subject<void>> = new Map();
@@ -150,30 +136,30 @@ function mockWriteFile(
   }
 
   const normalizedCallback = callback || (optionsOrCallback as WriteFileHandler);
-  files$.set(path, {content: data});
+  files.set(path, {content: data});
   normalizedCallback(null);
 }
 
 
 export function addFile(path: fs.PathLike, file: FakeFile): void {
-  files$.set(path, file);
+  files.set(path, file);
 }
 
 export function deleteFile(path: fs.PathLike): void {
-  files$.delete(path);
+  files.delete(path);
 }
 
-export function getFile(path: fs.PathLike): Observable<FakeFile|null> {
-  return files$.pipe(scanMap(), map(fileMap => fileMap.get(path) || null));
+export function getFile(path: fs.PathLike): FakeFile|null {
+  return files.get(path) || null;
 }
 
-export function hasDir(path: fs.PathLike): Observable<boolean> {
-  return dirs$.pipe(scanSet(), map(dirSet => dirSet.has(path)));
+export function hasDir(path: fs.PathLike): boolean {
+  return dirs.has(path);
 }
 
 export function mockFs(): void {
-  files$.complete();
-  files$ = new MapSubject<fs.PathLike, FakeFile>();
+  dirs.clear();
+  files.clear();
   fake(spy(fs, 'access')).always().call(mockAccess);
 
   watch$Map.clear();

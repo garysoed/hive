@@ -196,12 +196,8 @@ test('@hive/contentparser/google-oauth', () => {
 
       scheduler.tick(50);
 
-      const oauthContent$ = getFile(path.join(ROOT_DIR, TMP_DIR_NAME, OAUTH_FILE))
-          .pipe(
-              filterNonNull(),
-              map(({content}) => content),
-          );
-      assert(oauthContent$).to.emitSequence([match.anyStringThat().equal(JSON.stringify(tokens))]);
+      const oauthContent = getFile(path.join(ROOT_DIR, TMP_DIR_NAME, OAUTH_FILE))!.content;
+      assert(oauthContent).to.equal(JSON.stringify(tokens));
     });
   });
 });

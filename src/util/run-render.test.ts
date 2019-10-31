@@ -1,9 +1,8 @@
 import * as path from 'path';
 
 import { assert, createSpy, match, setup, should, test } from '@gs-testing';
-import { filterNonNull } from '@gs-tools/rxjs';
 import { Observable } from '@rxjs';
-import { map, take } from '@rxjs/operators';
+import { take } from '@rxjs/operators';
 
 import { RenderRule } from '../core/render-rule';
 import { RootType } from '../core/root-type';
@@ -73,18 +72,12 @@ test('@hive/util/run-render', () => {
         ['/out/2_3.txt', 9],
       ])),
     ]);
-    assert(getFile('/out/0_0.txt').pipe(filterNonNull(), map(({content}) => content)))
-        .to.emitSequence(['4']);
-    assert(getFile('/out/0_3.txt').pipe(filterNonNull(), map(({content}) => content)))
-        .to.emitSequence(['7']);
-    assert(getFile('/out/1_0.txt').pipe(filterNonNull(), map(({content}) => content)))
-        .to.emitSequence(['5']);
-    assert(getFile('/out/1_3.txt').pipe(filterNonNull(), map(({content}) => content)))
-        .to.emitSequence(['8']);
-    assert(getFile('/out/2_0.txt').pipe(filterNonNull(), map(({content}) => content)))
-        .to.emitSequence(['6']);
-    assert(getFile('/out/2_3.txt').pipe(filterNonNull(), map(({content}) => content)))
-        .to.emitSequence(['9']);
+    assert(getFile('/out/0_0.txt')!.content).to.equal('4');
+    assert(getFile('/out/0_3.txt')!.content).to.equal('7');
+    assert(getFile('/out/1_0.txt')!.content).to.equal('5');
+    assert(getFile('/out/1_3.txt')!.content).to.equal('8');
+    assert(getFile('/out/2_0.txt')!.content).to.equal('6');
+    assert(getFile('/out/2_3.txt')!.content).to.equal('9');
   });
 
   should(`handle processing results that are Promises`, async () => {
@@ -137,18 +130,12 @@ test('@hive/util/run-render', () => {
     assert(await (resultsMap.get('/out/2_0.txt') as Promise<number>)).to.equal(2);
     assert(await (resultsMap.get('/out/2_3.txt') as Promise<number>)).to.equal(5);
 
-    assert(getFile('/out/0_0.txt').pipe(filterNonNull(), map(({content}) => content)))
-        .to.emitSequence(['0']);
-    assert(getFile('/out/0_3.txt').pipe(filterNonNull(), map(({content}) => content)))
-        .to.emitSequence(['3']);
-    assert(getFile('/out/1_0.txt').pipe(filterNonNull(), map(({content}) => content)))
-        .to.emitSequence(['1']);
-    assert(getFile('/out/1_3.txt').pipe(filterNonNull(), map(({content}) => content)))
-        .to.emitSequence(['4']);
-    assert(getFile('/out/2_0.txt').pipe(filterNonNull(), map(({content}) => content)))
-        .to.emitSequence(['2']);
-    assert(getFile('/out/2_3.txt').pipe(filterNonNull(), map(({content}) => content)))
-        .to.emitSequence(['5']);
+    assert(getFile('/out/0_0.txt')!.content).to.equal('0');
+    assert(getFile('/out/0_3.txt')!.content).to.equal('3');
+    assert(getFile('/out/1_0.txt')!.content).to.equal('1');
+    assert(getFile('/out/1_3.txt')!.content).to.equal('4');
+    assert(getFile('/out/2_0.txt')!.content).to.equal('2');
+    assert(getFile('/out/2_3.txt')!.content).to.equal('5');
   });
 
   should(`emit error if the processor is not a declare rule`, () => {
