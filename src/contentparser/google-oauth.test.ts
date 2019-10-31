@@ -3,10 +3,8 @@ import { OAuth2Client } from 'googleapis-common';
 import * as path from 'path';
 import * as readline from 'readline';
 
-import { assert, createSpyObject, fake, match, resetCalls, setup, should, spy, Spy, SpyObj, test, TestScheduler } from '@gs-testing';
-import { filterNonNull } from '@gs-tools/rxjs';
+import { arrayThat, assert, createSpyObject, fake, objectThat, resetCalls, setThat, setup, should, Spy, spy, SpyObj, test, TestScheduler } from '@gs-testing';
 import { of as observableOf, ReplaySubject } from '@rxjs';
-import { map } from '@rxjs/operators';
 
 import { ROOT_FILE_NAME } from '../project/find-root';
 import { TMP_DIR_NAME } from '../project/get-project-tmp-dir';
@@ -68,12 +66,12 @@ test('@hive/contentparser/google-oauth', () => {
       const auth$ = new ReplaySubject<GoogleAuth>(1);
       createOauth().auth.subscribe(auth$);
 
-      assert(auth$).to.emitSequence([match.anyObjectThat<GoogleAuth>().haveProperties({
+      assert(auth$).to.emitSequence([objectThat<GoogleAuth>().haveProperties({
         client: mockOauthClient,
-        scopes: match.anySetThat<string>().haveExactElements(new Set([scope1, scope2])),
+        scopes: setThat<string>().haveExactElements(new Set([scope1, scope2])),
       })]);
       assert(mockOauthClient.setCredentials).to.haveBeenCalledWith(
-          match.anyObjectThat<CredentialsFile>().haveProperties({
+          objectThat<CredentialsFile>().haveProperties({
             scope,
           }));
     });
@@ -82,9 +80,9 @@ test('@hive/contentparser/google-oauth', () => {
       const auth$ = new ReplaySubject<GoogleAuth>(1);
       createOauth().auth.subscribe(auth$);
 
-      assert(auth$).to.emitSequence([match.anyObjectThat<GoogleAuth>().haveProperties({
+      assert(auth$).to.emitSequence([objectThat<GoogleAuth>().haveProperties({
         client: mockOauthClient,
-        scopes: match.anySetThat<string>().beEmpty(),
+        scopes: setThat<string>().beEmpty(),
       })]);
       assert(mockOauthClient.setCredentials).toNot.haveBeenCalled();
     });
@@ -95,9 +93,9 @@ test('@hive/contentparser/google-oauth', () => {
       const auth$ = new ReplaySubject<GoogleAuth>(1);
       createOauth().auth.subscribe(auth$);
 
-      assert(auth$).to.emitSequence([match.anyObjectThat<GoogleAuth>().haveProperties({
+      assert(auth$).to.emitSequence([objectThat<GoogleAuth>().haveProperties({
         client: mockOauthClient,
-        scopes: match.anySetThat<string>().beEmpty(),
+        scopes: setThat<string>().beEmpty(),
       })]);
       assert(mockOauthClient.setCredentials).toNot.haveBeenCalled();
     });
@@ -130,16 +128,16 @@ test('@hive/contentparser/google-oauth', () => {
 
       scheduler.tick(50);
 
-      assert(auth$).to.emitSequence([match.anyObjectThat<GoogleAuth>().haveProperties({
+      assert(auth$).to.emitSequence([objectThat<GoogleAuth>().haveProperties({
         client: mockOauthClient,
-        scopes: match.anySetThat<string>().haveExactElements(new Set([scope1, scope2])),
+        scopes: setThat<string>().haveExactElements(new Set([scope1, scope2])),
       })]);
       assert(mockOauthClient.setCredentials).to.haveBeenCalledWith(tokens);
       assert(mockOauthClient.getToken as unknown as Spy<Promise<GetTokenResponse>, [string]>)
           .to.haveBeenCalledWith(code);
       assert(mockOauthClient.generateAuthUrl).to.haveBeenCalledWith(
-          match.anyObjectThat<GenerateAuthUrlOpts>().haveProperties({
-            scope: match.anyArrayThat<string>().haveExactElements([scope1, scope2]),
+          objectThat<GenerateAuthUrlOpts>().haveProperties({
+            scope: arrayThat<string>().haveExactElements([scope1, scope2]),
           }));
     });
 
@@ -160,9 +158,9 @@ test('@hive/contentparser/google-oauth', () => {
       oauth.addScope(scope1);
       scheduler.tick(50);
 
-      assert(auth$).to.emitSequence([match.anyObjectThat<GoogleAuth>().haveProperties({
+      assert(auth$).to.emitSequence([objectThat<GoogleAuth>().haveProperties({
         client: mockOauthClient,
-        scopes: match.anySetThat<string>().haveExactElements(new Set([scope1, scope2])),
+        scopes: setThat<string>().haveExactElements(new Set([scope1, scope2])),
       })]);
       assert(mockOauthClient.setCredentials).toNot.haveBeenCalled();
       assert(mockOauthClient.getToken as unknown as Spy<Promise<GetTokenResponse>, [string]>)

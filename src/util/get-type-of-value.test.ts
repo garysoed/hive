@@ -1,4 +1,4 @@
-import { assert, match, setup, should, test } from '@gs-testing';
+import { assert, objectThat, setup, should, test } from '@gs-testing';
 
 import { RootType } from '../core/root-type';
 import { ConstType } from '../core/type/const-type';
@@ -8,6 +8,7 @@ import { mockProcess } from '../testing/fake-process';
 
 import { getTypeOfValue } from './get-type-of-value';
 
+
 test('@hive/util/get-type-of-value', () => {
   setup(() => {
     mockFs();
@@ -16,7 +17,7 @@ test('@hive/util/get-type-of-value', () => {
 
   should(`emit the correct type for functions`, () => {
     assert(getTypeOfValue(() => 123)).to.emitSequence([
-      match.anyObjectThat<OutputType>().haveProperties({
+      objectThat<OutputType>().haveProperties({
         isArray: false,
         baseType: ConstType.FUNCTION,
       }),
@@ -25,7 +26,7 @@ test('@hive/util/get-type-of-value', () => {
 
   should(`emit the correct type for objects`, () => {
     assert(getTypeOfValue({})).to.emitSequence([
-      match.anyObjectThat<OutputType>().haveProperties({
+      objectThat<OutputType>().haveProperties({
         isArray: false,
         baseType: ConstType.OBJECT,
       }),
@@ -34,7 +35,7 @@ test('@hive/util/get-type-of-value', () => {
 
   should(`emit the correct type of strings`, () => {
     assert(getTypeOfValue('abc')).to.emitSequence([
-      match.anyObjectThat<OutputType>().haveProperties({
+      objectThat<OutputType>().haveProperties({
         isArray: false,
         baseType: ConstType.STRING,
       }),
@@ -60,7 +61,7 @@ test('@hive/util/get-type-of-value', () => {
 
     const ruleRef = {path: 'a/c', rootType: RootType.SYSTEM_ROOT, ruleName: 'ruleA'};
     assert(getTypeOfValue(ruleRef)).to.emitSequence([
-      match.anyObjectThat<OutputType>().haveProperties({
+      objectThat<OutputType>().haveProperties({
         isArray: false,
         baseType: ConstType.NUMBER,
       }),
@@ -97,7 +98,7 @@ test('@hive/util/get-type-of-value', () => {
 
     const ruleRef = {path: 'a/c', rootType: RootType.SYSTEM_ROOT, ruleName: 'rule'};
     assert(getTypeOfValue(ruleRef)).to.emitSequence([
-      match.anyObjectThat<OutputType>().haveProperties({
+      objectThat<OutputType>().haveProperties({
         isArray: false,
         baseType: ConstType.NUMBER,
       }),
@@ -115,7 +116,7 @@ test('@hive/util/get-type-of-value', () => {
 
     const ruleRef = {path: 'a/c', rootType: RootType.SYSTEM_ROOT, ruleName: 'rule'};
     assert(getTypeOfValue(ruleRef)).to.emitSequence([
-      match.anyObjectThat<OutputType>().haveProperties({
+      objectThat<OutputType>().haveProperties({
         isArray: false,
         baseType: ConstType.FUNCTION,
       }),
@@ -124,7 +125,7 @@ test('@hive/util/get-type-of-value', () => {
 
   should(`emit the correct type for array of objects`, () => {
     assert(getTypeOfValue([{}])).to.emitSequence([
-      match.anyObjectThat<OutputType>().haveProperties({
+      objectThat<OutputType>().haveProperties({
         isArray: true,
         baseType: ConstType.OBJECT,
       }),

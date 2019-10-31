@@ -1,4 +1,4 @@
-import { assert, match, setup, should, test } from '@gs-testing';
+import { arrayThat, assert, setup, should, test } from '@gs-testing';
 import { of as observableOf } from '@rxjs';
 
 import { LoadRule } from '../core/load-rule';
@@ -51,7 +51,7 @@ test('@hive/util/run-load', () => {
     };
 
     assert(runLoad(rule)).to.emitSequence([
-      match.anyArrayThat<string>().haveExactElements([contentC, contentD, contentE]),
+      arrayThat<string>().haveExactElements([contentC, contentD, contentE]),
     ]);
   });
 });

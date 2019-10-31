@@ -1,4 +1,4 @@
-import { assert, match, should, test } from '@gs-testing';
+import { assert, mapThat, objectThat, should, test } from '@gs-testing';
 
 import { RootType } from '../core/root-type';
 import { ConstType } from '../core/type/const-type';
@@ -22,14 +22,14 @@ test('@hive/config/parse-declare', () => {
         output,
       });
 
-      assert(declareRule).to.equal(match.anyObjectThat().haveProperties({
+      assert(declareRule).to.equal(objectThat().haveProperties({
         name: ruleName,
         processor,
-        inputs: match.anyMapThat().haveExactElements(new Map([
-          ['a', match.anyObjectThat().haveProperties(inputs.a)],
-          ['b', match.anyObjectThat().haveProperties(inputs.b)],
+        inputs: mapThat().haveExactElements(new Map([
+          ['a', objectThat().haveProperties(inputs.a)],
+          ['b', objectThat().haveProperties(inputs.b)],
         ])),
-        output: match.anyObjectThat().haveProperties(output),
+        output: objectThat().haveProperties(output),
       }));
     });
 
@@ -53,11 +53,11 @@ test('@hive/config/parse-declare', () => {
         output,
       });
 
-      assert(declareRule).to.equal(match.anyObjectThat().haveProperties({
+      assert(declareRule).to.equal(objectThat().haveProperties({
         name: ruleName,
         processor,
-        inputs: match.anyMapThat().beEmpty(),
-        output: match.anyObjectThat().haveProperties(output),
+        inputs: mapThat().beEmpty(),
+        output: objectThat().haveProperties(output),
       }));
     });
 
@@ -110,10 +110,10 @@ test('@hive/config/parse-declare', () => {
         output: {baseType: ConstType.STRING, isArray: false},
       });
 
-      assert(declareRule).to.equal(match.anyObjectThat().haveProperties({
-        inputs: match.anyMapThat().haveExactElements(new Map([
-          ['a', match.anyObjectThat().haveProperties(inputs.a)],
-          ['b', match.anyObjectThat().haveProperties(inputs.b)],
+      assert(declareRule).to.equal(objectThat().haveProperties({
+        inputs: mapThat().haveExactElements(new Map([
+          ['a', objectThat().haveProperties(inputs.a)],
+          ['b', objectThat().haveProperties(inputs.b)],
         ])),
       }));
     });

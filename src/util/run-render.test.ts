@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import { assert, createSpy, match, setup, should, test } from '@gs-testing';
+import { assert, createSpy, mapThat, setup, should, test } from '@gs-testing';
 import { Observable } from '@rxjs';
 import { take } from '@rxjs/operators';
 
@@ -63,7 +63,7 @@ test('@hive/util/run-render', () => {
         'ResolveRuleFn');
 
     assert(runRender(rule, mockResolveRuleFn as any)).to.emitSequence([
-      match.anyMapThat<string, number>().haveExactElements(new Map([
+      mapThat<string, number>().haveExactElements(new Map([
         ['/out/0_0.txt', 4],
         ['/out/0_3.txt', 7],
         ['/out/1_0.txt', 5],

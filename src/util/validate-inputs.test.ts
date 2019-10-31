@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import { assert, match, setup, should, test } from '@gs-testing';
+import { assert, setThat, setup, should, test } from '@gs-testing';
 
 import { RenderInput } from '../core/render-input';
 import { RootType } from '../core/root-type';
@@ -29,7 +29,7 @@ test('@hive/util/validate-inputs', () => {
       ]);
 
       assert(validateInputs(actual, expected)).to.emitSequence([
-        match.anySetThat<string>().haveExactElements(new Set(['a', 'b'])),
+        setThat<string>().haveExactElements(new Set(['a', 'b'])),
       ]);
     });
 
@@ -44,7 +44,7 @@ test('@hive/util/validate-inputs', () => {
       ]);
 
       assert(validateInputs(actual, expected)).to.emitSequence([
-        match.anySetThat<string>().haveExactElements(new Set(['a', 'b'])),
+        setThat<string>().haveExactElements(new Set(['a', 'b'])),
       ]);
     });
 
@@ -59,7 +59,7 @@ test('@hive/util/validate-inputs', () => {
       ]);
 
       assert(validateInputs(actual, expected)).to.emitSequence([
-        match.anySetThat<string>().beEmpty(),
+        setThat<string>().beEmpty(),
       ]);
     });
 
@@ -74,7 +74,7 @@ test('@hive/util/validate-inputs', () => {
       ]);
 
       assert(validateInputs(actual, expected)).to.emitSequence([
-        match.anySetThat<string>().beEmpty(),
+        setThat<string>().beEmpty(),
       ]);
     });
 
@@ -89,7 +89,7 @@ test('@hive/util/validate-inputs', () => {
       ]);
 
       assert(validateInputs(actual, expected)).to.emitSequence([
-        match.anySetThat<string>().beEmpty(),
+        setThat<string>().beEmpty(),
       ]);
     });
 
@@ -149,7 +149,7 @@ test('@hive/util/validate-inputs', () => {
       const expected = new Map();
 
       assert(validateInputs(actual, expected)).to
-          .emitSequence([match.anySetThat<string>().beEmpty()]);
+          .emitSequence([setThat<string>().beEmpty()]);
     });
   });
 
@@ -163,7 +163,7 @@ test('@hive/util/validate-inputs', () => {
       ]);
 
       assert(validateInputs(actual, expected)).to.emitSequence([
-        match.anySetThat<string>().beEmpty(),
+        setThat<string>().beEmpty(),
       ]);
     });
 
@@ -194,7 +194,7 @@ test('@hive/util/validate-inputs', () => {
       ]);
 
       assert(validateInputs(actual, expected)).to.emitSequence([
-        match.anySetThat<string>().beEmpty(),
+        setThat<string>().beEmpty(),
       ]);
     });
 

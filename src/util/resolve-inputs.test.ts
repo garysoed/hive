@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import { assert, createSpy, fake, match, setup, should, Spy, test } from '@gs-testing';
+import { arrayThat, assert, createSpy, fake, mapThat, setup, should, Spy, test } from '@gs-testing';
 import { Observable, of as observableOf } from '@rxjs';
 
 import { DeclareRule } from '../core/declare-rule';
@@ -36,7 +36,7 @@ test('@hive/util/resolve-inputs', () => {
     const inputs = new Map<string, RenderInput>([['a', 1], ['b', 'two']]);
 
     assert(resolveInputs(inputs, fakeRunRule)).to.emitSequence([
-      match.anyMapThat<string, unknown>().haveExactElements(new Map<string, unknown>([
+      mapThat<string, unknown>().haveExactElements(new Map<string, unknown>([
         ['a', 1],
         ['b', 'two'],
       ])),
@@ -76,7 +76,7 @@ test('@hive/util/resolve-inputs', () => {
     ]);
 
     assert(resolveInputs(inputs, fakeRunRule)).to.emitSequence([
-      match.anyMapThat<string, unknown>().haveExactElements(new Map<string, unknown>([
+      mapThat<string, unknown>().haveExactElements(new Map<string, unknown>([
         ['a', 123],
         ['b', 'randomString'],
       ])),
@@ -100,8 +100,8 @@ test('@hive/util/resolve-inputs', () => {
     ]);
 
     assert(resolveInputs(inputs, fakeRunRule)).to.emitSequence([
-      match.anyMapThat<string, unknown>().haveExactElements(new Map<string, unknown>([
-        ['a', match.anyArrayThat().haveExactElements([123, 456])],
+      mapThat<string, unknown>().haveExactElements(new Map<string, unknown>([
+        ['a', arrayThat().haveExactElements([123, 456])],
       ])),
     ]);
   });
@@ -125,7 +125,7 @@ test('@hive/util/resolve-inputs', () => {
     ]);
 
     assert(resolveInputs(inputs, fakeRunRule)).to.emitSequence([
-      match.anyMapThat<string, unknown>().haveExactElements(new Map<string, unknown>([
+      mapThat<string, unknown>().haveExactElements(new Map<string, unknown>([
         ['a', fn],
       ])),
     ]);
@@ -149,8 +149,8 @@ test('@hive/util/resolve-inputs', () => {
     ]);
 
     assert(resolveInputs(inputs, fakeRunRule)).to.emitSequence([
-      match.anyMapThat<string, unknown>().haveExactElements(new Map<string, unknown>([
-        ['a', match.anyArrayThat().haveExactElements(['content1', 'content2'])],
+      mapThat<string, unknown>().haveExactElements(new Map<string, unknown>([
+        ['a', arrayThat().haveExactElements(['content1', 'content2'])],
       ])),
     ]);
   });

@@ -1,4 +1,4 @@
-import { assert, match, should, test } from '@gs-testing';
+import { arrayThat, assert, mapThat, objectThat, should, test } from '@gs-testing';
 
 import { RenderInput } from '../core/render-input';
 import { RootType } from '../core/root-type';
@@ -20,10 +20,10 @@ test('@hive/config/parse-render', () => {
 
       const renderRule = parseRender(ruleName, {inputs, processor, render});
 
-      assert(renderRule).to.equal(match.anyObjectThat().haveProperties({
+      assert(renderRule).to.equal(objectThat().haveProperties({
         name: ruleName,
         processor,
-        inputs: match.anyMapThat().haveExactElements(new Map<string, RenderInput>([
+        inputs: mapThat().haveExactElements(new Map<string, RenderInput>([
           ['inputA', 1],
           ['inputB', 'two'],
         ])),
@@ -57,10 +57,10 @@ test('@hive/config/parse-render', () => {
 
       const renderRule = parseRender(ruleName, {inputs: null, processor, render});
 
-      assert(renderRule).to.equal(match.anyObjectThat().haveProperties({
+      assert(renderRule).to.equal(objectThat().haveProperties({
         name: ruleName,
         processor,
-        inputs: match.anyMapThat().beEmpty(),
+        inputs: mapThat().beEmpty(),
         output: render,
       }));
     });
@@ -121,8 +121,8 @@ test('@hive/config/parse-render', () => {
 
 
       assert(renderRule).to.equal(
-          match.anyObjectThat().haveProperties({
-            inputs: match.anyMapThat().haveExactElements(new Map<string, RenderInput>([
+          objectThat().haveProperties({
+            inputs: mapThat().haveExactElements(new Map<string, RenderInput>([
               ['inputA', 1],
               ['inputB', 'two'],
             ])),
@@ -158,11 +158,11 @@ test('@hive/config/parse-render', () => {
           });
 
       assert(renderRule).to.equal(
-          match.anyObjectThat().haveProperties({
-            inputs: match.anyMapThat().haveExactElements(new Map([
+          objectThat().haveProperties({
+            inputs: mapThat().haveExactElements(new Map([
               [
                 'input',
-                match.anyObjectThat().haveProperties({
+                objectThat().haveProperties({
                   rootType: RootType.OUT_DIR,
                   path: 'path',
                 }),
@@ -184,11 +184,11 @@ test('@hive/config/parse-render', () => {
           });
 
       assert(renderRule).to.equal(
-          match.anyObjectThat().haveProperties({
-            inputs: match.anyMapThat().haveExactElements(new Map([
+          objectThat().haveProperties({
+            inputs: mapThat().haveExactElements(new Map([
               [
                 'input',
-                match.anyObjectThat().haveProperties({
+                objectThat().haveProperties({
                   rootType: RootType.OUT_DIR,
                   path: 'path',
                   ruleName: 'rule',
@@ -211,9 +211,9 @@ test('@hive/config/parse-render', () => {
           });
 
       assert(renderRule).to.equal(
-          match.anyObjectThat().haveProperties({
-            inputs: match.anyMapThat().haveExactElements(new Map([
-              ['input', match.anyArrayThat().haveExactElements([1])],
+          objectThat().haveProperties({
+            inputs: mapThat().haveExactElements(new Map([
+              ['input', arrayThat().haveExactElements([1])],
             ])),
           }),
       );
@@ -231,9 +231,9 @@ test('@hive/config/parse-render', () => {
           });
 
       assert(renderRule).to.equal(
-          match.anyObjectThat().haveProperties({
-            inputs: match.anyMapThat().haveExactElements(new Map([
-              ['input', match.anyArrayThat().beEmpty()],
+          objectThat().haveProperties({
+            inputs: mapThat().haveExactElements(new Map([
+              ['input', arrayThat().beEmpty()],
             ])),
           }),
       );
@@ -265,8 +265,8 @@ test('@hive/config/parse-render', () => {
           });
 
       assert(renderRule).to.equal(
-          match.anyObjectThat().haveProperties({
-            inputs: match.anyMapThat().haveExactElements(new Map([
+          objectThat().haveProperties({
+            inputs: mapThat().haveExactElements(new Map([
               ['input', 'abc'],
             ])),
           }),

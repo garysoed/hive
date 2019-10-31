@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import { assert, match, setup, should, test } from '@gs-testing';
+import { assert, objectThat, setup, should, test } from '@gs-testing';
 
 import { addFile, mockFs } from '../testing/fake-fs';
 import { mockProcess, setCwd } from '../testing/fake-process';
@@ -8,6 +8,7 @@ import { mockProcess, setCwd } from '../testing/fake-process';
 import { ROOT_FILE_NAME } from './find-root';
 import { loadProjectConfig } from './load-project-config';
 import { ProjectConfig } from './project-config';
+
 
 test('@hive/project/load-project-config', () => {
   setup(() => {
@@ -25,7 +26,7 @@ outdir: ${dir}
     addFile(path.join('/a', ROOT_FILE_NAME), {content});
 
     assert(loadProjectConfig()).to.emitSequence([
-      match.anyObjectThat<ProjectConfig>().haveProperties({
+      objectThat<ProjectConfig>().haveProperties({
         outdir: dir,
       }),
     ]);

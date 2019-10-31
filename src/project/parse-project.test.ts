@@ -1,6 +1,7 @@
-import { assert, match, should, test } from '@gs-testing';
+import { assert, objectThat, should, test } from '@gs-testing';
 
 import { parseProject } from './parse-project';
+
 
 test('@hive/project/parse-project', () => {
   should(`parse the config correctly`, () => {
@@ -12,9 +13,9 @@ test('@hive/project/parse-project', () => {
         b: abc
     `;
 
-    assert(parseProject(content)).to.equal(match.anyObjectThat().haveProperties({
+    assert(parseProject(content)).to.equal(objectThat().haveProperties({
       outdir,
-      globals: match.anyObjectThat().haveProperties({
+      globals: objectThat().haveProperties({
         a: 1,
         b: 'abc',
       }),
@@ -27,7 +28,7 @@ test('@hive/project/parse-project', () => {
     const config = parseProject(content);
 
 
-    assert(parseProject(content)).to.equal(match.anyObjectThat().haveProperties({
+    assert(parseProject(content)).to.equal(objectThat().haveProperties({
       outdir,
     }));
   });

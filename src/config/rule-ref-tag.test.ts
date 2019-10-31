@@ -1,6 +1,6 @@
 import * as yaml from 'yaml';
 
-import { assert, match, should, test } from '@gs-testing';
+import { assert, objectThat, should, test } from '@gs-testing';
 
 import { RootType } from '../core/root-type';
 
@@ -11,7 +11,7 @@ test('@hive/config/rule-ref-tag', () => {
   test('resolve', () => {
     should(`parse rule reference correctly`, () => {
       assert(yaml.parse('!!hive/rule /:path/to/dir:rulename', {tags: [RULE_REF_TAG]})).to
-          .equal(match.anyObjectThat().haveProperties({
+          .equal(objectThat().haveProperties({
             rootType: RootType.SYSTEM_ROOT,
             path: 'path/to/dir',
             ruleName: 'rulename',
@@ -40,7 +40,7 @@ test('@hive/config/rule-ref-tag', () => {
 
     should(`handle white spaces`, () => {
       assert(yaml.parse('!!hive/rule /:path/to/dir:rulename\n  ', {tags: [RULE_REF_TAG]})).to
-          .equal(match.anyObjectThat().haveProperties({
+          .equal(objectThat().haveProperties({
             rootType: RootType.SYSTEM_ROOT,
             path: 'path/to/dir',
             ruleName: 'rulename',

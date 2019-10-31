@@ -1,6 +1,6 @@
 import * as yaml from 'yaml';
 
-import { assert, match, should, test } from '@gs-testing';
+import { assert, objectThat, should, test } from '@gs-testing';
 
 import { RootType } from '../core/root-type';
 
@@ -11,7 +11,7 @@ test('@hive/config/glob-ref-tag', () => {
   test('resolve', () => {
     should(`parse correctly`, () => {
       assert(yaml.parse('!!hive/glob out:glob/path/*.txt', {tags: [GLOB_REF_TAG]})).to
-          .equal(match.anyObjectThat().haveProperties({
+          .equal(objectThat().haveProperties({
             rootType: RootType.OUT_DIR,
             globPattern: 'glob/path/*.txt',
           }));
@@ -39,7 +39,7 @@ test('@hive/config/glob-ref-tag', () => {
 
     should(`handle white spaces`, () => {
       assert(yaml.parse('!!hive/glob out:glob/path/*.txt\n   ', {tags: [GLOB_REF_TAG]})).to
-          .equal(match.anyObjectThat().haveProperties({
+          .equal(objectThat().haveProperties({
             rootType: RootType.OUT_DIR,
             globPattern: 'glob/path/*.txt',
           }));

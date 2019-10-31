@@ -1,7 +1,6 @@
 import * as yaml from 'yaml';
 
-import { assert, match, should, test } from '@gs-testing';
-import { NumberType, StringType } from '@gs-types';
+import { assert, objectThat, should, test } from '@gs-testing';
 
 import { ConstType } from '../core/type/const-type';
 import { MediaTypeType } from '../core/type/media-type-type';
@@ -14,7 +13,7 @@ test('@hive/config/output-type-tag', () => {
   test('resolve', () => {
     should(`parse non arrays correctly`, () => {
       assert(yaml.parse('!!hive/o_type number', {tags: [OUTPUT_TYPE_TAG]})).to
-          .equal(match.anyObjectThat<OutputType>().haveProperties({
+          .equal(objectThat<OutputType>().haveProperties({
             baseType: ConstType.NUMBER,
             isArray: false,
           }));
@@ -22,7 +21,7 @@ test('@hive/config/output-type-tag', () => {
 
     should(`parse arrays correctly`, () => {
       assert(yaml.parse('!!hive/o_type number[]', {tags: [OUTPUT_TYPE_TAG]})).to
-          .equal(match.anyObjectThat<OutputType>().haveProperties({
+          .equal(objectThat<OutputType>().haveProperties({
             baseType: ConstType.NUMBER,
             isArray: true,
           }));
@@ -45,7 +44,7 @@ test('@hive/config/output-type-tag', () => {
 
     should(`handle trailing whitespaces`, () => {
       assert(yaml.parse('!!hive/o_type number\n    ', {tags: [OUTPUT_TYPE_TAG]})).to
-          .equal(match.anyObjectThat<OutputType>().haveProperties({
+          .equal(objectThat<OutputType>().haveProperties({
             baseType: ConstType.NUMBER,
             isArray: false,
           }));
@@ -71,8 +70,8 @@ test('@hive/config/output-type-tag', () => {
   test('getBaseType', () => {
     should(`handle media types correctly`, () => {
       assert(yaml.parse('!!hive/o_type media-type/media-subtype', {tags: [OUTPUT_TYPE_TAG]})).to
-          .equal(match.anyObjectThat<OutputType>().haveProperties({
-            baseType: match.anyObjectThat<MediaTypeType>().haveProperties({
+          .equal(objectThat<OutputType>().haveProperties({
+            baseType: objectThat<MediaTypeType>().haveProperties({
               type: 'media-type',
               subtype: 'media-subtype',
             }),
@@ -82,7 +81,7 @@ test('@hive/config/output-type-tag', () => {
 
     should(`handle object types correctly`, () => {
       assert(yaml.parse('!!hive/o_type object', {tags: [OUTPUT_TYPE_TAG]})).to
-          .equal(match.anyObjectThat<OutputType>().haveProperties({
+          .equal(objectThat<OutputType>().haveProperties({
             baseType: ConstType.OBJECT,
             isArray: false,
           }));
@@ -90,7 +89,7 @@ test('@hive/config/output-type-tag', () => {
 
     should(`handle function types correctly`, () => {
       assert(yaml.parse('!!hive/o_type function', {tags: [OUTPUT_TYPE_TAG]})).to
-          .equal(match.anyObjectThat<OutputType>().haveProperties({
+          .equal(objectThat<OutputType>().haveProperties({
             baseType: ConstType.FUNCTION,
             isArray: false,
           }));
@@ -98,7 +97,7 @@ test('@hive/config/output-type-tag', () => {
 
     should(`handle string types correctly`, () => {
       assert(yaml.parse('!!hive/o_type string', {tags: [OUTPUT_TYPE_TAG]})).to
-          .equal(match.anyObjectThat<OutputType>().haveProperties({
+          .equal(objectThat<OutputType>().haveProperties({
             baseType: ConstType.STRING,
             isArray: false,
           }));

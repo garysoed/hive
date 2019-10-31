@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import { assert, match, setup, should, test } from '@gs-testing';
+import { arrayThat, assert, mapThat, setup, should, test } from '@gs-testing';
 import { of as observableOf } from '@rxjs';
 import { map } from '@rxjs/operators';
 
@@ -46,7 +46,7 @@ test('@hive/util/run-rule', () => {
     };
 
     assert(runRule(rule)).to.emitSequence([
-      match.anyArrayThat<string>().haveExactElements([contentC, contentD, contentE]),
+      arrayThat<string>().haveExactElements([contentC, contentD, contentE]),
     ]);
   });
 
@@ -112,7 +112,7 @@ test('@hive/util/run-rule', () => {
     };
 
     assert(runRule(rule)).to.emitSequence([
-      match.anyMapThat<string, number>().haveExactElements(new Map([
+      mapThat<string, number>().haveExactElements(new Map([
         ['/out/0_0.txt', 0],
         ['/out/0_3.txt', 3],
         ['/out/1_0.txt', 1],

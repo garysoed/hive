@@ -1,6 +1,6 @@
 import * as yaml from 'yaml';
 
-import { assert, match, should, test } from '@gs-testing';
+import { assert, objectThat, setThat, should, test } from '@gs-testing';
 
 import { RootType } from '../core/root-type';
 
@@ -11,10 +11,10 @@ test('@hive/config/file-pattern-tag', () => {
     should(`handle correct file patterns`, () => {
       const raw = `!!hive/pattern /:file/pattern/{input1}_{input2}`;
       assert(yaml.parse(raw, {tags: [FILE_PATTERN_TAG]})).to
-          .equal(match.anyObjectThat().haveProperties({
+          .equal(objectThat().haveProperties({
             rootType: RootType.SYSTEM_ROOT,
             pattern: 'file/pattern/{input1}_{input2}',
-            substitutionKeys: match.anySetThat().haveExactElements(new Set(['input1', 'input2'])),
+            substitutionKeys: setThat().haveExactElements(new Set(['input1', 'input2'])),
           }));
     });
 
@@ -45,10 +45,10 @@ test('@hive/config/file-pattern-tag', () => {
     should(`handle white spaces`, () => {
       const raw = `!!hive/pattern /:file/pattern/{input1}_{input2}\n   `;
       assert(yaml.parse(raw, {tags: [FILE_PATTERN_TAG]})).to
-          .equal(match.anyObjectThat().haveProperties({
+          .equal(objectThat().haveProperties({
             rootType: RootType.SYSTEM_ROOT,
             pattern: 'file/pattern/{input1}_{input2}',
-            substitutionKeys: match.anySetThat().haveExactElements(new Set(['input1', 'input2'])),
+            substitutionKeys: setThat().haveExactElements(new Set(['input1', 'input2'])),
           }));
     });
   });

@@ -1,6 +1,6 @@
 import * as yaml from 'yaml';
 
-import { assert, match, should, test } from '@gs-testing';
+import { assert, objectThat, should, test } from '@gs-testing';
 
 import { INPUT_TYPE_TAG } from './input-type-tag';
 
@@ -8,9 +8,9 @@ test('@hive/config/input-type-tag', () => {
   test('resolve', () => {
     should(`parse valid regex correctly`, () => {
       assert(yaml.parse('!!hive/i_type abc:gi', {tags: [INPUT_TYPE_TAG]})).to
-          .equal(match.anyObjectThat().haveProperties({
+          .equal(objectThat().haveProperties({
             isArray: false,
-            matcher: match.anyObjectThat().haveProperties({
+            matcher: objectThat().haveProperties({
               source: 'abc',
               flags: 'gi',
             }),
@@ -19,9 +19,9 @@ test('@hive/config/input-type-tag', () => {
 
     should(`parse valid regex without flags correctly`, () => {
       assert(yaml.parse('!!hive/i_type abc', {tags: [INPUT_TYPE_TAG]})).to
-          .equal(match.anyObjectThat().haveProperties({
+          .equal(objectThat().haveProperties({
             isArray: false,
-            matcher: match.anyObjectThat().haveProperties({
+            matcher: objectThat().haveProperties({
               source: 'abc',
               flags: '',
             }),
@@ -30,9 +30,9 @@ test('@hive/config/input-type-tag', () => {
 
     should(`parse valid regex array correctly`, () => {
       assert(yaml.parse('!!hive/i_type abc:gi[]', {tags: [INPUT_TYPE_TAG]})).to
-          .equal(match.anyObjectThat().haveProperties({
+          .equal(objectThat().haveProperties({
             isArray: true,
-            matcher: match.anyObjectThat().haveProperties({
+            matcher: objectThat().haveProperties({
               source: 'abc',
               flags: 'gi',
             }),
@@ -41,9 +41,9 @@ test('@hive/config/input-type-tag', () => {
 
     should(`parse valid regex array without flags correctly`, () => {
       assert(yaml.parse('!!hive/i_type abc:[]', {tags: [INPUT_TYPE_TAG]})).to
-          .equal(match.anyObjectThat().haveProperties({
+          .equal(objectThat().haveProperties({
             isArray: true,
-            matcher: match.anyObjectThat().haveProperties({
+            matcher: objectThat().haveProperties({
               source: 'abc',
               flags: '',
             }),
@@ -57,8 +57,8 @@ test('@hive/config/input-type-tag', () => {
 
     should(`handle trailing white spaces`, () => {
       assert(yaml.parse('!!hive/i_type abc:gi\n   ', {tags: [INPUT_TYPE_TAG]})).to
-          .equal(match.anyObjectThat().haveProperties({
-            matcher: match.anyObjectThat().haveProperties({
+          .equal(objectThat().haveProperties({
+            matcher: objectThat().haveProperties({
               source: 'abc',
               flags: 'gi',
             }),

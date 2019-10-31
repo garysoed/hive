@@ -1,10 +1,11 @@
-import { assert, match, MatcherType, should, test } from '@gs-testing';
+import { arrayThat, assert, mapThat, MatcherType, objectThat, should, test } from '@gs-testing';
 
 import { generateRunSpecs, RunSpec } from './generate-run-specs';
 
+
 function matchRunSpec(inputs: Map<string, unknown>, outputPath: string): MatcherType<RunSpec> {
-  return match.anyObjectThat<RunSpec>().haveProperties({
-    inputs: match.anyMapThat().haveExactElements(inputs),
+  return objectThat<RunSpec>().haveProperties({
+    inputs: mapThat().haveExactElements(inputs),
     outputPath,
   });
 }
@@ -37,8 +38,8 @@ test('@hive/util/generate-run-specs', () => {
     assert(generateRunSpecs(inputs, repeatedKeys, '{a}_{b}.txt')).to.haveExactElements([
       matchRunSpec(
           new Map<string, unknown>([
-            ['a', match.anyArrayThat().haveExactElements([1, 2, 3])],
-            ['b', match.anyArrayThat().haveExactElements(['a', 'b'])],
+            ['a', arrayThat().haveExactElements([1, 2, 3])],
+            ['b', arrayThat().haveExactElements(['a', 'b'])],
           ]),
           '{a}_{b}.txt',
       ),

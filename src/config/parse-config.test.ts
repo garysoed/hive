@@ -1,5 +1,5 @@
 
-import { assert, match, MatcherType, should, test } from '@gs-testing';
+import { arrayThat, assert, mapThat, MatcherType, objectThat, setThat, should, test } from '@gs-testing';
 
 import { DeclareRule } from '../core/declare-rule';
 import { FilePattern } from '../core/file-pattern';
@@ -24,8 +24,8 @@ function matchInputs(expected: InputTypes): MatcherType<Map<string, InputType>> 
   const matcherSpec = new Map<string, InputType>();
 
   for (const [key, value] of expected) {
-    const matcherValue = match.anyObjectThat<InputType>().haveProperties({
-      matcher: match.anyObjectThat<RegExp>().haveProperties({
+    const matcherValue = objectThat<InputType>().haveProperties({
+      matcher: objectThat<RegExp>().haveProperties({
         source: value.matcher.source,
         flags: value.matcher.flags,
       }),
@@ -33,48 +33,48 @@ function matchInputs(expected: InputTypes): MatcherType<Map<string, InputType>> 
     matcherSpec.set(key, matcherValue);
   }
 
-  return match.anyMapThat<string, InputType>().haveExactElements(matcherSpec);
+  return mapThat<string, InputType>().haveExactElements(matcherSpec);
 }
 
 function matchRenderInputs(
     expected: ReadonlyMap<string, RenderInput>,
 ): MatcherType<Map<string, RenderInput>> {
-  return match.anyMapThat<string, RenderInput>().haveExactElements(expected);
+  return mapThat<string, RenderInput>().haveExactElements(expected);
 }
 
 function matchRuleRef(expected: RuleRef): MatcherType<RuleRef> {
-  return match.anyObjectThat<RuleRef>().haveProperties(expected);
+  return objectThat<RuleRef>().haveProperties(expected);
 }
 
 function matchFilePattern(expected: FilePattern): MatcherType<FilePattern> {
-  return match.anyObjectThat<FilePattern>().haveProperties({
+  return objectThat<FilePattern>().haveProperties({
     pattern: expected.pattern,
     rootType: expected.rootType,
-    substitutionKeys: match.anySetThat().haveExactElements(expected.substitutionKeys),
+    substitutionKeys: setThat().haveExactElements(expected.substitutionKeys),
   });
 }
 
 function matchDeclareRule(expected: RuleWithoutType<DeclareRule>): MatcherType<DeclareRule> {
-  return match.anyObjectThat<DeclareRule>().haveProperties({
+  return objectThat<DeclareRule>().haveProperties({
     name: expected.name,
-    processor: match.anyObjectThat<FileRef>().haveProperties(expected.processor),
+    processor: objectThat<FileRef>().haveProperties(expected.processor),
     inputs: matchInputs(expected.inputs),
-    output: match.anyObjectThat().haveProperties(expected.output),
+    output: objectThat().haveProperties(expected.output),
     type: RuleType.DECLARE,
   });
 }
 
 function matchLoadRule(expected: RuleWithoutType<LoadRule>): MatcherType<LoadRule> {
-  return match.anyObjectThat<LoadRule>().haveProperties({
+  return objectThat<LoadRule>().haveProperties({
     name: expected.name,
-    srcs: match.anyObjectThat().haveProperties(expected.srcs),
-    outputType: match.anyObjectThat().haveProperties(expected.outputType),
+    srcs: objectThat().haveProperties(expected.srcs),
+    outputType: objectThat().haveProperties(expected.outputType),
     type: RuleType.LOAD,
   });
 }
 
 function matchRenderRule(expected: RuleWithoutType<RenderRule>): MatcherType<RenderRule> {
-  return match.anyObjectThat<RenderRule>().haveProperties({
+  return objectThat<RenderRule>().haveProperties({
     name: expected.name,
     processor: matchRuleRef(expected.processor),
     inputs: matchRenderInputs(expected.inputs),
@@ -185,7 +185,7 @@ test('@hive/config/parse-config', () => {
             substitutionKeys: new Set(['paramA', 'paramB']),
           },
           inputs: new Map<string, RenderInput>([
-            ['paramA', match.anyArrayThat().haveExactElements([1, 2, 3])],
+            ['paramA', arrayThat().haveExactElements([1, 2, 3])],
             ['paramB', 'stringValue'],
           ]),
           processor: {rootType: RootType.PROJECT_ROOT, path: 'path', ruleName: 'processor'},

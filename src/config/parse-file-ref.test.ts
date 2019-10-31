@@ -1,13 +1,14 @@
-import { assert, match, should, test } from '@gs-testing';
+import { assert, objectThat, should, test } from '@gs-testing';
 
 import { RootType } from '../core/root-type';
 
 import { parseFileRef } from './parse-file-ref';
 
+
 test('@hive/config/parse-file-ref', () => {
   should(`parse project root based path correctly`, () => {
     assert(parseFileRef('root:path/to/file.txt')).to
-        .equal(match.anyObjectThat().haveProperties({
+        .equal(objectThat().haveProperties({
           rootType: RootType.PROJECT_ROOT,
           path: 'path/to/file.txt',
         }));
@@ -15,7 +16,7 @@ test('@hive/config/parse-file-ref', () => {
 
   should(`parse current directory based path correctly`, () => {
     assert(parseFileRef('.:path/to/file.txt')).to
-        .equal(match.anyObjectThat().haveProperties({
+        .equal(objectThat().haveProperties({
           rootType: RootType.CURRENT_DIR,
           path: 'path/to/file.txt',
         }));
@@ -23,7 +24,7 @@ test('@hive/config/parse-file-ref', () => {
 
   should(`parse system root based path correctly`, () => {
     assert(parseFileRef('/:path/to/file.txt')).to
-        .equal(match.anyObjectThat().haveProperties({
+        .equal(objectThat().haveProperties({
           rootType: RootType.SYSTEM_ROOT,
           path: 'path/to/file.txt',
         }));

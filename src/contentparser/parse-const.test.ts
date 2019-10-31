@@ -1,4 +1,4 @@
-import { assert, match, should, test } from '@gs-testing';
+import { assert, objectThat, should, test } from '@gs-testing';
 
 import { ConstType } from '../core/type/const-type';
 
@@ -51,7 +51,7 @@ test('@hive/contentparser/parse-const', () => {
   test('object', () => {
     should(`parse JSON correctly`, () => {
       assert(parseConst('{"a": 1, "b": "abc"}', ConstType.OBJECT)).to
-          .equal(match.anyObjectThat().haveProperties({
+          .equal(objectThat().haveProperties({
             a: 1,
             b: 'abc',
           }));

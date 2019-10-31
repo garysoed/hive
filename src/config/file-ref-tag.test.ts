@@ -1,6 +1,6 @@
 import * as yaml from 'yaml';
 
-import { assert, match, should, test } from '@gs-testing';
+import { assert, objectThat, should, test } from '@gs-testing';
 
 import { RootType } from '../core/root-type';
 
@@ -10,7 +10,7 @@ test('@hive/config/file-ref-tag', () => {
   test('resolve', () => {
     should(`parse project root based path correctly`, () => {
       assert(yaml.parse('!!hive/file root:path/to/file.txt', {tags: [FILE_REF_TAG]})).to
-          .equal(match.anyObjectThat().haveProperties({
+          .equal(objectThat().haveProperties({
             rootType: RootType.PROJECT_ROOT,
             path: 'path/to/file.txt',
           }));
@@ -18,7 +18,7 @@ test('@hive/config/file-ref-tag', () => {
 
     should(`parse current directory based path correctly`, () => {
       assert(yaml.parse('!!hive/file .:path/to/file.txt', {tags: [FILE_REF_TAG]})).to
-          .equal(match.anyObjectThat().haveProperties({
+          .equal(objectThat().haveProperties({
             rootType: RootType.CURRENT_DIR,
             path: 'path/to/file.txt',
           }));
@@ -26,7 +26,7 @@ test('@hive/config/file-ref-tag', () => {
 
     should(`parse system root based path correctly`, () => {
       assert(yaml.parse('!!hive/file /:path/to/file.txt', {tags: [FILE_REF_TAG]})).to
-          .equal(match.anyObjectThat().haveProperties({
+          .equal(objectThat().haveProperties({
             rootType: RootType.SYSTEM_ROOT,
             path: 'path/to/file.txt',
           }));
@@ -54,7 +54,7 @@ test('@hive/config/file-ref-tag', () => {
 
     should(`handle white spaces`, () => {
       assert(yaml.parse('!!hive/file root:path/to/file.txt\n    ', {tags: [FILE_REF_TAG]})).to
-          .equal(match.anyObjectThat().haveProperties({
+          .equal(objectThat().haveProperties({
             rootType: RootType.PROJECT_ROOT,
             path: 'path/to/file.txt',
           }));

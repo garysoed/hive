@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import { assert, match, setup, should, test } from '@gs-testing';
+import { assert, objectThat, setup, should, test } from '@gs-testing';
 
 import { LoadRule } from '../core/load-rule';
 import { RootType } from '../core/root-type';
@@ -29,13 +29,13 @@ test('@hive/util/read-rule', () => {
 
     assert(readRule({path: 'a/b', rootType: RootType.CURRENT_DIR, ruleName: 'rule'})).to
         .emitSequence([
-          match.anyObjectThat<LoadRule>().haveProperties({
+          objectThat<LoadRule>().haveProperties({
             name: 'rule',
-            srcs: match.anyObjectThat().haveProperties({
+            srcs: objectThat().haveProperties({
               path: 'filename',
               rootType: RootType.OUT_DIR,
             }),
-            outputType: match.anyObjectThat().haveProperties({
+            outputType: objectThat().haveProperties({
               baseType: ConstType.NUMBER,
               isArray: false,
             }),

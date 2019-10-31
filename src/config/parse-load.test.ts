@@ -1,4 +1,4 @@
-import { assert, match, should, test } from '@gs-testing';
+import { assert, objectThat, should, test } from '@gs-testing';
 
 import { RootType } from '../core/root-type';
 import { ConstType } from '../core/type/const-type';
@@ -13,7 +13,7 @@ test('@hive/config/parse-load', () => {
       const as = {baseType: ConstType.NUMBER, isArray: true};
       const load = {rootType: RootType.SYSTEM_ROOT, globPattern: 'glob/pattern'};
 
-      assert(parseLoad(ruleName, {as, load})).to.equal(match.anyObjectThat().haveProperties({
+      assert(parseLoad(ruleName, {as, load})).to.equal(objectThat().haveProperties({
         name: ruleName,
         srcs: load,
         outputType: as,
@@ -25,7 +25,7 @@ test('@hive/config/parse-load', () => {
       const as = {baseType: ConstType.NUMBER, isArray: true};
       const load = {rootType: RootType.SYSTEM_ROOT, path: 'file/pattern'};
 
-      assert(parseLoad(ruleName, {as, load})).to.equal(match.anyObjectThat().haveProperties({
+      assert(parseLoad(ruleName, {as, load})).to.equal(objectThat().haveProperties({
         name: ruleName,
         srcs: load,
         outputType: as,

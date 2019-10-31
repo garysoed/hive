@@ -1,13 +1,14 @@
-import { assert, match, should, test } from '@gs-testing';
+import { arrayThat, assert, should, test } from '@gs-testing';
 
 import { ConstType } from '../core/type/const-type';
 
 import { parseContent } from './parse-content';
 
+
 test('@hive/contentparser/parse-content', () => {
   should(`parse arrays correctly`, () => {
     assert(parseContent('[1, 2, 3]', {baseType: ConstType.NUMBER, isArray: true})).to
-        .emitSequence([match.anyArrayThat().haveExactElements([1, 2, 3])]);
+        .emitSequence([arrayThat().haveExactElements([1, 2, 3])]);
   });
 
   should(`parse simple types correctly`, () => {
