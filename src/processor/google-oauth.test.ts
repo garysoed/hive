@@ -14,7 +14,7 @@ import { mockProcess, setCwd } from '../testing/fake-process';
 import { CredentialsFile, GoogleAuth, GoogleOauth, OAUTH_FILE } from './google-oauth';
 
 
-test('@hive/contentparser/google-oauth', () => {
+test('@hive/processor/google-oauth', () => {
   const ROOT_DIR = '/';
   const CLIENT_ID = 'clientId';
   const CLIENT_SECRET = 'clientSecret';

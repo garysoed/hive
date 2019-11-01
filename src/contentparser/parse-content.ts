@@ -1,19 +1,32 @@
-import { Observable, of as observableOf } from '@rxjs';
+import { Observable, of as observableOf, throwError } from '@rxjs';
 
 import { MediaTypeType } from '../core/type/media-type-type';
 import { OutputType } from '../core/type/output-type';
 
 import { parseArray } from './parse-array';
 import { parseConst } from './parse-const';
+import { parseGoogleSheets } from './parse-google-sheets';
 
 export function parseContent(content: string, expectedType: OutputType): Observable<unknown> {
-  if (expectedType.isArray) {
-    return observableOf(parseArray(content));
-  }
+  try {
+    if (expectedType.isArray) {
+      return observableOf(parseArray(content));
+    }
 
-  if (expectedType.baseType instanceof MediaTypeType) {
-    throw new Error('Unimplemented');
-  }
+    if (expectedType.baseType instanceof MediaTypeType) {
+      switch (expectedType.baseType.type) {
+        case 'application':
+          switch (expectedType.baseType.subtype) {
+            case 'vnd.google-apps.spreadsheet':
+              return observableOf(parseGoogleSheets(content));
+          }
+      }
 
-  return observableOf(parseConst(content, expectedType.baseType));
+      throw new Error('Unimplemented');
+    }
+
+    return observableOf(parseConst(content, expectedType.baseType));
+  } catch (e) {
+    return throwError(e);
+  }
 }

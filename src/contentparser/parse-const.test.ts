@@ -1,60 +1,72 @@
-import { assert, objectThat, should, test } from '@gs-testing';
+import { assert, numberThat, objectThat, should, test } from '@gs-testing';
+import { map } from '@rxjs/operators';
 
 import { ConstType } from '../core/type/const-type';
 
-import { parseConst } from './parse-const';
+import { parseContent } from './parse-content';
 
 
 test('@hive/contentparser/parse-const', () => {
   test('boolean', () => {
     should(`return true if the string is "true"`, () => {
-      assert(parseConst('true', ConstType.BOOLEAN)).to.equal(true);
+      assert(parseContent('true', {isArray: false, baseType: ConstType.BOOLEAN})).to
+          .emitSequence([true]);
     });
 
     should(`return false if the string is "false"`, () => {
-      assert(parseConst('false', ConstType.BOOLEAN)).to.equal(false);
+      assert(parseContent('false', {isArray: false, baseType: ConstType.BOOLEAN})).to
+          .emitSequence([false]);
     });
 
     should(`return false if the string is a number`, () => {
-      assert(parseConst('123', ConstType.BOOLEAN)).to.equal(false);
+      assert(parseContent('123', {isArray: false, baseType: ConstType.BOOLEAN})).to
+          .emitSequence([false]);
     });
   });
 
   test('number', () => {
     should(`handle floats`, () => {
-      assert(parseConst('12.3', ConstType.NUMBER)).to.equal(12.3);
+      assert(parseContent('12.3', {isArray: false, baseType: ConstType.NUMBER})).to
+          .emitSequence([12.3]);
     });
 
     should(`handle integers`, () => {
-      assert(parseConst('12', ConstType.NUMBER)).to.equal(12);
+      assert(parseContent('12', {isArray: false, baseType: ConstType.NUMBER})).to
+          .emitSequence([12]);
     });
 
     should(`return NaN if not a number`, () => {
-      assert(isNaN(parseConst('abc', ConstType.NUMBER) as number)).to.beTrue();
+      assert(parseContent('abc', {isArray: false, baseType: ConstType.NUMBER})).to
+          .emitSequence([numberThat().beANaN()]);
     });
   });
 
   test('function', () => {
     should(`return function if the string evaluates to a function`, () => {
-      const fn = parseConst('123;(a, b) => a + b', ConstType.FUNCTION);
+      const result$ = parseContent(
+          '123;(a, b) => a + b',
+          {isArray: false, baseType: ConstType.FUNCTION},
+      )
+      .pipe(map(fn => (fn as Function)(1, 2)));
 
-      assert((fn as Function)(1, 2)).to.equal(3);
+      assert(result$).to.emitSequence([3]);
     });
 
     should(`throw error if the string does not evaluate to a function`, () => {
-      assert(() => {
-        parseConst('(a, b) => a + b ;123;', ConstType.FUNCTION);
-      }).to.throwErrorWithMessage(/result in a function/);
+      assert(parseContent('(a, b) => a + b ;123;', {isArray: false, baseType: ConstType.FUNCTION}))
+          .to.emitErrorWithMessage(/result in a function/);
     });
   });
 
   test('object', () => {
     should(`parse JSON correctly`, () => {
-      assert(parseConst('{"a": 1, "b": "abc"}', ConstType.OBJECT)).to
-          .equal(objectThat().haveProperties({
-            a: 1,
-            b: 'abc',
-          }));
+      assert(parseContent('{"a": 1, "b": "abc"}', {isArray: false, baseType: ConstType.OBJECT}))
+          .to.emitSequence([
+            objectThat().haveProperties({
+              a: 1,
+              b: 'abc',
+            }),
+          ]);
     });
   });
 
@@ -62,7 +74,8 @@ test('@hive/contentparser/parse-const', () => {
     should(`return the string`, () => {
       const str = 'str';
 
-      assert(parseConst(str, ConstType.STRING)).to.equal(str);
+      assert(parseContent(str, {isArray: false, baseType: ConstType.STRING})).to
+          .emitSequence([str]);
     });
   });
 });
