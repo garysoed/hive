@@ -32,6 +32,15 @@ test('@hive/util/resolve-root', () => {
     assert(resolveRoot(RootType.OUT_DIR)).to.emitSequence([outdir]);
   });
 
+  should(`emit the out directory relative to the root directory the root type is OUT_DIR`, () => {
+    setCwd('/a/b/c');
+
+    const outdir = 'outdir';
+    addFile(path.join('/a', ROOT_FILE_NAME), {content: `outdir: ${outdir}`});
+
+    assert(resolveRoot(RootType.OUT_DIR)).to.emitSequence([path.join('/a', outdir)]);
+  });
+
   should(`emit the project root if the root type is PROJECT_ROOT`, () => {
     const projectRoot = '/a';
     setCwd('/a/b/c');
