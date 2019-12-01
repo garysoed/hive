@@ -2,7 +2,7 @@ import * as yaml from 'yaml';
 
 import { ProjectConfig } from './project-config';
 
-type ProjectConfigRaw = {[K in keyof ProjectConfig]: unknown};
+type ProjectConfigRaw = {readonly [K in keyof ProjectConfig]: unknown};
 
 export function parseProject(content: string): ProjectConfig {
   const yamlRaw = yaml.parse(content);
@@ -28,5 +28,11 @@ function parseConfig(obj: ProjectConfigRaw): ProjectConfig|null {
     return null;
   }
 
-  return {outdir: obj.outdir, globals: (obj.globals || {}) as {[key: string]: any}};
+  const globals = new Map<string, unknown>();
+  const globalsRaw = obj.globals as {[key: string]: string} || {};
+  for (const key of Object.keys(globalsRaw)) {
+    globals.set(key, globalsRaw[key]);
+  }
+
+  return {outdir: obj.outdir, globals};
 }

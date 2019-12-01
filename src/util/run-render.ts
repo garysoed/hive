@@ -1,9 +1,9 @@
 import * as path from 'path';
-import { LOGGER } from 'src/cli/logger';
 
 import { combineLatest, from as observableFrom, Observable, of as observableOf } from '@rxjs';
 import { map, mapTo, switchMap, tap } from '@rxjs/operators';
 
+import { LOGGER } from '../cli/logger';
 import { RenderRule } from '../core/render-rule';
 import { RuleType } from '../core/rule-type';
 import { loadProjectConfig } from '../project/load-project-config';

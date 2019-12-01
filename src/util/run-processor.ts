@@ -1,7 +1,7 @@
 export function runProcessor(
     processorContent: string,
     resolvedInputs: ReadonlyMap<string, unknown>,
-    globals: {[key: string]: any},
+    globals: ReadonlyMap<string, any>,
 ): unknown {
   const $hive: {[key: string]: unknown} = {};
   for (const [key, value] of resolvedInputs) {
@@ -9,7 +9,10 @@ export function runProcessor(
   }
 
   // This is used in eval.
-  const $hiveGlobals = globals;
+  const $hiveGlobals: {[key: string]: any} = {};
+  for (const [key, value] of globals) {
+    $hiveGlobals[key] = value;
+  }
 
   // tslint:disable-next-line: no-eval
   return eval(processorContent);

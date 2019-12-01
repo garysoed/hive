@@ -1,4 +1,4 @@
 export interface ProjectConfig {
-  globals: {[key: string]: any};
+  globals: ReadonlyMap<string, unknown>;
   outdir: string;
 }

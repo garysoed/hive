@@ -8,7 +8,7 @@ test('@hive/util/run-processor', () => {
     const result = runProcessor(
         '$hive.a + $hive.b + $hiveGlobals.g',
         new Map([['a', 1], ['b', 2]]),
-        {g: 3},
+        new Map([['g', 3]]),
     );
     assert(result).to.equal(6);
   });

@@ -1,4 +1,4 @@
-import { assert, objectThat, should, test } from '@gs-testing';
+import { assert, mapThat, objectThat, should, test } from '@gs-testing';
 
 import { parseProject } from './parse-project';
 
@@ -15,18 +15,16 @@ test('@hive/project/parse-project', () => {
 
     assert(parseProject(content)).to.equal(objectThat().haveProperties({
       outdir,
-      globals: objectThat().haveProperties({
-        a: 1,
-        b: 'abc',
-      }),
+      globals: mapThat().haveExactElements(new Map<string, unknown>([
+        ['a', 1],
+        ['b', 'abc'],
+      ])),
     }));
   });
 
   should(`parse the config correctly if globals is not specified`, () => {
     const outdir = 'file/outdir';
     const content = `outdir: ${outdir}`;
-    const config = parseProject(content);
-
 
     assert(parseProject(content)).to.equal(objectThat().haveProperties({
       outdir,
