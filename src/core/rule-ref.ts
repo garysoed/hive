@@ -1,4 +1,4 @@
-import { HasPropertiesType, StringType, UnionType } from '@gs-types';
+import { HasPropertiesType, IntersectType, StringType, Type } from '@gs-types';
 
 import { FILE_REF_TYPE, FileRef } from './file-ref';
 
@@ -7,7 +7,7 @@ export interface RuleRef extends FileRef {
   readonly ruleName: string;
 }
 
-const RULE_TYPE = UnionType<RuleRef>([
+const RULE_TYPE: Type<RuleRef> = IntersectType([
   HasPropertiesType<{ruleName: string}>({
     ruleName: StringType,
   }),

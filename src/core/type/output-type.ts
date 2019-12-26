@@ -12,7 +12,7 @@ export interface OutputType {
 }
 
 const OUTPUT_TYPE_TYPE = HasPropertiesType<OutputType>({
-  baseType: UnionType<BaseType>([
+  baseType: UnionType([
     EnumType(ConstType),
     InstanceofType(MediaTypeType),
   ]),

@@ -1,4 +1,4 @@
-import { EnumType, HasPropertiesType, IterableOfType, StringType } from '@gs-types';
+import { EnumType, HasPropertiesType, SetOfType, StringType } from '@gs-types';
 
 import { RootType } from './root-type';
 
@@ -12,7 +12,7 @@ export interface FilePattern {
 const FILE_PATTERN_TYPE = HasPropertiesType<FilePattern>({
   pattern: StringType,
   rootType: EnumType(RootType),
-  substitutionKeys: IterableOfType<string, Set<string>>(StringType),
+  substitutionKeys: SetOfType<string>(StringType),
 });
 
 export function isFilePattern(target: unknown): target is FilePattern {

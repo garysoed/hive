@@ -1,8 +1,8 @@
-import { EqualType, HasPropertiesType, Type } from '@gs-types';
+import { EqualType, HasPropertiesType, Type, ValidationResult } from '@gs-types';
 
 import { MediaType } from './media-type';
 
-export class MediaTypeType implements Type<MediaType> {
+export class MediaTypeType extends Type<MediaType> {
   private readonly hasPropertiesType = HasPropertiesType<MediaType>({
     type: EqualType(this.type),
     subtype: EqualType(this.subtype),
@@ -11,10 +11,8 @@ export class MediaTypeType implements Type<MediaType> {
   constructor(
       readonly type: string,
       readonly subtype: string,
-  ) { }
-
-  check(target: any): target is MediaType {
-    return this.hasPropertiesType.check(target);
+  ) {
+    super();
   }
 
   stringify(): string {
@@ -23,5 +21,9 @@ export class MediaTypeType implements Type<MediaType> {
 
   toString(): string {
     return this.hasPropertiesType.toString();
+  }
+
+  validate(target: unknown): ValidationResult {
+    return this.hasPropertiesType.validate(target);
   }
 }
