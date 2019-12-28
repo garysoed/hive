@@ -4,16 +4,16 @@ import { assertNonNull } from '@gs-tools/rxjs';
 import { combineLatest, Observable, of as observableOf } from '@rxjs';
 import { map } from '@rxjs/operators';
 
-import { RootType } from '../core/root-type';
+import { BuiltInRootType, RootType } from '../core/root-type';
 import { findRoot } from '../project/find-root';
 import { loadProjectConfig } from '../project/load-project-config';
 
 
 export function resolveRoot(rootType: RootType): Observable<string> {
   switch (rootType) {
-    case RootType.CURRENT_DIR:
+    case BuiltInRootType.CURRENT_DIR:
       return observableOf(process.cwd());
-    case RootType.OUT_DIR:
+    case BuiltInRootType.OUT_DIR:
       return combineLatest([
         loadProjectConfig(),
         findRoot(),
@@ -26,9 +26,14 @@ export function resolveRoot(rootType: RootType): Observable<string> {
             return path.join(root || '', config.outdir);
           }),
       );
-    case RootType.PROJECT_ROOT:
+    case BuiltInRootType.PROJECT_ROOT:
       return findRoot().pipe(assertNonNull('Cannot find project root'));
-    case RootType.SYSTEM_ROOT:
+    case BuiltInRootType.SYSTEM_ROOT:
       return observableOf('/');
+    default:
+      return loadProjectConfig().pipe(
+          map(config => config.roots.get(rootType) || null),
+          assertNonNull(`Cannot find root type: ${rootType}`),
+      );
   }
 }

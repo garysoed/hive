@@ -7,7 +7,7 @@ import { DeclareRule } from '../core/declare-rule';
 import { LoadRule } from '../core/load-rule';
 import { RenderInput } from '../core/render-input';
 import { RenderRule } from '../core/render-rule';
-import { RootType } from '../core/root-type';
+import { BuiltInRootType } from '../core/root-type';
 import { Rule } from '../core/rule';
 import { ConstType } from '../core/type/const-type';
 import { addFile, mockFs } from '../testing/fake-fs';
@@ -71,8 +71,8 @@ test('@hive/util/resolve-inputs', () => {
     addFile(path.join('/b', RULE_FILE_NAME), {content: contentB});
 
     const inputs = new Map<string, RenderInput>([
-      ['a', {rootType: RootType.SYSTEM_ROOT, path: 'a', ruleName: 'ruleA'}],
-      ['b', {rootType: RootType.SYSTEM_ROOT, path: 'b', ruleName: 'ruleB'}],
+      ['a', {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a', ruleName: 'ruleA'}],
+      ['b', {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'b', ruleName: 'ruleB'}],
     ]);
 
     assert(resolveInputs(inputs, fakeRunRule)).to.emitSequence([
@@ -96,7 +96,7 @@ test('@hive/util/resolve-inputs', () => {
     addFile(path.join('/a', RULE_FILE_NAME), {content: contentA});
 
     const inputs = new Map<string, RenderInput>([
-      ['a', {rootType: RootType.SYSTEM_ROOT, path: 'a', ruleName: 'ruleA'}],
+      ['a', {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a', ruleName: 'ruleA'}],
     ]);
 
     assert(resolveInputs(inputs, fakeRunRule)).to.emitSequence([
@@ -121,7 +121,7 @@ test('@hive/util/resolve-inputs', () => {
     addFile(path.join('/a', RULE_FILE_NAME), {content: contentA});
 
     const inputs = new Map<string, RenderInput>([
-      ['a', {rootType: RootType.SYSTEM_ROOT, path: 'a', ruleName: 'ruleA'}],
+      ['a', {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a', ruleName: 'ruleA'}],
     ]);
 
     assert(resolveInputs(inputs, fakeRunRule)).to.emitSequence([
@@ -145,7 +145,7 @@ test('@hive/util/resolve-inputs', () => {
     addFile(path.join('/a', RULE_FILE_NAME), {content: contentA});
 
     const inputs = new Map<string, RenderInput>([
-      ['a', {rootType: RootType.SYSTEM_ROOT, path: 'a', ruleName: 'ruleA'}],
+      ['a', {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a', ruleName: 'ruleA'}],
     ]);
 
     assert(resolveInputs(inputs, fakeRunRule)).to.emitSequence([

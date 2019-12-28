@@ -7,7 +7,7 @@ import { FileRef } from '../core/file-ref';
 import { LoadRule } from '../core/load-rule';
 import { RenderInput } from '../core/render-input';
 import { RenderRule } from '../core/render-rule';
-import { RootType } from '../core/root-type';
+import { BuiltInRootType } from '../core/root-type';
 import { Rule } from '../core/rule';
 import { RuleRef } from '../core/rule-ref';
 import { RuleType } from '../core/rule-type';
@@ -105,7 +105,7 @@ test('@hive/config/parse-config', () => {
         'ruleA',
         matchDeclareRule({
           name: 'ruleA',
-          processor: {rootType: RootType.SYSTEM_ROOT, path: 'path/to/scriptA'},
+          processor: {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'path/to/scriptA'},
           inputs: new Map([
             ['paramA', {isArray: false, matcher: /number/}],
             ['paramB', {isArray: false, matcher: /boolean/}],
@@ -117,7 +117,7 @@ test('@hive/config/parse-config', () => {
         'ruleB',
         matchDeclareRule({
           name: 'ruleB',
-          processor: {rootType: RootType.OUT_DIR, path: 'path/to/scriptB'},
+          processor: {rootType: BuiltInRootType.OUT_DIR, path: 'path/to/scriptB'},
           inputs: new Map([
             ['param', {isArray: false, matcher: /boolean/}],
           ]),
@@ -143,7 +143,7 @@ test('@hive/config/parse-config', () => {
         'ruleA',
         matchLoadRule({
           name: 'ruleA',
-          srcs: {rootType: RootType.OUT_DIR, globPattern: 'glob/path/*.txt'},
+          srcs: {rootType: BuiltInRootType.OUT_DIR, globPattern: 'glob/path/*.txt'},
           outputType: {baseType: ConstType.NUMBER, isArray: false},
         }),
       ],
@@ -151,7 +151,7 @@ test('@hive/config/parse-config', () => {
         'ruleB',
         matchLoadRule({
           name: 'ruleB',
-          srcs: {rootType: RootType.OUT_DIR, path: 'path/out.txt'},
+          srcs: {rootType: BuiltInRootType.OUT_DIR, path: 'path/out.txt'},
           outputType: {baseType: ConstType.STRING, isArray: true},
         }),
       ],
@@ -180,7 +180,7 @@ test('@hive/config/parse-config', () => {
         matchRenderRule({
           name: 'ruleA',
           output: {
-            rootType: RootType.OUT_DIR,
+            rootType: BuiltInRootType.OUT_DIR,
             pattern: 'path/{paramA}_{paramB}.txt',
             substitutionKeys: new Set(['paramA', 'paramB']),
           },
@@ -188,7 +188,7 @@ test('@hive/config/parse-config', () => {
             ['paramA', arrayThat().haveExactElements([1, 2, 3])],
             ['paramB', 'stringValue'],
           ]),
-          processor: {rootType: RootType.PROJECT_ROOT, path: 'path', ruleName: 'processor'},
+          processor: {rootType: BuiltInRootType.PROJECT_ROOT, path: 'path', ruleName: 'processor'},
         }),
       ],
       [
@@ -196,14 +196,14 @@ test('@hive/config/parse-config', () => {
         matchRenderRule({
           name: 'ruleB',
           output: {
-            rootType: RootType.OUT_DIR,
+            rootType: BuiltInRootType.OUT_DIR,
             pattern: 'path/out.txt',
             substitutionKeys: new Set(),
           },
           inputs: new Map([
             ['param', false],
           ]),
-          processor: {rootType: RootType.PROJECT_ROOT, path: 'path', ruleName: 'processor2'},
+          processor: {rootType: BuiltInRootType.PROJECT_ROOT, path: 'path', ruleName: 'processor2'},
         }),
       ],
     ]);

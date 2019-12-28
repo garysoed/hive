@@ -1,6 +1,6 @@
 import { assert, objectThat, should, test } from '@gs-testing';
 
-import { RootType } from '../core/root-type';
+import { BuiltInRootType } from '../core/root-type';
 
 import { parseRuleRef } from './parse-rule-ref';
 
@@ -9,7 +9,7 @@ test('@hive/config/parse-rule-ref', () => {
   should(`parse rule reference correctly`, () => {
     assert(parseRuleRef('/:path/to/dir:rulename')).to
         .equal(objectThat().haveProperties({
-          rootType: RootType.SYSTEM_ROOT,
+          rootType: BuiltInRootType.SYSTEM_ROOT,
           path: 'path/to/dir',
           ruleName: 'rulename',
         }));

@@ -1,6 +1,6 @@
 import { assert, objectThat, setup, should, test } from '@gs-testing';
 
-import { RootType } from '../core/root-type';
+import { BuiltInRootType } from '../core/root-type';
 import { ConstType } from '../core/type/const-type';
 import { OutputType } from '../core/type/output-type';
 import { addFile, mockFs } from '../testing/fake-fs';
@@ -59,7 +59,7 @@ test('@hive/util/get-type-of-value', () => {
     `;
     addFile('/a/hive.yaml', {content: processorContent});
 
-    const ruleRef = {path: 'a/c', rootType: RootType.SYSTEM_ROOT, ruleName: 'ruleA'};
+    const ruleRef = {path: 'a/c', rootType: BuiltInRootType.SYSTEM_ROOT, ruleName: 'ruleA'};
     assert(getTypeOfValue(ruleRef)).to.emitSequence([
       objectThat<OutputType>().haveProperties({
         isArray: false,
@@ -84,7 +84,7 @@ test('@hive/util/get-type-of-value', () => {
     `;
     addFile('/a/hive.yaml', {content: processorContent});
 
-    const ruleRef = {path: 'a/c', rootType: RootType.SYSTEM_ROOT, ruleName: 'ruleA'};
+    const ruleRef = {path: 'a/c', rootType: BuiltInRootType.SYSTEM_ROOT, ruleName: 'ruleA'};
     assert(getTypeOfValue(ruleRef)).to.emitErrorWithMessage(/is invalid/);
   });
 
@@ -96,7 +96,7 @@ test('@hive/util/get-type-of-value', () => {
     `;
     addFile('/a/c/hive.yaml', {content: configContent});
 
-    const ruleRef = {path: 'a/c', rootType: RootType.SYSTEM_ROOT, ruleName: 'rule'};
+    const ruleRef = {path: 'a/c', rootType: BuiltInRootType.SYSTEM_ROOT, ruleName: 'rule'};
     assert(getTypeOfValue(ruleRef)).to.emitSequence([
       objectThat<OutputType>().haveProperties({
         isArray: false,
@@ -114,7 +114,7 @@ test('@hive/util/get-type-of-value', () => {
     `;
     addFile('/a/c/hive.yaml', {content: configContent});
 
-    const ruleRef = {path: 'a/c', rootType: RootType.SYSTEM_ROOT, ruleName: 'rule'};
+    const ruleRef = {path: 'a/c', rootType: BuiltInRootType.SYSTEM_ROOT, ruleName: 'rule'};
     assert(getTypeOfValue(ruleRef)).to.emitSequence([
       objectThat<OutputType>().haveProperties({
         isArray: false,

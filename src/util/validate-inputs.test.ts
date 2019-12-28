@@ -3,7 +3,7 @@ import * as path from 'path';
 import { assert, setThat, setup, should, test } from '@gs-testing';
 
 import { RenderInput } from '../core/render-input';
-import { RootType } from '../core/root-type';
+import { BuiltInRootType } from '../core/root-type';
 import { addFile, mockFs } from '../testing/fake-fs';
 import { mockProcess } from '../testing/fake-process';
 
@@ -187,7 +187,7 @@ test('@hive/util/validate-inputs', () => {
       addFile(path.join('/a', RULE_FILE_NAME), {content});
 
       const actual = new Map<string, RenderInput>([
-        ['a', {rootType: RootType.SYSTEM_ROOT, path: 'a', ruleName: 'loadRule'}],
+        ['a', {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a', ruleName: 'loadRule'}],
       ]);
       const expected = new Map([
         ['a', {isArray: false, matcher: /text\/.*/}],
@@ -207,7 +207,7 @@ test('@hive/util/validate-inputs', () => {
       addFile(path.join('/a', RULE_FILE_NAME), {content});
 
       const actual = new Map<string, RenderInput>([
-        ['a', {rootType: RootType.SYSTEM_ROOT, path: 'a', ruleName: 'loadRule'}],
+        ['a', {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a', ruleName: 'loadRule'}],
       ]);
       const expected = new Map([
         ['a', {isArray: false, matcher: /image\/.*/}],

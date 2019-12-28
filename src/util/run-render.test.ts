@@ -5,7 +5,7 @@ import { Observable } from '@rxjs';
 import { take } from '@rxjs/operators';
 
 import { RenderRule } from '../core/render-rule';
-import { RootType } from '../core/root-type';
+import { BuiltInRootType } from '../core/root-type';
 import { RuleType } from '../core/rule-type';
 import { ROOT_FILE_NAME } from '../project/find-root';
 import { addFile, getFile, mockFs } from '../testing/fake-fs';
@@ -44,11 +44,11 @@ test('@hive/util/run-render', () => {
       ]),
       processor: {
         ruleName: 'declareRule',
-        rootType: RootType.SYSTEM_ROOT,
+        rootType: BuiltInRootType.SYSTEM_ROOT,
         path: 'src/declarations',
       },
       output: {
-        rootType: RootType.OUT_DIR,
+        rootType: BuiltInRootType.OUT_DIR,
         pattern: '{a}_{b}.txt',
         substitutionKeys: new Set(['a', 'b']),
       },
@@ -101,11 +101,11 @@ test('@hive/util/run-render', () => {
       ]),
       processor: {
         ruleName: 'declareRule',
-        rootType: RootType.SYSTEM_ROOT,
+        rootType: BuiltInRootType.SYSTEM_ROOT,
         path: 'src/declarations',
       },
       output: {
-        rootType: RootType.OUT_DIR,
+        rootType: BuiltInRootType.OUT_DIR,
         pattern: '{a}_{b}.txt',
         substitutionKeys: new Set(['a', 'b']),
       },
@@ -148,11 +148,11 @@ test('@hive/util/run-render', () => {
       ]),
       processor: {
         ruleName: 'declareRule',
-        rootType: RootType.SYSTEM_ROOT,
+        rootType: BuiltInRootType.SYSTEM_ROOT,
         path: 'src/declarations',
       },
       output: {
-        rootType: RootType.SYSTEM_ROOT,
+        rootType: BuiltInRootType.SYSTEM_ROOT,
         pattern: '{a}_{b}.txt',
         substitutionKeys: new Set(['a', 'b']),
       },

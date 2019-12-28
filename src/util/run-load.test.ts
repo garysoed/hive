@@ -2,7 +2,7 @@ import { arrayThat, assert, setup, should, test } from '@gs-testing';
 import { of as observableOf } from '@rxjs';
 
 import { LoadRule } from '../core/load-rule';
-import { RootType } from '../core/root-type';
+import { BuiltInRootType } from '../core/root-type';
 import { RuleType } from '../core/rule-type';
 import { ConstType } from '../core/type/const-type';
 import { addFile, mockFs } from '../testing/fake-fs';
@@ -23,7 +23,7 @@ test('@hive/util/run-load', () => {
 
     const rule: LoadRule = {
       name: 'loadRule',
-      srcs: {rootType: RootType.SYSTEM_ROOT, path: 'a/b/c.txt'},
+      srcs: {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a/b/c.txt'},
       type: RuleType.LOAD,
       outputType: {isArray: false, baseType: ConstType.STRING},
     };
@@ -45,7 +45,7 @@ test('@hive/util/run-load', () => {
 
     const rule: LoadRule = {
       name: 'loadRule',
-      srcs: {rootType: RootType.SYSTEM_ROOT, globPattern: 'a/b/*.txt'},
+      srcs: {rootType: BuiltInRootType.SYSTEM_ROOT, globPattern: 'a/b/*.txt'},
       type: RuleType.LOAD,
       outputType: {isArray: false, baseType: ConstType.STRING},
     };

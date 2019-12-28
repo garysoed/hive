@@ -2,7 +2,7 @@ import * as yaml from 'yaml';
 
 import { assert, objectThat, should, test } from '@gs-testing';
 
-import { RootType } from '../core/root-type';
+import { BuiltInRootType } from '../core/root-type';
 
 import { FILE_REF_TAG } from './file-ref-tag';
 
@@ -11,7 +11,7 @@ test('@hive/config/file-ref-tag', () => {
     should(`parse project root based path correctly`, () => {
       assert(yaml.parse('!!hive/file root:path/to/file.txt', {tags: [FILE_REF_TAG]})).to
           .equal(objectThat().haveProperties({
-            rootType: RootType.PROJECT_ROOT,
+            rootType: BuiltInRootType.PROJECT_ROOT,
             path: 'path/to/file.txt',
           }));
     });
@@ -19,7 +19,7 @@ test('@hive/config/file-ref-tag', () => {
     should(`parse current directory based path correctly`, () => {
       assert(yaml.parse('!!hive/file .:path/to/file.txt', {tags: [FILE_REF_TAG]})).to
           .equal(objectThat().haveProperties({
-            rootType: RootType.CURRENT_DIR,
+            rootType: BuiltInRootType.CURRENT_DIR,
             path: 'path/to/file.txt',
           }));
     });
@@ -27,7 +27,7 @@ test('@hive/config/file-ref-tag', () => {
     should(`parse system root based path correctly`, () => {
       assert(yaml.parse('!!hive/file /:path/to/file.txt', {tags: [FILE_REF_TAG]})).to
           .equal(objectThat().haveProperties({
-            rootType: RootType.SYSTEM_ROOT,
+            rootType: BuiltInRootType.SYSTEM_ROOT,
             path: 'path/to/file.txt',
           }));
     });
@@ -55,22 +55,9 @@ test('@hive/config/file-ref-tag', () => {
     should(`handle white spaces`, () => {
       assert(yaml.parse('!!hive/file root:path/to/file.txt\n    ', {tags: [FILE_REF_TAG]})).to
           .equal(objectThat().haveProperties({
-            rootType: RootType.PROJECT_ROOT,
+            rootType: BuiltInRootType.PROJECT_ROOT,
             path: 'path/to/file.txt',
           }));
-    });
-  });
-
-  test('stringify', () => {
-    should(`stringify path correctly`, () => {
-      const path = 'path/to/file.txt';
-      const value = {
-        rootType: RootType.OUT_DIR,
-        path,
-      };
-
-      assert(yaml.stringify(value, {tags: [FILE_REF_TAG]})).to
-          .match(/!!hive\/file out:path\/to\/file\.txt/);
     });
   });
 });

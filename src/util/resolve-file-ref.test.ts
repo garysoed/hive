@@ -2,7 +2,7 @@ import * as nodePath from 'path';
 
 import { assert, setup, should, test } from '@gs-testing';
 
-import { RootType } from '../core/root-type';
+import { BuiltInRootType } from '../core/root-type';
 import { ROOT_FILE_NAME } from '../project/find-root';
 import { addFile, mockFs } from '../testing/fake-fs';
 import { mockProcess, setCwd } from '../testing/fake-process';
@@ -20,7 +20,7 @@ test('@hive/util/resolve-file-ref', () => {
     setCwd(current);
 
     const path = 'path';
-    assert(resolveFileRef({rootType: RootType.CURRENT_DIR, path})).to.emitSequence([
+    assert(resolveFileRef({rootType: BuiltInRootType.CURRENT_DIR, path})).to.emitSequence([
       nodePath.join(current, path),
     ]);
   });
@@ -32,7 +32,7 @@ test('@hive/util/resolve-file-ref', () => {
     addFile(nodePath.join('/a', ROOT_FILE_NAME), {content: JSON.stringify({outdir})});
 
     const path = 'path';
-    assert(resolveFileRef({rootType: RootType.OUT_DIR, path})).to.emitSequence([
+    assert(resolveFileRef({rootType: BuiltInRootType.OUT_DIR, path})).to.emitSequence([
       nodePath.join(outdir, path),
     ]);
   });
@@ -44,21 +44,21 @@ test('@hive/util/resolve-file-ref', () => {
     addFile(nodePath.join(projectRoot, ROOT_FILE_NAME), {content: JSON.stringify({outdir: '/'})});
 
     const path = 'path';
-    assert(resolveFileRef({rootType: RootType.PROJECT_ROOT, path})).to.emitSequence([
+    assert(resolveFileRef({rootType: BuiltInRootType.PROJECT_ROOT, path})).to.emitSequence([
       nodePath.join(projectRoot, path),
     ]);
   });
 
   should(`return based on system root if root type is SYSTEM_ROOT`, () => {
     const path = 'path';
-    assert(resolveFileRef({rootType: RootType.SYSTEM_ROOT, path})).to.emitSequence([
+    assert(resolveFileRef({rootType: BuiltInRootType.SYSTEM_ROOT, path})).to.emitSequence([
       nodePath.join('/', path),
     ]);
   });
 
   should(`throw error if root type is PROJECT_ROOT but no project root is found`, () => {
     const path = 'path';
-    assert(resolveFileRef({rootType: RootType.PROJECT_ROOT, path})).to
+    assert(resolveFileRef({rootType: BuiltInRootType.PROJECT_ROOT, path})).to
         .emitErrorWithMessage(/Cannot find project root/);
   });
 });

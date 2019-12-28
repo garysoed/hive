@@ -1,7 +1,7 @@
 import { arrayThat, assert, mapThat, objectThat, should, test } from '@gs-testing';
 
 import { RenderInput } from '../core/render-input';
-import { RootType } from '../core/root-type';
+import { BuiltInRootType } from '../core/root-type';
 
 import { parseRender } from './parse-render';
 
@@ -10,10 +10,10 @@ test('@hive/config/parse-render', () => {
   test('parseRender', () => {
     should(`return correct render object`, () => {
       const ruleName = 'ruleName';
-      const processor = {rootType: RootType.OUT_DIR, path: 'path/to/rule', ruleName: 'rule'};
+      const processor = {rootType: BuiltInRootType.OUT_DIR, path: 'path/to/rule', ruleName: 'rule'};
       const inputs = {inputA: 1, inputB: 'two'};
       const render = {
-        rootType: RootType.SYSTEM_ROOT,
+        rootType: BuiltInRootType.SYSTEM_ROOT,
         pattern: 'path/to/{out}',
         substitutionKeys: new Set(['out']),
       };
@@ -33,10 +33,10 @@ test('@hive/config/parse-render', () => {
 
     should(`return null if input object is invalid`, () => {
       const ruleName = 'ruleName';
-      const processor = {rootType: RootType.OUT_DIR, path: 'path/to/rule', ruleName: 'rule'};
+      const processor = {rootType: BuiltInRootType.OUT_DIR, path: 'path/to/rule', ruleName: 'rule'};
       const inputs = {input: undefined};
       const render = {
-        rootType: RootType.SYSTEM_ROOT,
+        rootType: BuiltInRootType.SYSTEM_ROOT,
         pattern: 'path/to/{out}',
         substitutionKeys: new Set(['out']),
       };
@@ -48,9 +48,9 @@ test('@hive/config/parse-render', () => {
 
     should(`handle empty inputs`, () => {
       const ruleName = 'ruleName';
-      const processor = {rootType: RootType.OUT_DIR, path: 'path/to/rule', ruleName: 'rule'};
+      const processor = {rootType: BuiltInRootType.OUT_DIR, path: 'path/to/rule', ruleName: 'rule'};
       const render = {
-        rootType: RootType.SYSTEM_ROOT,
+        rootType: BuiltInRootType.SYSTEM_ROOT,
         pattern: 'path/to/{out}',
         substitutionKeys: new Set(['out']),
       };
@@ -67,10 +67,10 @@ test('@hive/config/parse-render', () => {
 
     should(`return null if the inputs is not an object`, () => {
       const ruleName = 'ruleName';
-      const processor = {rootType: RootType.OUT_DIR, path: 'path/to/rule', ruleName: 'rule'};
+      const processor = {rootType: BuiltInRootType.OUT_DIR, path: 'path/to/rule', ruleName: 'rule'};
       const inputs = 123;
       const render = {
-        rootType: RootType.SYSTEM_ROOT,
+        rootType: BuiltInRootType.SYSTEM_ROOT,
         pattern: 'path/to/{out}',
         substitutionKeys: new Set(['out']),
       };
@@ -85,7 +85,7 @@ test('@hive/config/parse-render', () => {
       const processor = {};
       const inputs = {inputA: 1, inputB: 'two'};
       const render = {
-        rootType: RootType.SYSTEM_ROOT,
+        rootType: BuiltInRootType.SYSTEM_ROOT,
         pattern: 'path/to/{out}',
         substitutionKeys: new Set(['out']),
       };
@@ -97,7 +97,7 @@ test('@hive/config/parse-render', () => {
 
     should(`return null if render is an invalid file pattern`, () => {
       const ruleName = 'ruleName';
-      const processor = {rootType: RootType.OUT_DIR, path: 'path/to/rule', ruleName: 'rule'};
+      const processor = {rootType: BuiltInRootType.OUT_DIR, path: 'path/to/rule', ruleName: 'rule'};
       const inputs = {inputA: 1, inputB: 'two'};
       const render = {};
 
@@ -115,8 +115,8 @@ test('@hive/config/parse-render', () => {
           'ruleName',
           {
             inputs,
-            processor: {rootType: RootType.OUT_DIR, path: 'path/to/rule', ruleName: 'rule'},
-            render: {rootType: RootType.SYSTEM_ROOT, pattern: 'path', substitutionKeys: new Set()},
+            processor: {rootType: BuiltInRootType.OUT_DIR, path: 'path/to/rule', ruleName: 'rule'},
+            render: {rootType: BuiltInRootType.SYSTEM_ROOT, pattern: 'path', substitutionKeys: new Set()},
           });
 
 
@@ -137,8 +137,8 @@ test('@hive/config/parse-render', () => {
           'ruleName',
           {
             inputs,
-            processor: {rootType: RootType.OUT_DIR, path: 'path/to/rule', ruleName: 'rule'},
-            render: {rootType: RootType.SYSTEM_ROOT, pattern: 'path', substitutionKeys: new Set()},
+            processor: {rootType: BuiltInRootType.OUT_DIR, path: 'path/to/rule', ruleName: 'rule'},
+            render: {rootType: BuiltInRootType.SYSTEM_ROOT, pattern: 'path', substitutionKeys: new Set()},
           });
 
       assert(renderRule).to.beNull();
@@ -147,14 +147,14 @@ test('@hive/config/parse-render', () => {
 
   test('isRenderInput', () => {
     should(`handle file ref`, () => {
-      const inputs = {input: {rootType: RootType.OUT_DIR, path: 'path'}};
+      const inputs = {input: {rootType: BuiltInRootType.OUT_DIR, path: 'path'}};
 
       const renderRule = parseRender(
           'ruleName',
           {
             inputs,
-            processor: {rootType: RootType.OUT_DIR, path: 'path/to/rule', ruleName: 'rule'},
-            render: {rootType: RootType.SYSTEM_ROOT, pattern: 'path', substitutionKeys: new Set()},
+            processor: {rootType: BuiltInRootType.OUT_DIR, path: 'path/to/rule', ruleName: 'rule'},
+            render: {rootType: BuiltInRootType.SYSTEM_ROOT, pattern: 'path', substitutionKeys: new Set()},
           });
 
       assert(renderRule).to.equal(
@@ -163,7 +163,7 @@ test('@hive/config/parse-render', () => {
               [
                 'input',
                 objectThat().haveProperties({
-                  rootType: RootType.OUT_DIR,
+                  rootType: BuiltInRootType.OUT_DIR,
                   path: 'path',
                 }),
               ],
@@ -173,14 +173,14 @@ test('@hive/config/parse-render', () => {
     });
 
     should(`handle rule ref`, () => {
-      const inputs = {input: {rootType: RootType.OUT_DIR, path: 'path', ruleName: 'rule'}};
+      const inputs = {input: {rootType: BuiltInRootType.OUT_DIR, path: 'path', ruleName: 'rule'}};
 
       const renderRule = parseRender(
           'ruleName',
           {
             inputs,
-            processor: {rootType: RootType.OUT_DIR, path: 'path/to/rule', ruleName: 'rule'},
-            render: {rootType: RootType.SYSTEM_ROOT, pattern: 'path', substitutionKeys: new Set()},
+            processor: {rootType: BuiltInRootType.OUT_DIR, path: 'path/to/rule', ruleName: 'rule'},
+            render: {rootType: BuiltInRootType.SYSTEM_ROOT, pattern: 'path', substitutionKeys: new Set()},
           });
 
       assert(renderRule).to.equal(
@@ -189,7 +189,7 @@ test('@hive/config/parse-render', () => {
               [
                 'input',
                 objectThat().haveProperties({
-                  rootType: RootType.OUT_DIR,
+                  rootType: BuiltInRootType.OUT_DIR,
                   path: 'path',
                   ruleName: 'rule',
                 }),
@@ -206,8 +206,8 @@ test('@hive/config/parse-render', () => {
           'ruleName',
           {
             inputs,
-            processor: {rootType: RootType.OUT_DIR, path: 'path/to/rule', ruleName: 'rule'},
-            render: {rootType: RootType.SYSTEM_ROOT, pattern: 'path', substitutionKeys: new Set()},
+            processor: {rootType: BuiltInRootType.OUT_DIR, path: 'path/to/rule', ruleName: 'rule'},
+            render: {rootType: BuiltInRootType.SYSTEM_ROOT, pattern: 'path', substitutionKeys: new Set()},
           });
 
       assert(renderRule).to.equal(
@@ -226,8 +226,8 @@ test('@hive/config/parse-render', () => {
           'ruleName',
           {
             inputs,
-            processor: {rootType: RootType.OUT_DIR, path: 'path/to/rule', ruleName: 'rule'},
-            render: {rootType: RootType.SYSTEM_ROOT, pattern: 'path', substitutionKeys: new Set()},
+            processor: {rootType: BuiltInRootType.OUT_DIR, path: 'path/to/rule', ruleName: 'rule'},
+            render: {rootType: BuiltInRootType.SYSTEM_ROOT, pattern: 'path', substitutionKeys: new Set()},
           });
 
       assert(renderRule).to.equal(
@@ -246,8 +246,8 @@ test('@hive/config/parse-render', () => {
           'ruleName',
           {
             inputs,
-            processor: {rootType: RootType.OUT_DIR, path: 'path/to/rule', ruleName: 'rule'},
-            render: {rootType: RootType.SYSTEM_ROOT, pattern: 'path', substitutionKeys: new Set()},
+            processor: {rootType: BuiltInRootType.OUT_DIR, path: 'path/to/rule', ruleName: 'rule'},
+            render: {rootType: BuiltInRootType.SYSTEM_ROOT, pattern: 'path', substitutionKeys: new Set()},
           });
 
       assert(renderRule).to.beNull();
@@ -260,8 +260,8 @@ test('@hive/config/parse-render', () => {
           'ruleName',
           {
             inputs,
-            processor: {rootType: RootType.OUT_DIR, path: 'path/to/rule', ruleName: 'rule'},
-            render: {rootType: RootType.SYSTEM_ROOT, pattern: 'path', substitutionKeys: new Set()},
+            processor: {rootType: BuiltInRootType.OUT_DIR, path: 'path/to/rule', ruleName: 'rule'},
+            render: {rootType: BuiltInRootType.SYSTEM_ROOT, pattern: 'path', substitutionKeys: new Set()},
           });
 
       assert(renderRule).to.equal(
@@ -280,8 +280,8 @@ test('@hive/config/parse-render', () => {
           'ruleName',
           {
             inputs,
-            processor: {rootType: RootType.OUT_DIR, path: 'path/to/rule', ruleName: 'rule'},
-            render: {rootType: RootType.SYSTEM_ROOT, pattern: 'path', substitutionKeys: new Set()},
+            processor: {rootType: BuiltInRootType.OUT_DIR, path: 'path/to/rule', ruleName: 'rule'},
+            render: {rootType: BuiltInRootType.SYSTEM_ROOT, pattern: 'path', substitutionKeys: new Set()},
           });
 
       assert(renderRule).to.beNull();

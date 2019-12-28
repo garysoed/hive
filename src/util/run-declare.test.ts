@@ -4,7 +4,7 @@ import { assert, setup, should, test } from '@gs-testing';
 import { map } from '@rxjs/operators';
 
 import { DeclareRule } from '../core/declare-rule';
-import { RootType } from '../core/root-type';
+import { BuiltInRootType } from '../core/root-type';
 import { RuleType } from '../core/rule-type';
 import { ConstType } from '../core/type/const-type';
 import { ROOT_FILE_NAME } from '../project/find-root';
@@ -34,7 +34,7 @@ test('@hive/util/run-declare', () => {
         ['b', {isArray: false, matcher: /number/}],
       ]),
       output: {isArray: false, baseType: ConstType.NUMBER},
-      processor: {rootType: RootType.SYSTEM_ROOT, path: 'a/b.js'},
+      processor: {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a/b.js'},
     };
 
     assert(runDeclare(rule).pipe(map(fn => fn(new Map([['a', 1], ['b', 2]])))))

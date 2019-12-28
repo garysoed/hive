@@ -7,7 +7,7 @@ import { map } from '@rxjs/operators';
 import { DeclareRule } from '../core/declare-rule';
 import { LoadRule } from '../core/load-rule';
 import { RenderRule } from '../core/render-rule';
-import { RootType } from '../core/root-type';
+import { BuiltInRootType } from '../core/root-type';
 import { RuleType } from '../core/rule-type';
 import { ConstType } from '../core/type/const-type';
 import { ROOT_FILE_NAME } from '../project/find-root';
@@ -40,7 +40,7 @@ test('@hive/util/run-rule', () => {
 
     const rule: LoadRule = {
       name: 'loadRule',
-      srcs: {rootType: RootType.SYSTEM_ROOT, globPattern: 'a/b/*.txt'},
+      srcs: {rootType: BuiltInRootType.SYSTEM_ROOT, globPattern: 'a/b/*.txt'},
       type: RuleType.LOAD,
       outputType: {isArray: false, baseType: ConstType.STRING},
     };
@@ -66,7 +66,7 @@ test('@hive/util/run-rule', () => {
         ['b', {isArray: false, matcher: /number/}],
       ]),
       output: {isArray: false, baseType: ConstType.NUMBER},
-      processor: {rootType: RootType.SYSTEM_ROOT, path: 'a/b.js'},
+      processor: {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a/b.js'},
     };
 
     assert(runRule(rule).pipe(map(fn => fn(new Map([['a', 1], ['b', 2]])))))
@@ -98,11 +98,11 @@ test('@hive/util/run-rule', () => {
       ]),
       processor: {
         ruleName: 'declareRule',
-        rootType: RootType.SYSTEM_ROOT,
+        rootType: BuiltInRootType.SYSTEM_ROOT,
         path: 'src/declarations',
       },
       output: {
-        rootType: RootType.OUT_DIR,
+        rootType: BuiltInRootType.OUT_DIR,
         pattern: '{a}_{b}.txt',
         substitutionKeys: new Set(['a', 'b']),
       },
