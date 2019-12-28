@@ -29,7 +29,7 @@ test('@hive/util/resolve-file-ref', () => {
     setCwd('/a/b/c');
 
     const outdir = '/outdir';
-    addFile(nodePath.join('/a', ROOT_FILE_NAME), {content: `outdir: ${outdir}`});
+    addFile(nodePath.join('/a', ROOT_FILE_NAME), {content: JSON.stringify({outdir})});
 
     const path = 'path';
     assert(resolveFileRef({rootType: RootType.OUT_DIR, path})).to.emitSequence([
@@ -41,7 +41,7 @@ test('@hive/util/resolve-file-ref', () => {
     const projectRoot = '/a';
     setCwd('/a/b/c');
 
-    addFile(nodePath.join(projectRoot, ROOT_FILE_NAME), {content: `outdir: '/'`});
+    addFile(nodePath.join(projectRoot, ROOT_FILE_NAME), {content: JSON.stringify({outdir: '/'})});
 
     const path = 'path';
     assert(resolveFileRef({rootType: RootType.PROJECT_ROOT, path})).to.emitSequence([

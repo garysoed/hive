@@ -6,12 +6,19 @@ import { parseProject } from './parse-project';
 test('@hive/project/parse-project', () => {
   should(`parse the config correctly`, () => {
     const outdir = 'file/outdir';
-    const content = `
-    outdir: ${outdir}
-    globals:
-        a: 1
-        b: abc
-    `;
+    const rootA = 'path/root/a';
+    const rootB = 'path/root/b';
+    const content = JSON.stringify({
+      outdir,
+      globals: {
+        a: 1,
+        b: 'abc',
+      },
+      roots: {
+        rootA,
+        rootB,
+      },
+    });
 
     assert(parseProject(content)).to.equal(objectThat().haveProperties({
       outdir,
@@ -19,12 +26,16 @@ test('@hive/project/parse-project', () => {
         ['a', 1],
         ['b', 'abc'],
       ])),
+      roots: mapThat().haveExactElements(new Map<string, unknown>([
+        ['rootA', rootA],
+        ['rootB', rootB],
+      ])),
     }));
   });
 
-  should(`parse the config correctly if globals is not specified`, () => {
+  should(`parse the config correctly if globals and roots are not specified`, () => {
     const outdir = 'file/outdir';
-    const content = `outdir: ${outdir}`;
+    const content = JSON.stringify({outdir});
 
     assert(parseProject(content)).to.equal(objectThat().haveProperties({
       outdir,
@@ -33,17 +44,14 @@ test('@hive/project/parse-project', () => {
 
   should(`throw error if globals is not an object`, () => {
     assert(() => {
-      const content = `
-      outdir: outdir
-      globals: 1
-      `;
+      const content = JSON.stringify({outdir: 'outdir', globals: 1});
       parseProject(content);
-    }).to.throwErrorWithMessage(/project config file/);
+    }).to.throwErrorWithMessage(/TypeAssertionError/);
   });
 
   should(`throw error if config is invalid`, () => {
     assert(() => {
       parseProject('a: b');
-    }).to.throwErrorWithMessage(/project config file/);
+    }).to.throwErrorWithMessage(/JSON/);
   });
 });

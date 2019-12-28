@@ -20,11 +20,7 @@ test('@hive/util/run-render', () => {
   });
 
   should(`emit map of file names to their content`, () => {
-    const configContent = `
-    outdir: /out
-    globals:
-        g: 4
-    `;
+    const configContent = JSON.stringify({outdir: '/out', globals: {g: 4}});
     addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
 
     const declarationContent = `
@@ -81,9 +77,7 @@ test('@hive/util/run-render', () => {
   });
 
   should(`handle processing results that are Promises`, async () => {
-    const configContent = `
-    outdir: /out
-    `;
+    const configContent = JSON.stringify({outdir: '/out'});
     addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
 
     const declarationContent = `

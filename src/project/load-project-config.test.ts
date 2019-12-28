@@ -20,9 +20,7 @@ test('@hive/project/load-project-config', () => {
     setCwd('/a/b/c');
 
     const dir = 'dir';
-    const content = `
-outdir: ${dir}
-    `;
+    const content = JSON.stringify({outdir: dir});
     addFile(path.join('/a', ROOT_FILE_NAME), {content});
 
     assert(loadProjectConfig()).to.emitSequence([

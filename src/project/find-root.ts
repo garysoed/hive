@@ -6,7 +6,7 @@ import { concat, fromEventPattern, Observable } from '@rxjs';
 import { find, map, share, take } from '@rxjs/operators';
 
 
-export const ROOT_FILE_NAME = 'hive_project.yaml';
+export const ROOT_FILE_NAME = 'hive_project.json';
 
 export function findRoot(): Observable<string|null> {
   // Generate the paths to the root.

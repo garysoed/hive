@@ -51,7 +51,7 @@ test('@hive/util/run-rule', () => {
   });
 
   should(`run declare rules correctly`, () => {
-    const configContent = `outdir: out`;
+    const configContent = JSON.stringify({outdir: 'out'});
     addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
 
     // tslint:disable-next-line: no-invalid-template-strings
@@ -74,9 +74,7 @@ test('@hive/util/run-rule', () => {
   });
 
   should(`run render rules correctly`, () => {
-    const configContent = `
-    outdir: /out
-    `;
+    const configContent = JSON.stringify({outdir: '/out'});
     addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
 
     const declarationContent = `

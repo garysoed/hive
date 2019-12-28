@@ -1,38 +1,30 @@
-import * as yaml from 'yaml';
+import { $, $recordToMap } from '@gs-tools/collect';
+import { HasPropertiesType, InstanceofType, StringType, Type, UndefinedType, UnionType } from '@gs-types';
 
-import { ProjectConfig } from './project-config';
+import { PROJECT_CONFIG_TYPE, ProjectConfig } from './project-config';
 
-type ProjectConfigRaw = {readonly [K in keyof ProjectConfig]: unknown};
 
-export function parseProject(content: string): ProjectConfig {
-  const yamlRaw = yaml.parse(content);
-
-  if (!(yaml instanceof Object)) {
-    throw new Error('Not an object');
-  }
-
-  const config = parseConfig(yamlRaw);
-  if (!config) {
-    throw new Error('Invalid project config file');
-  }
-
-  return config;
+interface ProjectConfigJson {
+  readonly globals?: {};
+  readonly outdir: string;
+  readonly roots?: {};
 }
 
-function parseConfig(obj: ProjectConfigRaw): ProjectConfig|null {
-  if (typeof obj.outdir !== 'string') {
-    return null;
-  }
+const PROJECT_CONFIG_JSON_TYPE: Type<ProjectConfigJson> = HasPropertiesType({
+  globals: UnionType([InstanceofType(Object), UndefinedType]),
+  outdir: StringType,
+  roots: UnionType([InstanceofType(Object), UndefinedType]),
+});
 
-  if (!!obj.globals && typeof obj.globals !== 'object') {
-    return null;
-  }
+export function parseProject(content: string): ProjectConfig {
+  const json = JSON.parse(content);
 
-  const globals = new Map<string, unknown>();
-  const globalsRaw = obj.globals as {[key: string]: string} || {};
-  for (const key of Object.keys(globalsRaw)) {
-    globals.set(key, globalsRaw[key]);
-  }
+  PROJECT_CONFIG_JSON_TYPE.assert(json);
+  const globals = $(json.globals || {}, $recordToMap());
+  const roots = $(json.roots || {}, $recordToMap());
 
-  return {outdir: obj.outdir, globals};
+  const config = {globals, outdir: json.outdir, roots};
+  PROJECT_CONFIG_TYPE.assert(config);
+
+  return config;
 }

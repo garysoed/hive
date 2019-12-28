@@ -19,7 +19,7 @@ test('@hive/util/run-declare', () => {
   });
 
   should(`emit function that runs the processor correctly`, () => {
-    const configContent = `outdir: out`;
+    const configContent = JSON.stringify({outdir: 'out'});
     addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
 
     // tslint:disable-next-line: no-invalid-template-strings
