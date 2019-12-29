@@ -57,16 +57,20 @@ test('@hive/util/resolve-inputs', () => {
     });
 
     const contentA = `
-    ruleA:
-        load: !!hive/file /:file.txt
-        as: !!hive/o_type number
+    hive.load({
+      name: 'ruleA',
+      srcs: ['/file.txt'],
+      outputType: 'number',
+    });
     `;
     addFile(path.join('/a', RULE_FILE_NAME), {content: contentA});
 
     const contentB = `
-    ruleB:
-        load: !!hive/file /:file.txt
-        as: !!hive/o_type string
+    hive.load({
+      name: 'ruleB',
+      srcs: ['/file.txt'],
+      outputType: 'string',
+    });
     `;
     addFile(path.join('/b', RULE_FILE_NAME), {content: contentB});
 
@@ -89,9 +93,11 @@ test('@hive/util/resolve-inputs', () => {
     });
 
     const contentA = `
-    ruleA:
-        load: !!hive/glob /:*.txt
-        as: !!hive/o_type number
+    hive.load({
+      name: 'ruleA',
+      srcs: [hive.glob('/*.txt')],
+      outputType: 'number',
+    });
     `;
     addFile(path.join('/a', RULE_FILE_NAME), {content: contentA});
 
@@ -113,10 +119,12 @@ test('@hive/util/resolve-inputs', () => {
     });
 
     const contentA = `
-    ruleA:
-        declare: !!hive/file /:file.txt
-        inputs:
-        output: !!hive/o_type number
+    hive.declare({
+      name: 'ruleA',
+      processor: '/file.txt',
+      inputs: {},
+      output: 'number',
+    });
     `;
     addFile(path.join('/a', RULE_FILE_NAME), {content: contentA});
 
@@ -137,10 +145,12 @@ test('@hive/util/resolve-inputs', () => {
     });
 
     const contentA = `
-    ruleA:
-        render: !!hive/pattern /:file.txt
-        inputs:
-        processor: !!hive/rule /:path:rule
+    hive.render({
+      name: 'ruleA',
+      processor: '/path:rule',
+      inputs: {},
+      output: '/file.txt',
+    });
     `;
     addFile(path.join('/a', RULE_FILE_NAME), {content: contentA});
 

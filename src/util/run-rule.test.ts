@@ -78,12 +78,15 @@ test('@hive/util/run-rule', () => {
     addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
 
     const declarationContent = `
-    declareRule:
-        declare: !!hive/file /:src/processors/plus.js
-        inputs:
-            a: !!hive/i_type number
-            b: !!hive/i_type number
-        output: !!hive/o_type number
+    hive.declare({
+      name: 'declareRule',
+      processor: '/src/processors/plus.js',
+      inputs: {
+        a: 'number',
+        b: 'number',
+      },
+      output: 'number',
+    });
     `;
     addFile(path.join('/src/declarations', RULE_FILE_NAME), {content: declarationContent});
 

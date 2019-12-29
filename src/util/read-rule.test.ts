@@ -19,9 +19,11 @@ test('@hive/util/read-rule', () => {
 
   should(`return the correct rule`, () => {
     const content = `
-      rule:
-          load: !!hive/file out:filename
-          as: !!hive/o_type number
+      hive.load({
+        name: 'rule',
+        srcs: ['@out/filename'],
+        outputType: 'number',
+      });
     `;
 
     setCwd('cwd');
@@ -47,9 +49,11 @@ test('@hive/util/read-rule', () => {
 
   should(`throw if the rule cannot be found`, () => {
     const content = `
-      rule:
-          load: !!hive/file out:filename
-          as: !!hive/o_type number
+      hive.load({
+        name: 'rule',
+        srcs: ['@out/filename'],
+        outputType: 'number',
+      });
     `;
 
     setCwd('cwd');

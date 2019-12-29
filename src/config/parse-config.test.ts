@@ -88,18 +88,24 @@ function matchRenderRule(expected: RuleWithoutType<RenderRule>): MatcherType<Ren
 test('@hive/config/parse-config', () => {
   should(`parse declares correctly`, () => {
     const CONTENT = `
-      ruleA:
-          declare: !!hive/file /:path/to/scriptA
-          inputs:
-              paramA: !!hive/i_type number
-              paramB: !!hive/i_type boolean
-          output: !!hive/o_type string
+      hive.declare({
+        name: 'ruleA',
+        processor: '/path/to/scriptA',
+        inputs: {
+          paramA: 'number',
+          paramB: 'boolean',
+        },
+        output: 'string',
+      });
 
-      ruleB:
-          declare: !!hive/file out:path/to/scriptB
-          inputs:
-              param: !!hive/i_type boolean
-          output: !!hive/o_type object[]
+      hive.declare({
+        name: 'ruleB',
+        processor: '@out/path/to/scriptB',
+        inputs: {
+          param: 'boolean',
+        },
+        output: 'object[]',
+      });
     `;
 
     assert(parseConfig(CONTENT)).to.haveElements([
@@ -131,13 +137,21 @@ test('@hive/config/parse-config', () => {
 
   should(`parse load rules correctly`, () => {
     const CONTENT = `
-      ruleA:
-          load: !!hive/glob out:glob/path/*.txt
-          as: !!hive/o_type number
+      hive.load({
+        name: 'ruleA',
+        srcs: [
+          hive.glob('@out/glob/path/*.txt'),
+        ],
+        outputType: 'number',
+      });
 
-      ruleB:
-          load: !!hive/file out:path/out.txt
-          as: !!hive/o_type string[]
+      hive.load({
+        name: 'ruleB',
+        srcs: [
+          '@out/path/out.txt',
+        ],
+        outputType: 'string[]',
+      });
     `;
 
     assert(parseConfig(CONTENT)).to.haveElements([
@@ -162,18 +176,24 @@ test('@hive/config/parse-config', () => {
 
   should(`parse renders correctly`, () => {
     const CONTENT = `
-      ruleA:
-          render: !!hive/pattern out:path/{paramA}_{paramB}.txt
-          inputs:
-              paramA: [1, 2, 3]
-              paramB: "stringValue"
-          processor: !!hive/rule root:path:processor
+      hive.render({
+        name: 'ruleA',
+        inputs: {
+          paramA: [1, 2, 3],
+          paramB: 'stringValue',
+        },
+        processor: '@root/path:processor',
+        output: '@out/path/{paramA}_{paramB}.txt',
+      });
 
-      ruleB:
-          render: !!hive/pattern out:path/out.txt
-          inputs:
-              param: false
-          processor: !!hive/rule root:path:processor2
+      hive.render({
+        name: 'ruleB',
+        inputs: {
+          param: false,
+        },
+        processor: '@root/path:processor2',
+        output: '@out/path/out.txt',
+      });
     `;
 
     assert(parseConfig(CONTENT)).to.haveElements([
@@ -209,26 +229,5 @@ test('@hive/config/parse-config', () => {
         }),
       ],
     ]);
-  });
-
-  should(`throw error if a rule is an invalid object`, () => {
-    const CONTENT = `
-      invalid-rule:
-          a: b
-    `;
-
-    assert(() => {
-      parseConfig(CONTENT);
-    }).to.throwErrorWithMessage(/is an invalid rule/);
-  });
-
-  should(`throw error if a rule is not an object`, () => {
-    const CONTENT = `
-      invalid-rule: 123
-    `;
-
-    assert(() => {
-      parseConfig(CONTENT);
-    }).to.throwErrorWithMessage(/is an invalid rule/);
   });
 });

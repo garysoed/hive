@@ -44,18 +44,22 @@ test('@hive/util/get-type-of-value', () => {
 
   should(`emit the correct type for render rules`, () => {
     const configContent = `
-    ruleA:
-        render: !!hive/pattern out:output.txt
-        processor: !!hive/rule /:a:processorRule
-        inputs:
+    hive.render({
+      name: 'ruleA',
+      processor: '/a:processorRule',
+      inputs: {},
+      output: '@out/:output.txt',
+    });
     `;
     addFile('/a/c/hive.yaml', {content: configContent});
 
     const processorContent = `
-    processorRule:
-        declare: !!hive/file .:path/to/processor.js
-        inputs:
-        output: !!hive/o_type number
+    hive.declare({
+      name: 'processorRule',
+      processor: './path/to/processor.js',
+      inputs: {},
+      output: 'number',
+    });
     `;
     addFile('/a/hive.yaml', {content: processorContent});
 
@@ -70,17 +74,21 @@ test('@hive/util/get-type-of-value', () => {
 
   should(`emit error if the render rule's processor is not a declare rule`, () => {
     const configContent = `
-    ruleA:
-        render: !!hive/pattern out:output.txt
-        processor: !!hive/rule /:a:processorRule
-        inputs:
+    hive.render({
+      name: 'ruleA',
+      processor: '/a:processorRule',
+      inputs: {},
+      output: '@out/:output.txt',
+    });
     `;
     addFile('/a/c/hive.yaml', {content: configContent});
 
     const processorContent = `
-    processorRule:
-        load: !!hive/file .:path/to/file.js
-        as: !!hive/o_type number
+    hive.load({
+      name: 'processorRule',
+      srcs: ['./path/to/file.js'],
+      outputType: 'number',
+    });
     `;
     addFile('/a/hive.yaml', {content: processorContent});
 
@@ -90,9 +98,11 @@ test('@hive/util/get-type-of-value', () => {
 
   should(`emit the correct type for load rules`, () => {
     const configContent = `
-    rule:
-        load: !!hive/file /:input.txt
-        as: !!hive/o_type number
+    hive.load({
+      name: 'rule',
+      srcs: ['/input.txt'],
+      outputType: 'number',
+    });
     `;
     addFile('/a/c/hive.yaml', {content: configContent});
 
@@ -107,10 +117,12 @@ test('@hive/util/get-type-of-value', () => {
 
   should(`emit the correct type for declare rules`, () => {
     const configContent = `
-    rule:
-        declare: !!hive/file /:processor.js
-        inputs:
-        output: !!hive/o_type number
+    hive.declare({
+      name: 'rule',
+      processor: '/processor.js',
+      inputs: {},
+      output: 'number',
+    });
     `;
     addFile('/a/c/hive.yaml', {content: configContent});
 

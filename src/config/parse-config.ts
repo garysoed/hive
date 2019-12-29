@@ -1,59 +1,43 @@
-import * as yaml from 'yaml';
-
 import { ConfigFile } from '../core/config-file';
 import { Rule } from '../core/rule';
 
-import { FILE_PATTERN_TAG } from './file-pattern-tag';
-import { FILE_REF_TAG } from './file-ref-tag';
-import { GLOB_REF_TAG } from './glob-ref-tag';
-import { INPUT_TYPE_TAG } from './input-type-tag';
-import { OUTPUT_TYPE_TAG } from './output-type-tag';
-import { parseDeclare } from './parse-declare';
-import { parseLoad } from './parse-load';
-import { parseRender } from './parse-render';
-import { RULE_REF_TAG } from './rule-ref-tag';
+import { declare } from './operator/declare';
+import { glob } from './operator/glob';
+import { load } from './operator/load';
+import { render } from './operator/render';
 
 
-const CUSTOM_TAGS = [
-  FILE_PATTERN_TAG,
-  FILE_REF_TAG,
-  GLOB_REF_TAG,
-  INPUT_TYPE_TAG,
-  OUTPUT_TYPE_TAG,
-  RULE_REF_TAG,
-];
+type HiveFnOf<F> = F extends (...args: infer A) => unknown ? (...args: A) => void : never;
+
+interface HiveGlobal {
+  readonly declare: HiveFnOf<typeof declare>;
+  readonly glob: typeof glob;
+  readonly load: HiveFnOf<typeof load>;
+  readonly render: HiveFnOf<typeof render>;
+}
+
+type FnContent = (global: HiveGlobal) => void;
 
 export function parseConfig(content: string): ConfigFile {
-  const yamlRaw = yaml.parse(content, {tags: CUSTOM_TAGS});
-
-  if (!(yaml instanceof Object)) {
-    throw new Error('Not an object');
-  }
-
+  const fn: FnContent = Function('hive', content) as unknown as FnContent;
   const rules = new Map<string, Rule>();
-  for (const key in yamlRaw) {
-    if (!yamlRaw.hasOwnProperty(key)) {
-      continue;
-    }
-
-    const entry = yamlRaw[key];
-    if (typeof entry !== 'object') {
-      throw new Error(`${key} is an invalid rule`);
-    }
-
-    const declaration = parseDeclare(key, entry);
-    const load = parseLoad(key, entry);
-    const render = parseRender(key, entry);
-    if (declaration) {
-      rules.set(declaration.name, declaration);
-    } else if (render) {
-      rules.set(render.name, render);
-    } else if (load) {
-      rules.set(load.name, load);
-    } else {
-      throw new Error(`${key} is an invalid rule`);
-    }
-  }
+  const hiveGlobal = {
+    declare: makeHiveRuleFn(declare, rules),
+    glob,
+    load: makeHiveRuleFn(load, rules),
+    render: makeHiveRuleFn(render, rules),
+  };
+  fn(hiveGlobal);
 
   return rules;
+}
+
+function makeHiveRuleFn<A extends any[]>(
+    fn: (...args: A) => Rule,
+    ruleMap: Map<string, Rule>,
+): (...args: A) => void {
+  return (...args) => {
+    const rule = fn(...args);
+    ruleMap.set(rule.name, rule);
+  };
 }

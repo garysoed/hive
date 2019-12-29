@@ -180,9 +180,11 @@ test('@hive/util/validate-inputs', () => {
 
     should(`handle MediaTypes`, () => {
       const content = `
-      loadRule:
-          load: !!hive/file .:file.txt
-          as: !!hive/o_type text/plain
+      hive.load({
+        name: 'loadRule',
+        srcs: ['./file.txt'],
+        outputType: 'text/plain',
+      });
       `;
       addFile(path.join('/a', RULE_FILE_NAME), {content});
 
@@ -200,9 +202,11 @@ test('@hive/util/validate-inputs', () => {
 
     should(`throw error if MediaTypes do not match`, () => {
       const content = `
-      loadRule:
-          load: !!hive/file .:file.txt
-          as: !!hive/o_type text/plain
+      hive.load({
+        name: 'loadRule',
+        srcs: ['./file.txt'],
+        outputType: 'text/plain',
+      });
       `;
       addFile(path.join('/a', RULE_FILE_NAME), {content});
 
