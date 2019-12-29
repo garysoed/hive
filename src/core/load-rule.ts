@@ -8,6 +8,6 @@ import { RuleType } from './rule-type';
 
 export interface LoadRule extends BaseRule {
   readonly outputType: OutputType;
-  readonly srcs: FileRef|GlobRef;
+  readonly srcs: ReadonlyArray<FileRef|GlobRef>;
   readonly type: RuleType.LOAD;
 }

@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import { assert, objectThat, setup, should, test } from '@gs-testing';
+import { arrayThat, assert, objectThat, setup, should, test } from '@gs-testing';
 
 import { LoadRule } from '../core/load-rule';
 import { BuiltInRootType } from '../core/root-type';
@@ -31,10 +31,12 @@ test('@hive/util/read-rule', () => {
         .emitSequence([
           objectThat<LoadRule>().haveProperties({
             name: 'rule',
-            srcs: objectThat().haveProperties({
-              path: 'filename',
-              rootType: BuiltInRootType.OUT_DIR,
-            }),
+            srcs: arrayThat().haveExactElements([
+              objectThat().haveProperties({
+                path: 'filename',
+                rootType: BuiltInRootType.OUT_DIR,
+              }),
+            ]),
             outputType: objectThat().haveProperties({
               baseType: ConstType.NUMBER,
               isArray: false,

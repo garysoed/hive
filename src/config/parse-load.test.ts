@@ -1,4 +1,4 @@
-import { assert, objectThat, should, test } from '@gs-testing';
+import { arrayThat, assert, objectThat, should, test } from '@gs-testing';
 
 import { BuiltInRootType } from '../core/root-type';
 import { ConstType } from '../core/type/const-type';
@@ -15,7 +15,7 @@ test('@hive/config/parse-load', () => {
 
       assert(parseLoad(ruleName, {as, load})).to.equal(objectThat().haveProperties({
         name: ruleName,
-        srcs: load,
+        srcs: arrayThat().haveExactElements([objectThat().haveProperties(load)]),
         outputType: as,
       }));
     });
@@ -27,7 +27,7 @@ test('@hive/config/parse-load', () => {
 
       assert(parseLoad(ruleName, {as, load})).to.equal(objectThat().haveProperties({
         name: ruleName,
-        srcs: load,
+        srcs: arrayThat().haveExactElements([objectThat().haveProperties(load)]),
         outputType: as,
       }));
     });

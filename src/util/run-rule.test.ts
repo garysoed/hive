@@ -40,7 +40,7 @@ test('@hive/util/run-rule', () => {
 
     const rule: LoadRule = {
       name: 'loadRule',
-      srcs: {rootType: BuiltInRootType.SYSTEM_ROOT, globPattern: 'a/b/*.txt'},
+      srcs: [{rootType: BuiltInRootType.SYSTEM_ROOT, globPattern: 'a/b/*.txt'}],
       type: RuleType.LOAD,
       outputType: {isArray: false, baseType: ConstType.STRING},
     };

@@ -21,7 +21,7 @@ export function parseLoad(ruleName: string, obj: LoadRaw): LoadRule|null {
 
   return {
     name: ruleName,
-    srcs: load,
+    srcs: [load],
     outputType: as,
     type: RuleType.LOAD,
   };

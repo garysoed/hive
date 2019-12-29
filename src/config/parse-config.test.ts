@@ -4,6 +4,7 @@ import { arrayThat, assert, mapThat, MatcherType, objectThat, setThat, should, t
 import { DeclareRule } from '../core/declare-rule';
 import { FilePattern } from '../core/file-pattern';
 import { FileRef } from '../core/file-ref';
+import { GlobRef } from '../core/glob-ref';
 import { LoadRule } from '../core/load-rule';
 import { RenderInput } from '../core/render-input';
 import { RenderRule } from '../core/render-rule';
@@ -65,9 +66,10 @@ function matchDeclareRule(expected: RuleWithoutType<DeclareRule>): MatcherType<D
 }
 
 function matchLoadRule(expected: RuleWithoutType<LoadRule>): MatcherType<LoadRule> {
+  const srcsMatch = expected.srcs.map(src => objectThat<FileRef|GlobRef>().haveProperties(src));
   return objectThat<LoadRule>().haveProperties({
     name: expected.name,
-    srcs: objectThat().haveProperties(expected.srcs),
+    srcs: arrayThat<FileRef|GlobRef>().haveExactElements(srcsMatch),
     outputType: objectThat().haveProperties(expected.outputType),
     type: RuleType.LOAD,
   });
@@ -143,7 +145,7 @@ test('@hive/config/parse-config', () => {
         'ruleA',
         matchLoadRule({
           name: 'ruleA',
-          srcs: {rootType: BuiltInRootType.OUT_DIR, globPattern: 'glob/path/*.txt'},
+          srcs: [{rootType: BuiltInRootType.OUT_DIR, globPattern: 'glob/path/*.txt'}],
           outputType: {baseType: ConstType.NUMBER, isArray: false},
         }),
       ],
@@ -151,7 +153,7 @@ test('@hive/config/parse-config', () => {
         'ruleB',
         matchLoadRule({
           name: 'ruleB',
-          srcs: {rootType: BuiltInRootType.OUT_DIR, path: 'path/out.txt'},
+          srcs: [{rootType: BuiltInRootType.OUT_DIR, path: 'path/out.txt'}],
           outputType: {baseType: ConstType.STRING, isArray: true},
         }),
       ],

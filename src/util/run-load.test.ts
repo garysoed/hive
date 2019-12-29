@@ -23,12 +23,12 @@ test('@hive/util/run-load', () => {
 
     const rule: LoadRule = {
       name: 'loadRule',
-      srcs: {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a/b/c.txt'},
+      srcs: [{rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a/b/c.txt'}],
       type: RuleType.LOAD,
       outputType: {isArray: false, baseType: ConstType.STRING},
     };
 
-    assert(runLoad(rule)).to.emitSequence([content]);
+    assert(runLoad(rule)).to.emitSequence([arrayThat<string>().haveExactElements([content])]);
   });
 
   should(`emit content of all matching files if glob ref was given`, () => {
@@ -45,7 +45,7 @@ test('@hive/util/run-load', () => {
 
     const rule: LoadRule = {
       name: 'loadRule',
-      srcs: {rootType: BuiltInRootType.SYSTEM_ROOT, globPattern: 'a/b/*.txt'},
+      srcs: [{rootType: BuiltInRootType.SYSTEM_ROOT, globPattern: 'a/b/*.txt'}],
       type: RuleType.LOAD,
       outputType: {isArray: false, baseType: ConstType.STRING},
     };
