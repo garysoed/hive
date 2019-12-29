@@ -1,15 +1,16 @@
-import { EnumType, HasPropertiesType, StringType } from '@gs-types';
+import { HasPropertiesType, StringType } from '@gs-types';
 
-import { BuiltInRootType } from './root-type';
+import { ROOT_TYPE_TYPE, RootType } from './root-type';
+
 
 export interface GlobRef {
   globPattern: string;
-  rootType: BuiltInRootType;
+  rootType: RootType;
 }
 
 export const GLOB_REF_TYPE = HasPropertiesType<GlobRef>({
   globPattern: StringType,
-  rootType: EnumType(BuiltInRootType),
+  rootType: ROOT_TYPE_TYPE,
 });
 
 export function isGlobRef(target: unknown): target is GlobRef {

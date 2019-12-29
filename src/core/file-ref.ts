@@ -1,6 +1,7 @@
-import { EnumType, HasPropertiesType, StringType, UnionType } from '@gs-types';
+import { HasPropertiesType, StringType } from '@gs-types';
 
-import { BuiltInRootType, RootType } from './root-type';
+import { ROOT_TYPE_TYPE, RootType } from './root-type';
+
 
 export interface FileRef {
   readonly path: string;
@@ -9,7 +10,7 @@ export interface FileRef {
 
 export const FILE_REF_TYPE = HasPropertiesType<FileRef>({
   path: StringType,
-  rootType: UnionType([EnumType(BuiltInRootType), StringType]),
+  rootType: ROOT_TYPE_TYPE,
 });
 
 export function isFileRef(target: unknown): target is FileRef {
