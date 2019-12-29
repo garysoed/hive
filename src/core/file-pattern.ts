@@ -1,17 +1,17 @@
-import { EnumType, HasPropertiesType, SetOfType, StringType } from '@gs-types';
+import { HasPropertiesType, SetOfType, StringType } from '@gs-types';
 
-import { BuiltInRootType } from './root-type';
+import { ROOT_TYPE_TYPE, RootType } from './root-type';
 
 
 export interface FilePattern {
   readonly pattern: string;
-  readonly rootType: BuiltInRootType;
+  readonly rootType: RootType;
   readonly substitutionKeys: ReadonlySet<string>;
 }
 
 const FILE_PATTERN_TYPE = HasPropertiesType<FilePattern>({
   pattern: StringType,
-  rootType: EnumType(BuiltInRootType),
+  rootType: ROOT_TYPE_TYPE,
   substitutionKeys: SetOfType<string>(StringType),
 });
 

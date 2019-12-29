@@ -7,7 +7,7 @@ export interface RuleRef extends FileRef {
   readonly ruleName: string;
 }
 
-const RULE_TYPE: Type<RuleRef> = IntersectType([
+export const RULE_REF_TYPE: Type<RuleRef> = IntersectType([
   HasPropertiesType<{ruleName: string}>({
     ruleName: StringType,
   }),
@@ -15,5 +15,5 @@ const RULE_TYPE: Type<RuleRef> = IntersectType([
 ]);
 
 export function isRuleRef(target: unknown): target is RuleRef {
-  return RULE_TYPE.check(target);
+  return RULE_REF_TYPE.check(target);
 }
