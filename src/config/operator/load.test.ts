@@ -12,14 +12,14 @@ test('@hive/config/operator/load', () => {
     const globRef = glob('/glob/pattern');
     const config = {
       name: ruleName,
-      outputType: 'number[]',
+      output: 'number[]',
       srcs: [globRef],
     };
 
     assert(load(config)).to.equal(objectThat().haveProperties({
       name: ruleName,
       srcs: arrayThat().haveExactElements([objectThat().haveProperties(globRef)]),
-      outputType: objectThat().haveProperties({isArray: true, baseType: ConstType.NUMBER}),
+      output: objectThat().haveProperties({isArray: true, baseType: ConstType.NUMBER}),
     }));
   });
 
@@ -27,7 +27,7 @@ test('@hive/config/operator/load', () => {
     const ruleName = 'ruleName';
     const config = {
       name: ruleName,
-      outputType: 'number[]',
+      output: 'number[]',
       srcs: ['/file/pattern'],
     };
 
@@ -39,7 +39,7 @@ test('@hive/config/operator/load', () => {
           path: 'file/pattern',
         }),
       ]),
-      outputType: objectThat().haveProperties({baseType: ConstType.NUMBER, isArray: true}),
+      output: objectThat().haveProperties({baseType: ConstType.NUMBER, isArray: true}),
     }));
   });
 });

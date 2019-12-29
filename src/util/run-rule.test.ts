@@ -42,7 +42,7 @@ test('@hive/util/run-rule', () => {
       name: 'loadRule',
       srcs: [{rootType: BuiltInRootType.SYSTEM_ROOT, globPattern: 'a/b/*.txt'}],
       type: RuleType.LOAD,
-      outputType: {isArray: false, baseType: ConstType.STRING},
+      output: {isArray: false, baseType: ConstType.STRING},
     };
 
     assert(runRule(rule)).to.emitSequence([

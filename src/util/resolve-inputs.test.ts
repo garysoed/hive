@@ -46,7 +46,7 @@ test('@hive/util/resolve-inputs', () => {
   should(`resolve single file load rule reference inputs correctly`, () => {
     fake(mockResolveRule).always().call(rule => {
       const loadRule = rule as LoadRule;
-      switch (loadRule.outputType.baseType) {
+      switch (loadRule.output.baseType) {
         case ConstType.NUMBER:
           return observableOf('123');
         case ConstType.STRING:
@@ -60,7 +60,7 @@ test('@hive/util/resolve-inputs', () => {
     hive.load({
       name: 'ruleA',
       srcs: ['/file.txt'],
-      outputType: 'number',
+      output: 'number',
     });
     `;
     addFile(path.join('/a', RULE_FILE_NAME), {content: contentA});
@@ -69,7 +69,7 @@ test('@hive/util/resolve-inputs', () => {
     hive.load({
       name: 'ruleB',
       srcs: ['/file.txt'],
-      outputType: 'string',
+      output: 'string',
     });
     `;
     addFile(path.join('/b', RULE_FILE_NAME), {content: contentB});
@@ -96,7 +96,7 @@ test('@hive/util/resolve-inputs', () => {
     hive.load({
       name: 'ruleA',
       srcs: [hive.glob('/*.txt')],
-      outputType: 'number',
+      output: 'number',
     });
     `;
     addFile(path.join('/a', RULE_FILE_NAME), {content: contentA});

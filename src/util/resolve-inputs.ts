@@ -30,7 +30,7 @@ export function resolveInputs(
               return resolveRuleFn(rule).pipe(
                   switchMap(content => {
                     if (content instanceof Array) {
-                      const entries = content.map(entry => parseContent(entry, rule.outputType));
+                      const entries = content.map(entry => parseContent(entry, rule.output));
                       if (entries.length <= 0) {
                         return observableOf([]);
                       }
@@ -38,7 +38,7 @@ export function resolveInputs(
                       return combineLatest(entries);
                     }
 
-                    return parseContent(content, rule.outputType);
+                    return parseContent(content, rule.output);
                   }),
               );
             case RuleType.RENDER:

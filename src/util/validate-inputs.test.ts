@@ -183,7 +183,7 @@ test('@hive/util/validate-inputs', () => {
       hive.load({
         name: 'loadRule',
         srcs: ['./file.txt'],
-        outputType: 'text/plain',
+        output: 'text/plain',
       });
       `;
       addFile(path.join('/a', RULE_FILE_NAME), {content});
@@ -205,7 +205,7 @@ test('@hive/util/validate-inputs', () => {
       hive.load({
         name: 'loadRule',
         srcs: ['./file.txt'],
-        outputType: 'text/plain',
+        output: 'text/plain',
       });
       `;
       addFile(path.join('/a', RULE_FILE_NAME), {content});

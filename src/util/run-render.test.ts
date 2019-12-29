@@ -143,7 +143,7 @@ test('@hive/util/run-render', () => {
     hive.load({
       name: 'declareRule',
       srcs: ['/src/processors/plus.js'],
-      outputType: 'number',
+      output: 'number',
     });
     `;
     addFile(path.join('/src/declarations', RULE_FILE_NAME), {content: declarationContent});

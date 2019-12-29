@@ -7,7 +7,7 @@ import { RuleType } from './rule-type';
 
 
 export interface LoadRule extends BaseRule {
-  readonly outputType: OutputType;
+  readonly output: OutputType;
   readonly srcs: ReadonlyArray<FileRef|GlobRef>;
   readonly type: RuleType.LOAD;
 }

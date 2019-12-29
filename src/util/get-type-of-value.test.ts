@@ -87,7 +87,7 @@ test('@hive/util/get-type-of-value', () => {
     hive.load({
       name: 'processorRule',
       srcs: ['./path/to/file.js'],
-      outputType: 'number',
+      output: 'number',
     });
     `;
     addFile('/a/hive.yaml', {content: processorContent});
@@ -101,7 +101,7 @@ test('@hive/util/get-type-of-value', () => {
     hive.load({
       name: 'rule',
       srcs: ['/input.txt'],
-      outputType: 'number',
+      output: 'number',
     });
     `;
     addFile('/a/c/hive.yaml', {content: configContent});

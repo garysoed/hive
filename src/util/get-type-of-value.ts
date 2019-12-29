@@ -26,7 +26,7 @@ export function getTypeOfValue(value: RenderInput): Observable<OutputType|'empty
             case RuleType.DECLARE:
               return observableOf({isArray: false, baseType: ConstType.FUNCTION});
             case RuleType.LOAD:
-              return observableOf(rule.outputType);
+              return observableOf(rule.output);
             case RuleType.RENDER:
               return readRule(rule.processor).pipe(
                   map(processorRule => {

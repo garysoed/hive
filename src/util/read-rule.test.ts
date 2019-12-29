@@ -22,7 +22,7 @@ test('@hive/util/read-rule', () => {
       hive.load({
         name: 'rule',
         srcs: ['@out/filename'],
-        outputType: 'number',
+        output: 'number',
       });
     `;
 
@@ -39,7 +39,7 @@ test('@hive/util/read-rule', () => {
                 rootType: BuiltInRootType.OUT_DIR,
               }),
             ]),
-            outputType: objectThat().haveProperties({
+            output: objectThat().haveProperties({
               baseType: ConstType.NUMBER,
               isArray: false,
             }),
@@ -52,7 +52,7 @@ test('@hive/util/read-rule', () => {
       hive.load({
         name: 'rule',
         srcs: ['@out/filename'],
-        outputType: 'number',
+        output: 'number',
       });
     `;
 

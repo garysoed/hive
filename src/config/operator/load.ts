@@ -9,13 +9,13 @@ import { parseOutputType } from '../parse/parse-output-type';
 
 interface Args {
   readonly name: string;
-  readonly outputType: string;
+  readonly output: string;
   readonly srcs: Array<string|GlobRef>;
 }
 
 const ARGS_TYPE: Type<Args> = HasPropertiesType({
   name: StringType,
-  outputType: StringType,
+  output: StringType,
   srcs: ArrayOfType(UnionType([StringType, GLOB_REF_TYPE])),
 });
 
@@ -30,7 +30,7 @@ export function load(args: unknown): LoadRule {
     return src;
   });
 
-  const outputType = parseOutputType(args.outputType);
+  const output = parseOutputType(args.output);
 
-  return {name: args.name, outputType, srcs, type: RuleType.LOAD};
+  return {name: args.name, output, srcs, type: RuleType.LOAD};
 }
