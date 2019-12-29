@@ -29,8 +29,9 @@ export function resolveInputs(
             case RuleType.LOAD:
               return resolveRuleFn(rule).pipe(
                   switchMap(content => {
-                    if (content instanceof Array) {
-                      const entries = content.map(entry => parseContent(entry, rule.output));
+                    if (rule.output.isArray) {
+                      const typePerFile = {...rule.output, isArray: false};
+                      const entries = content.map(entry => parseContent(entry, typePerFile));
                       if (entries.length <= 0) {
                         return observableOf([]);
                       }
@@ -38,7 +39,11 @@ export function resolveInputs(
                       return combineLatest(entries);
                     }
 
-                    return parseContent(content, rule.output);
+                    if (content.length !== 1) {
+                      throw new Error(`Rule ${rule.name} has non array output but multiple inputs`);
+                    }
+
+                    return parseContent(content[0], rule.output);
                   }),
               );
             case RuleType.RENDER:

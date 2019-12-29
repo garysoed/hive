@@ -51,7 +51,7 @@ test('@hive/util/get-type-of-value', () => {
       output: '@out/:output.txt',
     });
     `;
-    addFile('/a/c/hive.yaml', {content: configContent});
+    addFile('/a/c/hive.js', {content: configContent});
 
     const processorContent = `
     hive.declare({
@@ -61,7 +61,7 @@ test('@hive/util/get-type-of-value', () => {
       output: 'number',
     });
     `;
-    addFile('/a/hive.yaml', {content: processorContent});
+    addFile('/a/hive.js', {content: processorContent});
 
     const ruleRef = {path: 'a/c', rootType: BuiltInRootType.SYSTEM_ROOT, ruleName: 'ruleA'};
     assert(getTypeOfValue(ruleRef)).to.emitSequence([
@@ -81,7 +81,7 @@ test('@hive/util/get-type-of-value', () => {
       output: '@out/:output.txt',
     });
     `;
-    addFile('/a/c/hive.yaml', {content: configContent});
+    addFile('/a/c/hive.js', {content: configContent});
 
     const processorContent = `
     hive.load({
@@ -90,7 +90,7 @@ test('@hive/util/get-type-of-value', () => {
       output: 'number',
     });
     `;
-    addFile('/a/hive.yaml', {content: processorContent});
+    addFile('/a/hive.js', {content: processorContent});
 
     const ruleRef = {path: 'a/c', rootType: BuiltInRootType.SYSTEM_ROOT, ruleName: 'ruleA'};
     assert(getTypeOfValue(ruleRef)).to.emitErrorWithMessage(/is invalid/);
@@ -104,7 +104,7 @@ test('@hive/util/get-type-of-value', () => {
       output: 'number',
     });
     `;
-    addFile('/a/c/hive.yaml', {content: configContent});
+    addFile('/a/c/hive.js', {content: configContent});
 
     const ruleRef = {path: 'a/c', rootType: BuiltInRootType.SYSTEM_ROOT, ruleName: 'rule'};
     assert(getTypeOfValue(ruleRef)).to.emitSequence([
@@ -124,7 +124,7 @@ test('@hive/util/get-type-of-value', () => {
       output: 'number',
     });
     `;
-    addFile('/a/c/hive.yaml', {content: configContent});
+    addFile('/a/c/hive.js', {content: configContent});
 
     const ruleRef = {path: 'a/c', rootType: BuiltInRootType.SYSTEM_ROOT, ruleName: 'rule'};
     assert(getTypeOfValue(ruleRef)).to.emitSequence([

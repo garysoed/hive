@@ -22,7 +22,7 @@ test('@hive/util/resolve-inputs', () => {
 
   function fakeRunRule(renderRule: RenderRule): Observable<ReadonlyMap<string, string>>;
   function fakeRunRule(declareRule: DeclareRule): Observable<DeclareFn>;
-  function fakeRunRule(loadRule: LoadRule): Observable<string|string[]>;
+  function fakeRunRule(loadRule: LoadRule): Observable<string[]>;
   function fakeRunRule(rule: Rule): Observable<unknown> {
     return mockResolveRule(rule);
   }
@@ -48,9 +48,9 @@ test('@hive/util/resolve-inputs', () => {
       const loadRule = rule as LoadRule;
       switch (loadRule.output.baseType) {
         case ConstType.NUMBER:
-          return observableOf('123');
+          return observableOf(['123']);
         case ConstType.STRING:
-          return observableOf('randomString');
+          return observableOf(['randomString']);
         default:
           throw new Error('Unsupported');
       }
@@ -87,6 +87,33 @@ test('@hive/util/resolve-inputs', () => {
     ]);
   });
 
+  should(`emit error if the output is not an array but the sources has multiple contents`, () => {
+    fake(mockResolveRule).always().call(rule => {
+      const loadRule = rule as LoadRule;
+      switch (loadRule.output.baseType) {
+        case ConstType.NUMBER:
+          return observableOf(['123', '234']);
+        default:
+          throw new Error('Unsupported');
+      }
+    });
+
+    const contentA = `
+    hive.load({
+      name: 'ruleA',
+      srcs: ['/file.txt'],
+      output: 'number',
+    });
+    `;
+    addFile(path.join('/a', RULE_FILE_NAME), {content: contentA});
+
+    const inputs = new Map<string, RenderInput>([
+      ['a', {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a', ruleName: 'ruleA'}],
+    ]);
+
+    assert(resolveInputs(inputs, fakeRunRule)).to.emitErrorWithMessage(/non array output/);
+  });
+
   should(`resolve glob file load rule reference inputs correctly`, () => {
     fake(mockResolveRule).always().call(rule => {
       return observableOf(['123', '456']);
@@ -96,7 +123,7 @@ test('@hive/util/resolve-inputs', () => {
     hive.load({
       name: 'ruleA',
       srcs: [hive.glob('/*.txt')],
-      output: 'number',
+      output: 'number[]',
     });
     `;
     addFile(path.join('/a', RULE_FILE_NAME), {content: contentA});

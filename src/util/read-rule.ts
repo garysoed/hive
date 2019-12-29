@@ -11,7 +11,7 @@ import { RuleRef } from '../core/rule-ref';
 import { readFile } from './read-file';
 import { resolveFileRef } from './resolve-file-ref';
 
-export const RULE_FILE_NAME = 'hive.yaml';
+export const RULE_FILE_NAME = 'hive.js';
 
 export function readRule(ref: RuleRef): Observable<Rule> {
   return resolveFileRef(ref).pipe(

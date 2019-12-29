@@ -9,5 +9,5 @@ import { DeclareFn } from './run-declare';
 export interface RunRuleFn {
   (renderRule: RenderRule): Observable<ReadonlyMap<string, string>>;
   (declareRule: DeclareRule): Observable<DeclareFn>;
-  (loadRule: LoadRule): Observable<string|string[]>;
+  (loadRule: LoadRule): Observable<string[]>;
 }

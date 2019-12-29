@@ -154,7 +154,6 @@ test('@hive/config/parse-config', () => {
       });
     `;
 
-    debugger;
     assert(parseConfig(CONTENT)).to.haveElements([
       [
         'ruleA',
