@@ -108,7 +108,7 @@ test('@hive/config/parse-config', () => {
       });
     `;
 
-    assert(parseConfig(CONTENT)).to.haveElements([
+    assert(parseConfig(CONTENT)).to.haveExactElements(new Map([
       [
         'ruleA',
         matchDeclareRule({
@@ -132,7 +132,7 @@ test('@hive/config/parse-config', () => {
           output: {baseType: ConstType.OBJECT, isArray: true},
         }),
       ],
-    ]);
+    ]));
   });
 
   should(`parse load rules correctly`, () => {
@@ -154,7 +154,7 @@ test('@hive/config/parse-config', () => {
       });
     `;
 
-    assert(parseConfig(CONTENT)).to.haveElements([
+    assert(parseConfig(CONTENT)).to.haveExactElements(new Map([
       [
         'ruleA',
         matchLoadRule({
@@ -163,15 +163,15 @@ test('@hive/config/parse-config', () => {
           output: {baseType: ConstType.NUMBER, isArray: false},
         }),
       ],
-      // [
-      //   'ruleB',
-      //   matchLoadRule({
-      //     name: 'ruleB',
-      //     srcs: [{rootType: BuiltInRootType.OUT_DIR, path: 'path/out.txt'}],
-      //     output: {baseType: ConstType.STRING, isArray: true},
-      //   }),
-      // ],
-    ]);
+      [
+        'ruleB',
+        matchLoadRule({
+          name: 'ruleB',
+          srcs: [{rootType: BuiltInRootType.OUT_DIR, path: 'path/out.txt'}],
+          output: {baseType: ConstType.STRING, isArray: true},
+        }),
+      ],
+    ]));
   });
 
   should(`parse renders correctly`, () => {
@@ -196,7 +196,7 @@ test('@hive/config/parse-config', () => {
       });
     `;
 
-    assert(parseConfig(CONTENT)).to.haveElements([
+    assert(parseConfig(CONTENT)).to.haveExactElements(new Map([
       [
         'ruleA',
         matchRenderRule({
@@ -228,6 +228,6 @@ test('@hive/config/parse-config', () => {
           processor: {rootType: BuiltInRootType.PROJECT_ROOT, path: 'path', ruleName: 'processor2'},
         }),
       ],
-    ]);
+    ]));
   });
 });
