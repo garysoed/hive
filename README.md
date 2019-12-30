@@ -2,8 +2,8 @@
 
 Hive offers a pipeline that chains together processes to process documents.
 
-Hive is configured using `hive.yaml` files. A `hive.yaml` file consists of `rule`s, keyed by their
-names. A Hive operation chains together these rules to produce the pipeline.
+Hive is configured using `hive.js` files. A `hive.js` file declares `rule`s which are then chained
+together to produce a pipeline.
 
 ## Rule
 
@@ -11,24 +11,30 @@ There are three kinds of rules.
 
 -   `render`: Render rules can be ran. They look as follows:
 
-    ```yaml
-    rule_name:
-        render: PATTERN
-        processor: RULE
-        inputs:
-            input_name_1: INPUT
-            input_name_2: INPUT
+    ```js
+    hive.render({
+      name: 'rule_name',
+      processor: RULE,
+      inputs: {
+        input_name_1: INPUT,
+        input_name_2: INPUT,
+      },
+      output: PATTERN,
+    });
     ```
 
 -   `declare`: Takes a JS file and declares it as a runnable process. They look as follows:
 
-    ```yaml
-    rule_name:
-        declare: FILE
-        inputs:
-            input_name_1: I_TYPE
-            input_name_2: I_TYPE
-        output: O_TYPE
+    ```js
+    hive.declare({
+      name: 'rule_name',
+      processor: FILE,
+      inputs: {
+        input_name_1: I_TYPE,
+        input_name_2: I_TYPE,
+      },
+      output: O_TYPE,
+    });
     ```
 
     The JS file will be executed with a global object called `$hive`. This contains the inputs,
@@ -39,37 +45,41 @@ There are three kinds of rules.
 
 -   `load`: Takes a file, or group of files and declares their type.
 
-    ```yaml
-    rule_name:
-        load: FILE|GLOB
-        as: O_TYPE
+    ```js
+    hive.load({
+      name: 'rule_name',
+      srcs: [FILE, GLOB],
+      output: O_TYPE,
+    });
     ```
 
 ---
 
-`FILE` is a YAML tag with the following format:
+`FILE` is a `string` with the following format:
 
-```yaml
-!!hive/file ROOT:path/relative/from/root
+```js
+'ROOT/path/relative/from/root'
 ```
 
 ---
 
 `ROOT` specifies where the path is relative from. This can be the following:
 
--   `root`: Relative to the root of the project, i.e.: where the `hive_project.yaml`  file is
+-   `@root`: Relative to the root of the project, i.e.: where the `hive_project.json` file is
     located.
--   `out`: Out directory as specified in `hive_project.yaml`.
+-   `@out`: Out directory as specified in `hive_project.json`.
 -   `.`: The current directory, or the directory where the current `hive.yaml` is located.
 -   `/`: The root directory of the system.
+-   `@custom`: Or any custom directories with label `custom`. This should be specified in the
+    `hive_project.json`.
 
 ---
 
-`PATTERN` is similar to `FILE`. It's a YAML tag that Hive uses to generate file paths. It looks
+`PATTERN` is similar to `FILE`. It's a `string` that Hive uses to generate file paths. It looks
 like:
 
-```yaml
-!!hive/pattern ROOT:path/relative/from/root/{input_name_1}
+```js
+'ROOT/path/relative/from/root/{input_name_1}'
 ```
 
 `ROOT` takes in exactly the same values as in `FILE`. Unlike `FILE`, `PATTERN` can specify the
@@ -77,36 +87,36 @@ input argument keys to generate the files. For example, say a declare rule takes
 with type `string`. However, a render rule `R` gives input `A` an array of `string`:
 `"a", "b", "c"`. If `R`'s `render` specifies the pattern as:
 
-```yaml
-!!hive/pattern .:{A}.txt`
+```js
+'./{A}.txt'
 ```
 
 `R` will generate the files `a.txt`, `b.txt`, and `c.txt` when ran.
 
 ---
 
-`RULE` is also similar to `FILE`. It refers to a rule in a `hive.yaml` file. It looks like:
+`RULE` is also similar to `FILE`. It refers to a rule in a `hive.js` file. It looks like:
 
-```yaml
-!!hive/rule ROOT:path/relative/from/root:rule_name
+```js
+'ROOT/path/relative/from/root:rule_name'
 ```
 
-`rule_name` must be a rule that exists in the `hive.yaml` file in that directory.
+`rule_name` must be a rule that exists in the `hive.js` file in that directory.
 
 ---
 
-`GLOB` refers to a group of files matching the glob expression. It looks like:
+`GLOB` is the output of `hive.glob` method. This method takes a glob pattern that looks like:
 
-```yaml
-!!hive/glob ROOT:glob/expression
+```js
+hive.glob('ROOT/glob/expression')
 ```
 
 ---
 
-`O_TYPE` specifies the type of output. This is a tag that looks like:
+`O_TYPE` specifies the type of output. This is a string that looks like:
 
-```yaml
-!!o_type number
+```js
+'number'
 ```
 
 Valid types are:
@@ -123,11 +133,12 @@ Valid types are:
 
 `I_TYPE` specifies the type of input. This takes in a regex string:
 
-```yaml
-!!i_type number|boolean|string:flags
+```js
+'number|boolean|string:flags'
 ```
 
-`flags` contains regex flags.
+`flags` contains regex flags. If the last flag is `[]`, it indicates that the input type is an
+array.
 
 ---
 
