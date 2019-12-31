@@ -16,15 +16,17 @@ const OPTIONS = [
 
 export const CLI = {
   title: 'Hive: Help',
-  body: () => ({
-    header: 'COMMANDS',
-    content: [
-      {name: CommandType.HELP, summary: CLI.summary},
-      {name: CommandType.RENDER, summary: RENDER_CLI.summary},
-    ],
-  }),
+  body: () => ([
+    {
+      header: 'COMMANDS',
+      content: [
+        {name: CommandType.HELP, summary: CLI.summary},
+        {name: CommandType.RENDER, summary: RENDER_CLI.summary},
+      ],
+    },
+  ]),
   summary: 'Display help on commands',
-  synopsis: `$ hive ${CommandType.HELP} <command>`,
+  synopsis: `$ {bold hive} {underline ${CommandType.HELP}} <command>`,
 };
 
 export function help(argv: string[]): Observable<unknown> {

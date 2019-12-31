@@ -21,10 +21,19 @@ const OPTIONS = [
 
 export const CLI = {
   title: 'Hive: Render',
-  body: () => ({
-  }),
+  body: () => ([
+    {
+      header: 'OPTIONS',
+      content: [
+        {
+          name: 'path_to_render_rule',
+          description: `Path to the rule to be rendered. E.g.: @out/path/to:render_rule`,
+        },
+      ],
+    },
+  ]),
   summary: 'Renders the given render rule',
-  synopsis: `$ hive ${CommandType.RENDER} <path_to_render_rule>`,
+  synopsis: `$ {bold hive} {underline ${CommandType.RENDER}} <path_to_render_rule>`,
 };
 
 export function render(argv: string[]): Observable<string> {

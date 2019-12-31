@@ -7,9 +7,9 @@ import { LOGGER } from './logger';
 
 
 export interface CliSummary {
-  summary: string;
-  synopsis: string;
-  body(): commandLineUsage.Section;
+  readonly summary: string;
+  readonly synopsis: string;
+  body(): readonly commandLineUsage.Section[];
 }
 
 export function printSummary(summary: CliSummary): Observable<unknown> {
@@ -22,10 +22,10 @@ export function printSummary(summary: CliSummary): Observable<unknown> {
       header: 'SYNOPSIS',
       content: summary.synopsis,
     },
-    summary.body(),
+    ...summary.body(),
   ]);
 
   return observableOf(message).pipe(
-      tap(message => LOGGER.info('', message)),
+      tap(message => console.log(message)),
   );
 }
