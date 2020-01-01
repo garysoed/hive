@@ -2,8 +2,9 @@ import * as fs from 'fs';
 
 import { fromEventPattern, Observable } from '@rxjs';
 import { startWith, switchMap, tap } from '@rxjs/operators';
+import { Logger } from '@santa';
 
-import { LOGGER } from '../cli/logger';
+const LOGGER = new Logger('@hive/util/read-file');
 
 export function readFile(filepath: string): Observable<string> {
   return fromEventPattern(
@@ -17,7 +18,7 @@ export function readFile(filepath: string): Observable<string> {
       },
   )
   .pipe(
-      tap(() => LOGGER.info('', `Detected change to: ${filepath}`)),
+      tap(() => LOGGER.info(`Detected change to: ${filepath}`)),
       startWith({}),
       switchMap(() => {
         return new Observable<string>(subscriber => {

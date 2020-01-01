@@ -3,21 +3,23 @@ import { google } from 'googleapis';
 import * as path from 'path';
 import * as process from 'process';
 import * as readline from 'readline';
-import { writeFile } from 'src/util/write-file';
 
 import { cache } from '@gs-tools/data';
 import { assertNonNull } from '@gs-tools/rxjs';
 import { BehaviorSubject, from as observableFrom, Observable, of as observableOf, ReplaySubject, SchedulerLike, Subject } from '@rxjs';
 import { bufferTime, catchError, filter, map, mapTo, skipUntil, switchMap, take, tap, withLatestFrom } from '@rxjs/operators';
+import { Logger } from '@santa';
 
-import { LOGGER } from '../cli/logger';
 import { getProjectTmpDir } from '../project/get-project-tmp-dir';
 import { readFile } from '../util/read-file';
+import { writeFile } from '../util/write-file';
 
 
 const REDIRECT_URI = 'urn:ietf:wg:oauth:2.0:oob';
 const SCOPE_CHANGE_DEBOUNCE_MS = 50;
 export const OAUTH_FILE = 'google_oauth.json';
+
+const LOGGER = new Logger('@hive/processor/google-oauth');
 
 export interface GoogleAuth {
   client: OAuth2Client;
@@ -107,7 +109,7 @@ export class GoogleOauth {
             scope: [...newScopes],
           });
 
-          LOGGER.info('', `Please visit:\n\n${authUrl}\n\nand paste the auth code below:`);
+          LOGGER.info(`Please visit:\n\n${authUrl}\n\nand paste the auth code below:`);
 
           const readlineInterface = readline.createInterface({
             input: process.stdin,

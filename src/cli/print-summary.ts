@@ -1,9 +1,7 @@
-import * as commandLineUsage from 'command-line-usage';
+import commandLineUsage from 'command-line-usage';
 
 import { Observable, of as observableOf } from '@rxjs';
 import { tap } from '@rxjs/operators';
-
-import { LOGGER } from './logger';
 
 
 export interface CliSummary {

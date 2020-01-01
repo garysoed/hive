@@ -1,12 +1,12 @@
-import { logDestination } from '@santa';
-
-import { ConsoleDestination } from '../cli/console-destination';
+import { ConsoleDestination, ON_LOG_$ } from '@santa';
 
 import { GoogleOauth } from './google-oauth';
 import { loadGoogleSheets } from './load-google-sheets';
 
-
-logDestination.set(new ConsoleDestination());
+const consoleLog = new ConsoleDestination();
+ON_LOG_$.subscribe(entry => {
+  consoleLog.log(entry);
+});
 
 loadGoogleSheets(
     {doc_id: '1VeQrzTz2ibWrN8bRQ1mJbck8vLY7U_ZMtir3lAHDHe0'},

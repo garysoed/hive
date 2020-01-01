@@ -2,8 +2,8 @@ import * as path from 'path';
 
 import { combineLatest, from as observableFrom, Observable, of as observableOf } from '@rxjs';
 import { map, mapTo, switchMap, tap } from '@rxjs/operators';
+import { Logger } from '@santa';
 
-import { LOGGER } from '../cli/logger';
 import { RenderRule } from '../core/render-rule';
 import { RuleType } from '../core/rule-type';
 import { loadProjectConfig } from '../project/load-project-config';
@@ -19,6 +19,8 @@ import { RunRuleFn } from './run-rule-fn';
 import { validateInputs } from './validate-inputs';
 import { writeFile } from './write-file';
 
+
+const LOGGER = new Logger('@hive/util/run-render');
 
 export function runRender(
     rule: RenderRule,
@@ -63,7 +65,7 @@ export function runRender(
                 return result$.pipe(
                     switchMap(result => {
                       return writeFile(runSpec.outputPath, `${result}`).pipe(
-                          tap(() => LOGGER.success('', `Updated: ${runSpec.outputPath}`)),
+                          tap(() => LOGGER.success(`Updated: ${runSpec.outputPath}`)),
                           mapTo([runSpec.outputPath, result] as [string, unknown]),
                       );
                     }),

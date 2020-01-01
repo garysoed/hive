@@ -1,18 +1,19 @@
-import * as commandLineArgs from 'command-line-args';
+import commandLineArgs from 'command-line-args';
 
-import { EMPTY, Observable, throwError } from '@rxjs';
-import { catchError } from '@rxjs/operators';
-import { logDestination } from '@santa';
+import { EMPTY, Observable, Subject } from '@rxjs';
+import { catchError, takeUntil } from '@rxjs/operators';
+import { ConsoleDestination, Logger, ON_LOG_$ } from '@santa';
 
 import { CommandType } from './cli/command-type';
-import { ConsoleDestination } from './cli/console-destination';
 import { CLI as HELP_CLI, help } from './cli/help';
-import { LOGGER } from './cli/logger';
 import { printSummary } from './cli/print-summary';
 import { render } from './cli/render';
 
 
-logDestination.set(new ConsoleDestination());
+const LOGGER = new Logger('@hive/main');
+
+const consoleLog = new ConsoleDestination();
+ON_LOG_$.subscribe();
 
 const COMMAND_OPTION = 'command';
 const OPTIONS = [
@@ -29,6 +30,9 @@ const CLI = {
 
 const options = commandLineArgs(OPTIONS, {stopAtFirstUnknown: true});
 
+/**
+ * Completes whenever running is done.
+ */
 function run(): Observable<unknown> {
   switch (options[COMMAND_OPTION]) {
     // case CommandType.ANALYZE:
@@ -44,7 +48,13 @@ function run(): Observable<unknown> {
   }
 }
 
-// tslint:disable:no-console
+const onDone$ = new Subject();
+ON_LOG_$
+    .pipe(takeUntil(onDone$))
+    .subscribe(entry => {
+      consoleLog.log(entry);
+    });
+
 run()
     .pipe(
         catchError(e => {
@@ -52,4 +62,6 @@ run()
           return EMPTY;
         }),
     )
-    .subscribe();
+    .subscribe({complete: () => {
+      onDone$.next();
+    }});
