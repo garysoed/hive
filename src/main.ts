@@ -12,7 +12,7 @@ import { render } from './cli/render';
 
 const LOGGER = new Logger('@hive/main');
 
-const consoleLog = new ConsoleDestination();
+const consoleLog = new ConsoleDestination({showKey: false});
 ON_LOG_$.subscribe();
 
 const COMMAND_OPTION = 'command';
