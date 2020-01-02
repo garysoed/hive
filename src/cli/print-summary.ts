@@ -1,4 +1,4 @@
-import commandLineUsage from 'command-line-usage';
+import * as commandLineUsage from 'command-line-usage';
 
 import { EMPTY, Observable } from '@rxjs';
 import { Logger } from '@santa';

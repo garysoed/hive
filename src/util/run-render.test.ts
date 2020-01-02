@@ -12,6 +12,7 @@ import { addFile, getFile, mockFs } from '../testing/fake-fs';
 
 import { RULE_FILE_NAME } from './read-rule';
 import { runRender } from './run-render';
+import { runRule } from './run-rule';
 
 
 test('@hive/util/run-render', () => {
@@ -58,10 +59,7 @@ test('@hive/util/run-render', () => {
       type: RuleType.RENDER,
     };
 
-    const mockResolveRuleFn = createSpy<Observable<ReadonlyMap<string, string>>, [RenderRule]>(
-        'ResolveRuleFn');
-
-    assert(runRender(rule, mockResolveRuleFn as any)).to.emitSequence([
+    assert(runRule(rule)).to.emitSequence([
       mapThat<string, number>().haveExactElements(new Map([
         ['/out/0_0.txt', 4],
         ['/out/0_3.txt', 7],
@@ -118,10 +116,7 @@ test('@hive/util/run-render', () => {
       type: RuleType.RENDER,
     };
 
-    const mockResolveRuleFn = createSpy<Observable<ReadonlyMap<string, string>>, [RenderRule]>(
-        'ResolveRuleFn');
-
-    const resultsMap = await runRender(rule, mockResolveRuleFn as any).pipe(take(1)).toPromise();
+    const resultsMap = await runRule(rule).pipe(take(1)).toPromise();
 
     assert(await (resultsMap.get('/out/0_0.txt') as Promise<number>)).to.equal(0);
     assert(await (resultsMap.get('/out/0_3.txt') as Promise<number>)).to.equal(3);
@@ -167,8 +162,6 @@ test('@hive/util/run-render', () => {
       type: RuleType.RENDER,
     };
 
-    const mockResolveRuleFn = createSpy<Observable<ReadonlyMap<string, string>>, [RenderRule]>('ResolveRuleFn');
-
-    assert(runRender(rule, mockResolveRuleFn as any)).to.emitErrorWithMessage(/should be a declare rule/);
+    assert(runRule(rule)).to.emitErrorWithMessage(/should be a declare rule/);
   });
 });

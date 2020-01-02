@@ -6,15 +6,11 @@ import { Logger } from '@santa';
 
 import { RenderRule } from '../core/render-rule';
 import { RuleType } from '../core/rule-type';
-import { loadProjectConfig } from '../project/load-project-config';
 
 import { generateRunSpecs } from './generate-run-specs';
-import { readFile } from './read-file';
 import { readRule } from './read-rule';
-import { resolveFileRef } from './resolve-file-ref';
 import { resolveInputs } from './resolve-inputs';
 import { resolveRoot } from './resolve-root';
-import { runProcessor } from './run-processor';
 import { RunRuleFn } from './run-rule-fn';
 import { validateInputs } from './validate-inputs';
 import { writeFile } from './write-file';
@@ -38,28 +34,20 @@ export function runRender(
           throw new Error(`Rule ${rule.processor} should be a declare rule, but not`);
         }
 
-        const processorContent$ = resolveFileRef(processor.processor)
-            .pipe(switchMap(path => readFile(path)));
-
         return combineLatest([
           validateInputs(rule.inputs, processor.inputs),
           resolveInputs(rule.inputs, runRuleFn),
-          processorContent$,
-          loadProjectConfig(),
+          runRuleFn(processor),
         ])
         .pipe(
-            switchMap(([repeatedKeys, validatedInputs, processorContent, projectConfig]) => {
+            switchMap(([repeatedKeys, validatedInputs, processorFn]) => {
               const results: Array<Observable<[string, unknown]>> = generateRunSpecs(
                   validatedInputs,
                   repeatedKeys,
                   outputPattern,
               )
               .map(runSpec => {
-                const resultRaw = runProcessor(
-                    processorContent,
-                    runSpec.inputs,
-                    projectConfig.globals,
-                );
+                const resultRaw = processorFn(runSpec.inputs);
                 const result$ = resultRaw instanceof Promise ?
                     observableFrom(resultRaw) : observableOf(resultRaw);
                 return result$.pipe(

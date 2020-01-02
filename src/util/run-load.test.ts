@@ -8,7 +8,7 @@ import { ConstType } from '../core/type/const-type';
 import { addFile, mockFs } from '../testing/fake-fs';
 import { addGlobHandler, mockGlob } from '../testing/fake-glob';
 
-import { runLoad } from './run-load';
+import { runRule } from './run-rule';
 
 
 test('@hive/util/run-load', () => {
@@ -28,7 +28,7 @@ test('@hive/util/run-load', () => {
       output: {isArray: false, baseType: ConstType.STRING},
     };
 
-    assert(runLoad(rule)).to.emitSequence([arrayThat<string>().haveExactElements([content])]);
+    assert(runRule(rule)).to.emitSequence([arrayThat<string>().haveExactElements([content])]);
   });
 
   should(`emit content of all matching files if glob ref was given`, () => {
@@ -50,7 +50,7 @@ test('@hive/util/run-load', () => {
       output: {isArray: false, baseType: ConstType.STRING},
     };
 
-    assert(runLoad(rule)).to.emitSequence([
+    assert(runRule(rule)).to.emitSequence([
       arrayThat<string>().haveExactElements([contentC, contentD, contentE]),
     ]);
   });

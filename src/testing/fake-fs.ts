@@ -1,9 +1,8 @@
 import * as fs from 'fs';
 
 import { fake, spy, SpyObj } from '@gs-testing';
-import { MapSubject, scanMap, scanSet, SetSubject } from '@gs-tools/rxjs';
-import { Observable, Subject } from '@rxjs';
-import { map, take } from '@rxjs/operators';
+import { Subject } from '@rxjs';
+
 
 interface FakeFile {
   content: string;

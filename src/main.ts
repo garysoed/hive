@@ -1,4 +1,4 @@
-import commandLineArgs from 'command-line-args';
+import * as commandLineArgs from 'command-line-args';
 
 import { EMPTY, Observable, Subject } from '@rxjs';
 import { catchError, takeUntil } from '@rxjs/operators';

@@ -1,4 +1,4 @@
-import commandLineArgs from 'command-line-args';
+import * as commandLineArgs from 'command-line-args';
 
 import { Observable, throwError } from '@rxjs';
 import { mapTo, switchMap } from '@rxjs/operators';

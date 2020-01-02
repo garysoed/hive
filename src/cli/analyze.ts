@@ -1,4 +1,4 @@
-import commandLineArgs from 'command-line-args';
+import * as commandLineArgs from 'command-line-args';
 
 import { $, $asArray, $asMap, $join, $map } from '@gs-tools/collect';
 import { combineLatest, Observable, throwError } from '@rxjs';

@@ -2,7 +2,6 @@
   "compilerOptions": {
     "alwaysStrict": true,
     "baseUrl": ".",
-    "esModuleInterop": true,
     "experimentalDecorators": true,
     "lib": [
       "dom",

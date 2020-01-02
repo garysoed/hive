@@ -10,7 +10,7 @@ import { ConstType } from '../core/type/const-type';
 import { ROOT_FILE_NAME } from '../project/find-root';
 import { addFile, mockFs } from '../testing/fake-fs';
 
-import { runDeclare } from './run-declare';
+import { runRule } from './run-rule';
 
 
 test('@hive/util/run-declare', () => {
@@ -37,7 +37,7 @@ test('@hive/util/run-declare', () => {
       processor: {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a/b.js'},
     };
 
-    assert(runDeclare(rule).pipe(map(fn => fn(new Map([['a', 1], ['b', 2]])))))
+    assert(runRule(rule).pipe(map(fn => fn(new Map([['a', 1], ['b', 2]])))))
         .to.emitSequence(['3']);
   });
 });
