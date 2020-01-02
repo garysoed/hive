@@ -1,9 +1,10 @@
 import commandLineArgs from 'command-line-args';
 
 import { EMPTY, Observable, Subject } from '@rxjs';
-import { catchError, takeUntil, tap } from '@rxjs/operators';
+import { catchError, takeUntil } from '@rxjs/operators';
 import { ConsoleDestination, Logger, ON_LOG_$ } from '@santa';
 
+import { analyze } from './cli/analyze';
 import { CommandType } from './cli/command-type';
 import { CLI as HELP_CLI, help } from './cli/help';
 import { printSummary } from './cli/print-summary';
@@ -32,8 +33,8 @@ const options = commandLineArgs(OPTIONS, {stopAtFirstUnknown: true});
  */
 function run(): Observable<unknown> {
   switch (options[COMMAND_OPTION]) {
-    // case CommandType.ANALYZE:
-    //   return analyze(options._unknown || []);
+    case CommandType.ANALYZE:
+      return analyze(options._unknown || []);
     case CommandType.HELP:
       return help(options._unknown || []);
     // case CommandType.INIT:
