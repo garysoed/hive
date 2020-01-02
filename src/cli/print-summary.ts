@@ -1,8 +1,10 @@
 import commandLineUsage from 'command-line-usage';
 
-import { Observable, of as observableOf } from '@rxjs';
-import { tap } from '@rxjs/operators';
+import { EMPTY, Observable } from '@rxjs';
+import { Logger } from '@santa';
 
+
+const LOGGER = new Logger('@hive/cli/print-summary');
 
 export interface CliSummary {
   readonly summary: string;
@@ -11,7 +13,7 @@ export interface CliSummary {
 }
 
 export function printSummary(summary: CliSummary): Observable<unknown> {
-  const message = commandLineUsage([
+  const message = [
     {
       header: 'NAME',
       content: summary.summary,
@@ -21,9 +23,9 @@ export function printSummary(summary: CliSummary): Observable<unknown> {
       content: summary.synopsis,
     },
     ...summary.body(),
-  ]);
+  ];
 
-  return observableOf(message).pipe(
-      tap(message => console.log(message)),
-  );
+  LOGGER.info(message);
+
+  return EMPTY;
 }

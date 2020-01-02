@@ -1,7 +1,7 @@
 import commandLineArgs from 'command-line-args';
 
 import { EMPTY, Observable, Subject } from '@rxjs';
-import { catchError, takeUntil } from '@rxjs/operators';
+import { catchError, takeUntil, tap } from '@rxjs/operators';
 import { ConsoleDestination, Logger, ON_LOG_$ } from '@santa';
 
 import { CommandType } from './cli/command-type';
@@ -11,9 +11,6 @@ import { render } from './cli/render';
 
 
 const LOGGER = new Logger('@hive/main');
-
-const consoleLog = new ConsoleDestination({showKey: false});
-ON_LOG_$.subscribe();
 
 const COMMAND_OPTION = 'command';
 const OPTIONS = [
@@ -49,6 +46,7 @@ function run(): Observable<unknown> {
 }
 
 const onDone$ = new Subject();
+const consoleLog = new ConsoleDestination({showKey: false});
 ON_LOG_$
     .pipe(takeUntil(onDone$))
     .subscribe(entry => {
