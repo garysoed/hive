@@ -1,22 +1,31 @@
 import commandLineArgs from 'command-line-args';
 
-import { $, $map } from '@gs-tools/collect';
-import { Observable, throwError } from '@rxjs';
-import { map, mapTo, switchMap, take, tap } from '@rxjs/operators';
+import { $, $asArray, $asMap, $join, $map } from '@gs-tools/collect';
+import { combineLatest, Observable, throwError } from '@rxjs';
+import { map, switchMap, take, tap } from '@rxjs/operators';
 import { Logger } from '@santa';
 
 import { parseRuleRef } from '../config/parse/parse-rule-ref';
+import { FilePattern } from '../core/file-pattern';
+import { FILE_REF_TYPE, FileRef } from '../core/file-ref';
+import { GlobRef } from '../core/glob-ref';
+import { RenderInput } from '../core/render-input';
+import { BuiltInRootType, RootType } from '../core/root-type';
+import { Rule } from '../core/rule';
+import { RULE_REF_TYPE, RuleRef } from '../core/rule-ref';
 import { RuleType } from '../core/rule-type';
+import { InputType } from '../core/type/input-type';
+import { MediaTypeType } from '../core/type/media-type-type';
+import { BaseType, OutputType } from '../core/type/output-type';
 import { findRoot } from '../project/find-root';
 import { loadProjectConfig } from '../project/load-project-config';
+import { ProjectConfig } from '../project/project-config';
 import { readRule } from '../util/read-rule';
-import { runRule } from '../util/run-rule';
 
 import { CommandType } from './command-type';
 
 
 const LOGGER = new Logger('@hive/cli/analyze');
-
 
 const ALL_OPTIONS = 'all';
 const OPTIONS = [
@@ -26,6 +35,11 @@ const OPTIONS = [
     multiple: true,
   },
 ];
+
+interface ProjectDetails {
+  readonly config: ProjectConfig;
+  readonly path: string;
+}
 
 export const CLI = {
   title: 'Hive: Analyze',
@@ -40,56 +54,187 @@ export function analyze(argv: string[]): Observable<unknown> {
   const [type, rulePath] = options[ALL_OPTIONS];
   switch (type) {
     case 'project':
-      return analyzeProject();
+      return getProjectDetails().pipe(
+          map(details => printProjectDetails(details)),
+          tap(message => LOGGER.info(message)),
+      );
+    case 'rule':
+      return combineLatest([getProjectDetails(), getRuleDetails(rulePath)]).pipe(
+          map(([project, rule]) => [
+            ['=== PROJECT ==='],
+            ...printProjectDetails(project),
+            [''],
+            ['=== RULE ==='],
+            ...printRuleDetails(rule),
+            [''],
+            [''],
+          ]),
+          tap(message => LOGGER.info(message)),
+      );
   }
 
-
-  if (typeof rulePath !== 'string') {
-    return throwError(new Error(`Path ${rulePath} is invalid`));
-  }
-
-  const ruleRef = parseRuleRef(rulePath);
-
-  return readRule(ruleRef).pipe(
-      switchMap(rule => {
-        if (rule.type !== RuleType.RENDER) {
-          throw new Error(`Rule ${rulePath} is not a RENDER rule`);
-        }
-        return runRule(rule);
-      }),
-      mapTo('done'),
-  );
+  return throwError(`Analyze is not supported for type ${type}`);
 }
 
-function analyzeProject(): Observable<unknown> {
+function getProjectDetails(): Observable<ProjectDetails> {
   return findRoot().pipe(
       take(1),
-      switchMap(root => {
-        if (!root) {
+      switchMap(path => {
+        if (!path) {
           return throwError(new Error('No project roots found'));
         }
 
-        return loadProjectConfig().pipe(map(config => ({root, config})));
+        return loadProjectConfig().pipe(map(config => ({path, config})));
       }),
-      map(({root, config}) => {
-        const roots = $(
-            config.roots,
-            $map(([key, value]) => `-   @${key} -> ${value}`),
-        );
-        const globals = $(
-            config.globals,
-            $map(([key, value]) => `-   ${key}: ${value}`),
-        );
-        return [
-          `Root: ${root}`,
-          `@out -> ${config.outdir}`,
-          `Root directories:`,
-          ...roots,
-          'Globals:',
-          ...globals,
-          '',
-        ].join('\n');
-      }),
-      tap(message => LOGGER.info(message)),
   );
+}
+
+function getRuleDetails(ruleRaw: string): Observable<Rule> {
+  return readRule(parseRuleRef(ruleRaw));
+}
+
+function printProjectDetails({path, config}: ProjectDetails): ReadonlyArray<readonly string[]> {
+  const roots = stringifyMap(config.roots, ' -> ');
+  const globals = stringifyMap(
+      $(
+          config.globals,
+          $map(([key, value]) => [key, `${value}`] as [string, string]),
+          $asMap(),
+      ),
+      ': ',
+  );
+
+  return [
+    ['Root', path],
+    ['@out', config.outdir],
+    ['Root dirs', roots],
+    ['Globals', globals],
+  ];
+}
+
+function printRuleDetails(rule: Rule): ReadonlyArray<readonly string[]> {
+  const lines: string[][] = [
+    ['Name', rule.name],
+    ['Type', stringifyRuleType(rule.type)],
+  ];
+
+  switch (rule.type) {
+    case RuleType.DECLARE: {
+      const inputs: ReadonlyMap<string, string> = $(
+          rule.inputs,
+          $map(([key, value]) => [key, stringifyInputType(value)] as [string, string]),
+          $asMap(),
+      );
+      lines.push(['Processor', stringifyFileRef(rule.processor)]);
+      lines.push(['Inputs', stringifyMap(inputs, ': ')]);
+      lines.push(['Output', stringifyOutputType(rule.output)]);
+      break;
+    }
+    case RuleType.LOAD:
+      const sources = $(
+          rule.srcs,
+          $map(src => {
+            if (FILE_REF_TYPE.check(src)) {
+              return stringifyFileRef(src);
+            }
+
+            return stringifyGlobRef(src);
+          }),
+          $asArray(),
+          $join('\n'),
+      );
+      lines.push(['Sources', sources]);
+      lines.push(['Output', stringifyOutputType(rule.output)]);
+      break;
+    case RuleType.RENDER: {
+      const inputs: ReadonlyMap<string, string> = $(
+          rule.inputs,
+          $map(([key, value]) => [key, `${stringifyRenderInput(value)}`] as [string, string]),
+          $asMap(),
+      );
+      lines.push(['Processor', stringifyRuleRef(rule.processor)]);
+      lines.push(['Inputs', stringifyMap(inputs, ': ')]);
+      lines.push(['Output', stringifyFilePattern(rule.output)]);
+    }
+  }
+  return lines;
+}
+
+function stringifyBaseType(baseType: BaseType): string {
+  if (!(baseType instanceof MediaTypeType)) {
+    return baseType;
+  }
+
+  return baseType.stringify();
+}
+
+function stringifyFilePattern(filePattern: FilePattern): string {
+  return `${stringifyRootType(filePattern.rootType)}${filePattern.pattern}`;
+}
+
+function stringifyFileRef(fileRef: FileRef): string {
+  return `${stringifyRootType(fileRef.rootType)}${fileRef.path}`;
+}
+
+function stringifyGlobRef(globRef: GlobRef): string {
+  return `glob(${stringifyRootType(globRef.rootType)}${globRef.globPattern})`;
+}
+
+function stringifyInputType(type: InputType): string {
+  const arrayStr = type.isArray ? '[]' : '';
+  return `${type.matcher.source}:${type.matcher.flags}${arrayStr}`;
+}
+
+function stringifyMap(map: ReadonlyMap<string, string>, separator: string): string {
+  return $(
+      map,
+      $map(([key, value]) => `${key}${separator}${value}`),
+      $asArray(),
+      $join('\n'),
+  );
+}
+
+function stringifyOutputType(type: OutputType): string {
+  const arrayStr = type.isArray ? '[]' : '';
+  return `${stringifyBaseType(type.baseType)}${arrayStr}`;
+}
+
+function stringifyRenderInput(input: RenderInput): string {
+  if (RULE_REF_TYPE.check(input)) {
+    return stringifyRuleRef(input);
+  }
+
+  return `${input}`;
+}
+
+function stringifyRootType(rootType: RootType): string {
+  if (typeof rootType === 'string') {
+    return `@${rootType}`;
+  }
+
+  switch (rootType) {
+    case BuiltInRootType.CURRENT_DIR:
+      return '';
+    case BuiltInRootType.OUT_DIR:
+      return '@out/';
+    case BuiltInRootType.PROJECT_ROOT:
+      return '@root/';
+    case BuiltInRootType.SYSTEM_ROOT:
+      return '/';
+  }
+}
+
+function stringifyRuleRef(ruleRef: RuleRef): string {
+  return `${stringifyFileRef(ruleRef)}:${ruleRef.ruleName}`;
+}
+
+function stringifyRuleType(ruleType: RuleType): string {
+  switch (ruleType) {
+    case RuleType.DECLARE:
+      return 'DECLARE';
+    case RuleType.LOAD:
+      return 'LOAD';
+    case RuleType.RENDER:
+      return 'RENDER';
+  }
 }
