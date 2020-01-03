@@ -3,6 +3,7 @@ import * as path from 'path';
 import { arrayThat, assert, createSpy, fake, mapThat, setup, should, Spy, test } from '@gs-testing';
 import { Observable, of as observableOf } from '@rxjs';
 
+import { DeclareFn } from '../core/declare-fn';
 import { DeclareRule } from '../core/declare-rule';
 import { LoadRule } from '../core/load-rule';
 import { RenderInput } from '../core/render-input';
@@ -14,7 +15,6 @@ import { addFile, mockFs } from '../testing/fake-fs';
 
 import { RULE_FILE_NAME } from './read-rule';
 import { resolveInputs } from './resolve-inputs';
-import { DeclareFn } from './run-declare';
 
 
 test('@hive/util/resolve-inputs', () => {

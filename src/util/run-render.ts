@@ -4,8 +4,10 @@ import { combineLatest, from as observableFrom, Observable, of as observableOf }
 import { map, mapTo, switchMap, tap } from '@rxjs/operators';
 import { Logger } from '@santa';
 
+import { RenderInput } from '../core/render-input';
 import { RenderRule } from '../core/render-rule';
 import { RuleType } from '../core/rule-type';
+import { loadProjectConfig } from '../project/load-project-config';
 
 import { generateRunSpecs } from './generate-run-specs';
 import { readRule } from './read-rule';
@@ -28,15 +30,21 @@ export function runRender(
   return combineLatest([
     readRule(rule.processor),
     outputPattern$,
+    loadProjectConfig(),
   ]).pipe(
-      switchMap(([processor, outputPattern]) => {
+      switchMap(([processor, outputPattern, projectConfig]) => {
         if (processor.type !== RuleType.DECLARE) {
           throw new Error(`Rule ${rule.processor} should be a declare rule, but not`);
         }
 
+        const allInputs = new Map<string, RenderInput>([
+          ...projectConfig.globals,
+          ...rule.inputs,
+        ]);
+
         return combineLatest([
-          validateInputs(rule.inputs, processor.inputs),
-          resolveInputs(rule.inputs, runRuleFn),
+          validateInputs(allInputs, processor.inputs),
+          resolveInputs(allInputs, runRuleFn),
           runRuleFn(processor),
         ])
         .pipe(

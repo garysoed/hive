@@ -1,12 +1,13 @@
 import { Observable } from '@rxjs';
 
+import { DeclareFn } from '../core/declare-fn';
 import { DeclareRule } from '../core/declare-rule';
 import { LoadRule } from '../core/load-rule';
 import { RenderRule } from '../core/render-rule';
 import { Rule } from '../core/rule';
 import { RuleType } from '../core/rule-type';
 
-import { DeclareFn, runDeclare } from './run-declare';
+import { runDeclare } from './run-declare';
 import { runLoad } from './run-load';
 import { runRender } from './run-render';
 import { RunRuleFn } from './run-rule-fn';

@@ -1,28 +1,27 @@
-import { combineLatest, Observable } from '@rxjs';
+import { Observable } from '@rxjs';
 import { map, switchMap } from '@rxjs/operators';
 
+import { DeclareFn } from '../core/declare-fn';
 import { DeclareRule } from '../core/declare-rule';
-import { loadProjectConfig } from '../project/load-project-config';
 
 import { readFile } from './read-file';
 import { resolveFileRef } from './resolve-file-ref';
-import { runProcessor } from './run-processor';
 
-
-export type DeclareFn = (inputs: ReadonlyMap<string, unknown>) => unknown;
 
 export function runDeclare(rule: DeclareRule): Observable<DeclareFn> {
+  const sortedInputArgs = [...rule.inputs.keys()].sort();
   return resolveFileRef(rule.processor).pipe(
-      switchMap(filePath => combineLatest([
-        loadProjectConfig(),
-        readFile(filePath),
-      ])),
-      map(([projectConfig, fileContent]) => {
-        return (inputs: unknown) => {
-          if (!(inputs instanceof Map)) {
-            throw new Error('Inputs to processor should be a map');
-          }
-          return runProcessor(fileContent, inputs, projectConfig.globals);
+      switchMap(filePath => {
+        return readFile(filePath).pipe(
+            map(fileContent => {
+              return Function(...sortedInputArgs, fileContent);
+            }),
+        );
+      }),
+      map(processorFn => {
+        return (inputs: ReadonlyMap<string, unknown>) => {
+          const inputsValues = sortedInputArgs.map(key => inputs.get(key));
+          return processorFn(...inputsValues);
         };
       }),
   );

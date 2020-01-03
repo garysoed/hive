@@ -1,7 +1,6 @@
 import * as path from 'path';
 
-import { assert, createSpy, mapThat, setup, should, test } from '@gs-testing';
-import { Observable } from '@rxjs';
+import { assert, mapThat, setup, should, test } from '@gs-testing';
 import { take } from '@rxjs/operators';
 
 import { RenderRule } from '../core/render-rule';
@@ -11,7 +10,6 @@ import { ROOT_FILE_NAME } from '../project/find-root';
 import { addFile, getFile, mockFs } from '../testing/fake-fs';
 
 import { RULE_FILE_NAME } from './read-rule';
-import { runRender } from './run-render';
 import { runRule } from './run-rule';
 
 
@@ -21,7 +19,7 @@ test('@hive/util/run-render', () => {
   });
 
   should(`emit map of file names to their content`, () => {
-    const configContent = JSON.stringify({outdir: '/out', globals: {g: 4}});
+    const configContent = JSON.stringify({outdir: '/out', globals: {a: 10, g: 4}});
     addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
 
     const declarationContent = `
@@ -31,13 +29,14 @@ test('@hive/util/run-render', () => {
       inputs: {
         a: 'number',
         b: 'number',
+        g: 'number',
       },
       output: 'number',
     });
     `;
     addFile(path.join('/src/declarations', RULE_FILE_NAME), {content: declarationContent});
 
-    const processorContent = `$hive.a + $hive.b + $hiveGlobals.g`;
+    const processorContent = `return a + b + g`;
     addFile('/src/processors/plus.js', {content: processorContent});
 
     const rule: RenderRule = {
@@ -94,7 +93,7 @@ test('@hive/util/run-render', () => {
     `;
     addFile(path.join('/src/declarations', RULE_FILE_NAME), {content: declarationContent});
 
-    const processorContent = `Promise.resolve($hive.a + $hive.b)`;
+    const processorContent = `return Promise.resolve(a + b)`;
     addFile('/src/processors/plus.js', {content: processorContent});
 
     const rule: RenderRule = {
@@ -134,6 +133,9 @@ test('@hive/util/run-render', () => {
   });
 
   should(`emit error if the processor is not a declare rule`, () => {
+    const configContent = JSON.stringify({outdir: '/out'});
+    addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
+
     const declarationContent = `
     hive.load({
       name: 'declareRule',

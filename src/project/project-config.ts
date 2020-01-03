@@ -1,13 +1,16 @@
-import { HasPropertiesType, InstanceofType, MapOfType, StringType, Type, UnknownType } from '@gs-types';
+import { HasPropertiesType, MapOfType, StringType, Type } from '@gs-types';
+
+import { RENDER_INPUT_TYPE, RenderInput } from '../core/render-input';
+
 
 export interface ProjectConfig {
-  globals: ReadonlyMap<string, unknown>;
+  globals: ReadonlyMap<string, RenderInput>;
   outdir: string;
   roots: ReadonlyMap<string, string>;
 }
 
 export const PROJECT_CONFIG_TYPE: Type<ProjectConfig> = HasPropertiesType({
-  globals: MapOfType(StringType, UnknownType),
+  globals: MapOfType(StringType, RENDER_INPUT_TYPE),
   outdir: StringType,
   roots: MapOfType(StringType, StringType),
 });
