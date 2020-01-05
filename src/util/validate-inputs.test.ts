@@ -180,7 +180,7 @@ test('@hive/util/validate-inputs', () => {
 
     should(`handle MediaTypes`, () => {
       const content = `
-      hive.load({
+      load({
         name: 'loadRule',
         srcs: ['./file.txt'],
         output: 'text/plain',
@@ -202,7 +202,7 @@ test('@hive/util/validate-inputs', () => {
 
     should(`throw error if MediaTypes do not match`, () => {
       const content = `
-      hive.load({
+      load({
         name: 'loadRule',
         srcs: ['./file.txt'],
         output: 'text/plain',

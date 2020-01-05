@@ -23,7 +23,7 @@ test('@hive/util/run-render', () => {
     addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
 
     const declarationContent = `
-    hive.declare({
+    declare({
       name: 'declareRule',
       processor: '/src/processors/plus.js',
       inputs: {
@@ -81,7 +81,7 @@ test('@hive/util/run-render', () => {
     addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
 
     const declarationContent = `
-    hive.declare({
+    declare({
       name: 'declareRule',
       processor: '/src/processors/plus.js',
       inputs: {
@@ -137,7 +137,7 @@ test('@hive/util/run-render', () => {
     addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
 
     const declarationContent = `
-    hive.load({
+    load({
       name: 'declareRule',
       srcs: ['/src/processors/plus.js'],
       output: 'number',

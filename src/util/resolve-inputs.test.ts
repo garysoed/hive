@@ -57,7 +57,7 @@ test('@hive/util/resolve-inputs', () => {
     });
 
     const contentA = `
-    hive.load({
+    load({
       name: 'ruleA',
       srcs: ['/file.txt'],
       output: 'number',
@@ -66,7 +66,7 @@ test('@hive/util/resolve-inputs', () => {
     addFile(path.join('/a', RULE_FILE_NAME), {content: contentA});
 
     const contentB = `
-    hive.load({
+    load({
       name: 'ruleB',
       srcs: ['/file.txt'],
       output: 'string',
@@ -99,7 +99,7 @@ test('@hive/util/resolve-inputs', () => {
     });
 
     const contentA = `
-    hive.load({
+    load({
       name: 'ruleA',
       srcs: ['/file.txt'],
       output: 'number',
@@ -120,9 +120,9 @@ test('@hive/util/resolve-inputs', () => {
     });
 
     const contentA = `
-    hive.load({
+    load({
       name: 'ruleA',
-      srcs: [hive.glob('/*.txt')],
+      srcs: [glob('/*.txt')],
       output: 'number[]',
     });
     `;
@@ -146,7 +146,7 @@ test('@hive/util/resolve-inputs', () => {
     });
 
     const contentA = `
-    hive.declare({
+    declare({
       name: 'ruleA',
       processor: '/file.txt',
       inputs: {},
@@ -172,7 +172,7 @@ test('@hive/util/resolve-inputs', () => {
     });
 
     const contentA = `
-    hive.render({
+    render({
       name: 'ruleA',
       processor: '/path:rule',
       inputs: {},

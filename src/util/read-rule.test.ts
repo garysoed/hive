@@ -19,7 +19,7 @@ test('@hive/util/read-rule', () => {
 
   should(`return the correct rule`, () => {
     const content = `
-      hive.load({
+      load({
         name: 'rule',
         srcs: ['@out/filename'],
         output: 'number',
@@ -49,7 +49,7 @@ test('@hive/util/read-rule', () => {
 
   should(`throw if the rule cannot be found`, () => {
     const content = `
-      hive.load({
+      load({
         name: 'rule',
         srcs: ['@out/filename'],
         output: 'number',

@@ -91,7 +91,7 @@ function matchRenderRule(expected: RuleWithoutType<RenderRule>): MatcherType<Ren
 test('@hive/config/parse-config', () => {
   should(`parse declares correctly`, () => {
     const CONTENT = `
-      hive.declare({
+      declare({
         name: 'ruleA',
         processor: '/path/to/scriptA',
         inputs: {
@@ -101,7 +101,7 @@ test('@hive/config/parse-config', () => {
         output: 'string',
       });
 
-      hive.declare({
+      declare({
         name: 'ruleB',
         processor: '@out/path/to/scriptB',
         inputs: {
@@ -140,15 +140,15 @@ test('@hive/config/parse-config', () => {
 
   should(`parse load rules correctly`, () => {
     const CONTENT = `
-      hive.load({
+      load({
         name: 'ruleA',
         srcs: [
-          hive.glob('@out/glob/path/*.txt'),
+          glob('@out/glob/path/*.txt'),
         ],
         output: 'number',
       });
 
-      hive.load({
+      load({
         name: 'ruleB',
         srcs: [
           '@out/path/out.txt',
@@ -179,7 +179,7 @@ test('@hive/config/parse-config', () => {
 
   should(`parse renders correctly`, () => {
     const CONTENT = `
-      hive.render({
+      render({
         name: 'ruleA',
         inputs: {
           paramA: [1, 2, 3],
@@ -189,7 +189,7 @@ test('@hive/config/parse-config', () => {
         output: '@out/path/{paramA}_{paramB}.txt',
       });
 
-      hive.render({
+      render({
         name: 'ruleB',
         inputs: {
           param: false,

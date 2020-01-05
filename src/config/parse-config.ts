@@ -6,28 +6,15 @@ import { glob } from './operator/glob';
 import { load } from './operator/load';
 import { render } from './operator/render';
 
-
-type HiveFnOf<F> = F extends (...args: infer A) => unknown ? (...args: A) => void : never;
-
-interface HiveGlobal {
-  readonly declare: HiveFnOf<typeof declare>;
-  readonly glob: typeof glob;
-  readonly load: HiveFnOf<typeof load>;
-  readonly render: HiveFnOf<typeof render>;
-}
-
-type FnContent = (global: HiveGlobal) => void;
-
 export function parseConfig(content: string): ConfigFile {
-  const fn: FnContent = Function('hive', content) as unknown as FnContent;
+  const fn = Function('declare', 'load', 'render', 'glob', content);
   const rules = new Map<string, Rule>();
-  const hiveGlobal = {
-    declare: makeHiveRuleFn(declare, rules),
-    glob,
-    load: makeHiveRuleFn(load, rules),
-    render: makeHiveRuleFn(render, rules),
-  };
-  fn(hiveGlobal);
+  fn(
+      makeHiveRuleFn(declare, rules),
+      makeHiveRuleFn(load, rules),
+      makeHiveRuleFn(render, rules),
+      glob,
+  );
 
   return rules;
 }

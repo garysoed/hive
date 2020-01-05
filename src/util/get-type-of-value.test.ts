@@ -45,7 +45,7 @@ test('@hive/util/get-type-of-value', () => {
 
   should(`emit the correct type for render rules`, () => {
     const configContent = `
-    hive.render({
+    render({
       name: 'ruleA',
       processor: '/a:processorRule',
       inputs: {},
@@ -55,7 +55,7 @@ test('@hive/util/get-type-of-value', () => {
     addFile('/a/c/hive.js', {content: configContent});
 
     const processorContent = `
-    hive.declare({
+    declare({
       name: 'processorRule',
       processor: './path/to/processor.js',
       inputs: {},
@@ -75,7 +75,7 @@ test('@hive/util/get-type-of-value', () => {
 
   should(`emit the correct type for render rules with built in processor`, () => {
     const configContent = `
-    hive.render({
+    render({
       name: 'ruleA',
       processor: '$loadGoogleSheets',
       inputs: {},
@@ -95,7 +95,7 @@ test('@hive/util/get-type-of-value', () => {
 
   should(`emit error if the render rule's processor is not a declare rule`, () => {
     const configContent = `
-    hive.render({
+    render({
       name: 'ruleA',
       processor: '/a:processorRule',
       inputs: {},
@@ -105,7 +105,7 @@ test('@hive/util/get-type-of-value', () => {
     addFile('/a/c/hive.js', {content: configContent});
 
     const processorContent = `
-    hive.load({
+    load({
       name: 'processorRule',
       srcs: ['./path/to/file.js'],
       output: 'number',
@@ -119,7 +119,7 @@ test('@hive/util/get-type-of-value', () => {
 
   should(`emit the correct type for load rules`, () => {
     const configContent = `
-    hive.load({
+    load({
       name: 'rule',
       srcs: ['/input.txt'],
       output: 'number',
@@ -138,7 +138,7 @@ test('@hive/util/get-type-of-value', () => {
 
   should(`emit the correct type for declare rules`, () => {
     const configContent = `
-    hive.declare({
+    declare({
       name: 'rule',
       processor: '/processor.js',
       inputs: {},

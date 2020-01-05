@@ -78,7 +78,7 @@ test('@hive/util/run-rule', () => {
     addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
 
     const declarationContent = `
-    hive.declare({
+    declare({
       name: 'declareRule',
       processor: '/src/processors/plus.js',
       inputs: {
