@@ -154,3 +154,7 @@ export class GoogleOauth {
         .subscribe();
   }
 }
+
+export type GoogleOauthFactory = (clientId: string, clientSecret: string) => GoogleOauth;
+export const DEFAULT_GOOGLE_OAUTH_FACTORY: GoogleOauthFactory =
+    (clientId, clientSecret) => new GoogleOauth(clientId, clientSecret);

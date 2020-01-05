@@ -3,9 +3,9 @@ import * as path from 'path';
 import { arrayThat, assert, createSpy, fake, mapThat, setup, should, Spy, test } from '@gs-testing';
 import { Observable, of as observableOf } from '@rxjs';
 
-import { DeclareFn } from '../core/declare-fn';
 import { DeclareRule } from '../core/declare-rule';
 import { LoadRule } from '../core/load-rule';
+import { Processor } from '../core/processor';
 import { RenderInput } from '../core/render-input';
 import { RenderRule } from '../core/render-rule';
 import { BuiltInRootType } from '../core/root-type';
@@ -21,7 +21,7 @@ test('@hive/util/resolve-inputs', () => {
   let mockResolveRule: Spy<Observable<unknown>, [Rule]>;
 
   function fakeRunRule(renderRule: RenderRule): Observable<ReadonlyMap<string, string>>;
-  function fakeRunRule(declareRule: DeclareRule): Observable<DeclareFn>;
+  function fakeRunRule(declareRule: DeclareRule): Observable<Processor>;
   function fakeRunRule(loadRule: LoadRule): Observable<string[]>;
   function fakeRunRule(rule: Rule): Observable<unknown> {
     return mockResolveRule(rule);

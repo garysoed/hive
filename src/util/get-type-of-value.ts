@@ -6,6 +6,7 @@ import { isRuleRef } from '../core/rule-ref';
 import { RuleType } from '../core/rule-type';
 import { ConstType } from '../core/type/const-type';
 import { BaseType, OutputType } from '../core/type/output-type';
+import { BUILT_IN_PROCESSOR_MAP, BUILT_IN_PROCESSOR_TYPE } from '../processor/built-in-processor-id';
 
 import { readRule } from './read-rule';
 
@@ -28,10 +29,20 @@ export function getTypeOfValue(value: RenderInput): Observable<OutputType|'empty
             case RuleType.LOAD:
               return observableOf(rule.output);
             case RuleType.RENDER:
-              return readRule(rule.processor).pipe(
+              const processor = rule.processor;
+              if (BUILT_IN_PROCESSOR_TYPE.check(processor)) {
+                const declaration = BUILT_IN_PROCESSOR_MAP.get(processor);
+                if (declaration) {
+                  return observableOf(declaration.output);
+                }
+
+                return throwError(new Error(`Invalid built in processor: ${processor}`));
+              }
+
+              return readRule(processor).pipe(
                   map(processorRule => {
                     if (processorRule.type !== RuleType.DECLARE) {
-                      throw new Error(`Rule ${rule.processor.path}:${rule.processor.ruleName} is ` +
+                      throw new Error(`Rule ${processor.path}:${processor.ruleName} is ` +
                           `invalid`);
                     }
 

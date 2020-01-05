@@ -5,6 +5,7 @@ import { RENDER_INPUT_TYPE, RenderInput } from '../../core/render-input';
 import { RenderRule } from '../../core/render-rule';
 import { RULE_REF_TYPE, RuleRef } from '../../core/rule-ref';
 import { RuleType } from '../../core/rule-type';
+import { BUILT_IN_PROCESSOR_TYPE, BuiltInProcessorId } from '../../processor/built-in-processor-id';
 import { parseFilePattern } from '../parse/parse-file-pattern';
 import { parseRuleRef } from '../parse/parse-rule-ref';
 
@@ -55,6 +56,16 @@ export function render(args: unknown): RenderRule {
   );
 
   const output = parseFilePattern(args.output);
-  const processor = parseRuleRef(args.processor);
+  const processor = getProcessor(args.processor);
   return {inputs, name: args.name, output, processor, type: RuleType.RENDER};
+}
+
+function getProcessor(raw: string): RuleRef|BuiltInProcessorId {
+  try {
+    const ruleRef = parseRuleRef(raw);
+    return ruleRef;
+  } catch (e) {
+    BUILT_IN_PROCESSOR_TYPE.assert(raw);
+    return raw;
+  }
 }

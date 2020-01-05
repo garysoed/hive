@@ -1,7 +1,7 @@
 import { GaxiosResponse } from 'gaxios';
 import { google, sheets_v4 } from 'googleapis';
 
-import { assert, createSpy, createSpyInstance, createSpyObject, fake, objectThat, setup, should, spy, Spy, test, TestScheduler } from '@gs-testing';
+import { assert, createSpy, createSpyInstance, createSpyObject, fake, objectThat, should, spy, Spy, test } from '@gs-testing';
 import { Observable, of as observableOf, ReplaySubject } from '@rxjs';
 
 import { GoogleOauth } from './google-oauth';
@@ -18,7 +18,7 @@ test('@hive/processor/load-google-sheets', () => {
         createSpyObject<sheets_v4.Resource$Spreadsheets>('Spreadsheets', ['get']);
     const data = {};
     const mockGet = mockSpreadsheets.get as unknown as
-        Spy<Observable<GaxiosResponse<sheets_v4.Schema$Spreadsheet>>>;
+        Spy<Observable<GaxiosResponse<sheets_v4.Schema$Spreadsheet>>, [any]>;
     fake(mockGet).always().return(observableOf({
       config: {},
       status: 0,
@@ -38,7 +38,9 @@ test('@hive/processor/load-google-sheets', () => {
         .return(observableOf({scopes: new Set([SCOPE]), client: mockClient} as any));
 
     const spreadsheet$ = new ReplaySubject<sheets_v4.Schema$Spreadsheet>(1);
-    loadGoogleSheets(metadata, ranges, mockGoogleOauth).subscribe(spreadsheet$);
+
+    loadGoogleSheets(metadata, ranges, 'clientId', 'clientSecret', () => mockGoogleOauth)
+        .subscribe(spreadsheet$);
 
     assert(spreadsheet$).to.emitSequence([data]);
     assert(mockGet).to.haveBeenCalledWith(objectThat().haveProperties({

@@ -1,12 +1,15 @@
 import * as path from 'path';
 
-import { combineLatest, from as observableFrom, Observable, of as observableOf } from '@rxjs';
+import { combineLatest, from as observableFrom, Observable, of as observableOf, throwError } from '@rxjs';
 import { map, mapTo, switchMap, tap } from '@rxjs/operators';
 import { Logger } from '@santa';
 
+import { Processor } from '../core/processor';
 import { RenderInput } from '../core/render-input';
 import { RenderRule } from '../core/render-rule';
+import { RuleRef } from '../core/rule-ref';
 import { RuleType } from '../core/rule-type';
+import { BUILT_IN_PROCESSOR_MAP, BUILT_IN_PROCESSOR_TYPE, BuiltInProcessorId } from '../processor/built-in-processor-id';
 import { loadProjectConfig } from '../project/load-project-config';
 
 import { generateRunSpecs } from './generate-run-specs';
@@ -28,34 +31,29 @@ export function runRender(
       .pipe(map(root => path.join(root, rule.output.pattern)));
 
   return combineLatest([
-    readRule(rule.processor),
+    getDeclaration(rule.processor, runRuleFn),
     outputPattern$,
     loadProjectConfig(),
   ]).pipe(
-      switchMap(([processor, outputPattern, projectConfig]) => {
-        if (processor.type !== RuleType.DECLARE) {
-          throw new Error(`Rule ${rule.processor} should be a declare rule, but not`);
-        }
-
+      switchMap(([declaration, outputPattern, projectConfig]) => {
         const allInputs = new Map<string, RenderInput>([
           ...projectConfig.globals,
           ...rule.inputs,
         ]);
 
         return combineLatest([
-          validateInputs(allInputs, processor.inputs),
+          validateInputs(allInputs, declaration.inputs),
           resolveInputs(allInputs, runRuleFn),
-          runRuleFn(processor),
         ])
         .pipe(
-            switchMap(([repeatedKeys, validatedInputs, processorFn]) => {
+            switchMap(([repeatedKeys, validatedInputs]) => {
               const results: Array<Observable<[string, unknown]>> = generateRunSpecs(
                   validatedInputs,
                   repeatedKeys,
                   outputPattern,
               )
               .map(runSpec => {
-                const resultRaw = processorFn(runSpec.inputs);
+                const resultRaw = declaration.fn(runSpec.inputs);
                 const result$ = resultRaw instanceof Promise ?
                     observableFrom(resultRaw) : observableOf(resultRaw);
                 return result$.pipe(
@@ -77,4 +75,28 @@ export function runRender(
         );
       }),
   );
+}
+
+function getDeclaration(
+    processorSpec: RuleRef|BuiltInProcessorId,
+    runRuleFn: RunRuleFn,
+): Observable<Processor> {
+  if (!BUILT_IN_PROCESSOR_TYPE.check(processorSpec)) {
+    return readRule(processorSpec).pipe(
+        switchMap(processor => {
+          if (processor.type !== RuleType.DECLARE) {
+            throw new Error(`Rule ${processorSpec} should be a declare rule, but not`);
+          }
+
+          return runRuleFn(processor);
+        }),
+    );
+  }
+
+  const builtInDeclaration = BUILT_IN_PROCESSOR_MAP.get(processorSpec);
+  if (!builtInDeclaration) {
+    return throwError(new Error(`Invalid built in processor: ${processorSpec}`));
+  }
+
+  return observableOf(builtInDeclaration);
 }

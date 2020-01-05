@@ -17,6 +17,7 @@ import { RuleType } from '../core/rule-type';
 import { InputType } from '../core/type/input-type';
 import { MediaTypeType } from '../core/type/media-type-type';
 import { BaseType, OutputType } from '../core/type/output-type';
+import { BUILT_IN_PROCESSOR_TYPE as BUILT_IN_PROCESSOR_ID, BuiltInProcessorId } from '../processor/built-in-processor-id';
 import { findRoot } from '../project/find-root';
 import { loadProjectConfig } from '../project/load-project-config';
 import { ProjectConfig } from '../project/project-config';
@@ -152,7 +153,7 @@ function printRuleDetails(rule: Rule): ReadonlyArray<readonly string[]> {
           $map(([key, value]) => [key, `${stringifyRenderInput(value)}`] as [string, string]),
           $asMap(),
       );
-      lines.push(['Processor', stringifyRuleRef(rule.processor)]);
+      lines.push(['Processor', stringifyProcessor(rule.processor)]);
       lines.push(['Inputs', stringifyMap(inputs, ': ')]);
       lines.push(['Output', stringifyFilePattern(rule.output)]);
     }
@@ -197,6 +198,14 @@ function stringifyMap(map: ReadonlyMap<string, string>, separator: string): stri
 function stringifyOutputType(type: OutputType): string {
   const arrayStr = type.isArray ? '[]' : '';
   return `${stringifyBaseType(type.baseType)}${arrayStr}`;
+}
+
+function stringifyProcessor(processor: RuleRef|BuiltInProcessorId): string {
+  if (BUILT_IN_PROCESSOR_ID.check(processor)) {
+    return processor;
+  }
+
+  return stringifyRuleRef(processor);
 }
 
 function stringifyRenderInput(input: RenderInput): string {

@@ -69,7 +69,7 @@ test('@hive/util/run-rule', () => {
       processor: {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a/b.js'},
     };
 
-    assert(runRule(rule).pipe(map(fn => fn(new Map([['a', 1], ['b', 2]])))))
+    assert(runRule(rule).pipe(map(({fn}) => fn(new Map([['a', 1], ['b', 2]])))))
         .to.emitSequence(['3']);
   });
 

@@ -14,6 +14,7 @@ import { RuleRef } from '../core/rule-ref';
 import { RuleType } from '../core/rule-type';
 import { ConstType } from '../core/type/const-type';
 import { InputType } from '../core/type/input-type';
+import { BUILT_IN_PROCESSOR_TYPE } from '../processor/built-in-processor-id';
 
 import { parseConfig } from './parse-config';
 
@@ -76,9 +77,11 @@ function matchLoadRule(expected: RuleWithoutType<LoadRule>): MatcherType<LoadRul
 }
 
 function matchRenderRule(expected: RuleWithoutType<RenderRule>): MatcherType<RenderRule> {
+  const processor = BUILT_IN_PROCESSOR_TYPE.check(expected.processor) ?
+      expected.processor : matchRuleRef(expected.processor);
   return objectThat<RenderRule>().haveProperties({
     name: expected.name,
-    processor: matchRuleRef(expected.processor),
+    processor,
     inputs: matchRenderInputs(expected.inputs),
     output: matchFilePattern(expected.output),
     type: RuleType.RENDER,

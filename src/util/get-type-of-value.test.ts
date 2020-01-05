@@ -3,6 +3,7 @@ import { assert, objectThat, setup, should, test } from '@gs-testing';
 import { BuiltInRootType } from '../core/root-type';
 import { ConstType } from '../core/type/const-type';
 import { OutputType } from '../core/type/output-type';
+import { BUILT_IN_PROCESSOR_MAP } from '../processor/built-in-processor-id';
 import { addFile, mockFs } from '../testing/fake-fs';
 import { mockProcess } from '../testing/fake-process';
 
@@ -68,6 +69,26 @@ test('@hive/util/get-type-of-value', () => {
       objectThat<OutputType>().haveProperties({
         isArray: false,
         baseType: ConstType.NUMBER,
+      }),
+    ]);
+  });
+
+  should(`emit the correct type for render rules with built in processor`, () => {
+    const configContent = `
+    hive.render({
+      name: 'ruleA',
+      processor: '$loadGoogleSheets',
+      inputs: {},
+      output: '@out/:output.txt',
+    });
+    `;
+    addFile('/a/c/hive.js', {content: configContent});
+
+    const ruleRef = {path: 'a/c', rootType: BuiltInRootType.SYSTEM_ROOT, ruleName: 'ruleA'};
+    assert(getTypeOfValue(ruleRef)).to.emitSequence([
+      objectThat<OutputType>().haveProperties({
+        isArray: false,
+        baseType: ConstType.OBJECT,
       }),
     ]);
   });
