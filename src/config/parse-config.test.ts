@@ -1,5 +1,5 @@
 
-import { arrayThat, assert, mapThat, MatcherType, objectThat, setThat, should, test } from '@gs-testing';
+import { arrayThat, assert, MatcherType, objectThat, setThat, should, test } from '@gs-testing';
 
 import { DeclareRule } from '../core/declare-rule';
 import { FilePattern } from '../core/file-pattern';
@@ -13,7 +13,6 @@ import { Rule } from '../core/rule';
 import { RuleRef } from '../core/rule-ref';
 import { RuleType } from '../core/rule-type';
 import { ConstType } from '../core/type/const-type';
-import { InputType } from '../core/type/input-type';
 import { BUILT_IN_PROCESSOR_TYPE } from '../processor/built-in-processor-id';
 
 import { parseConfig } from './parse-config';
@@ -21,29 +20,6 @@ import { parseConfig } from './parse-config';
 
 type RuleWithoutType<R extends Rule> = {[K in Exclude<keyof R, 'type'>]: R[K]};
 type RuleWithoutTypeOrInputs<R extends Rule> = {[K in Exclude<keyof R, 'type'|'inputs'>]: R[K]};
-
-type InputTypes = ReadonlyMap<string, InputType>;
-function matchInputs(expected: InputTypes): MatcherType<Map<string, InputType>> {
-  const matcherSpec = new Map<string, InputType>();
-
-  for (const [key, value] of expected) {
-    const matcherValue = objectThat<InputType>().haveProperties({
-      matcher: objectThat<RegExp>().haveProperties({
-        source: value.matcher.source,
-        flags: value.matcher.flags,
-      }),
-    });
-    matcherSpec.set(key, matcherValue);
-  }
-
-  return mapThat<string, InputType>().haveExactElements(matcherSpec);
-}
-
-function matchRenderInputs(
-    expected: ReadonlyMap<string, RenderInput>,
-): MatcherType<Map<string, RenderInput>> {
-  return mapThat<string, RenderInput>().haveExactElements(expected);
-}
 
 function matchRuleRef(expected: RuleRef): MatcherType<RuleRef> {
   return objectThat<RuleRef>().haveProperties(expected);

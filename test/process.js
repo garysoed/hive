@@ -1,1 +1,1 @@
-$hive.a + $hive.b
+return a + b;

@@ -1,26 +1,25 @@
-hive.load({
+load({
   name: 'a',
   srcs: ['./a.txt'],
   output: 'number',
 });
 
-hive.load({
+load({
   name: 'b',
   srcs: ['./b.txt'],
   output: 'number',
 });
 
-hive.declare({
+declare({
   name: 'plus',
   processor: './process.js',
   inputs: {
-    a: 'number',
-    b: 'number',
+    a: type.number,
+    b: type.number,
   },
-  output: 'number',
 });
 
-hive.render({
+render({
   name: 'render',
   processor: './:plus',
   inputs: {

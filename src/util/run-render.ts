@@ -80,7 +80,6 @@ function getDeclaration(
     processorSpec: RuleRef|BuiltInProcessorId,
     runRuleFn: RunRuleFn,
 ): Observable<Processor> {
-  debugger;
   if (!BUILT_IN_PROCESSOR_TYPE.check(processorSpec)) {
     return readRule(processorSpec).pipe(
         switchMap(processor => {

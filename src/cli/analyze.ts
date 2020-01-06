@@ -128,7 +128,6 @@ function printRuleDetails(rule: Rule): ReadonlyArray<readonly string[]> {
       );
       lines.push(['Processor', stringifyFileRef(rule.processor)]);
       lines.push(['Inputs', stringifyMap(inputs, ': ')]);
-      // lines.push(['Output', stringifyOutputType(rule.output)]);
       break;
     }
     case RuleType.LOAD:

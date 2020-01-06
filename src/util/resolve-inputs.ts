@@ -3,7 +3,7 @@ import { map, switchMap } from '@rxjs/operators';
 
 import { parseContent } from '../contentparser/parse-content';
 import { RenderInput, ResolvedRenderInput } from '../core/render-input';
-import { isRuleRef, RuleRef } from '../core/rule-ref';
+import { isRuleRef } from '../core/rule-ref';
 import { RuleType } from '../core/rule-type';
 
 import { readRule } from './read-rule';
