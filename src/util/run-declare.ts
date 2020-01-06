@@ -25,7 +25,6 @@ export function runDeclare(rule: DeclareRule): Observable<Processor> {
         };
 
         return {
-          output: rule.output,
           inputs: rule.inputs,
           fn,
         };

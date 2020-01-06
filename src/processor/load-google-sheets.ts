@@ -5,7 +5,6 @@ import { filter, map, switchMap } from '@rxjs/operators';
 
 import { GoogleSheetsMetadata } from '../contentparser/google-sheets-metadata';
 import { Processor } from '../core/processor';
-import { ConstType } from '../core/type/const-type';
 
 import { DEFAULT_GOOGLE_OAUTH_FACTORY, GoogleOauthFactory } from './google-oauth';
 
@@ -54,8 +53,4 @@ export const LOAD_GOOGLE_SHEETS: Processor = {
     ['clientId', {isArray: false, matcher: /string/}],
     ['clientSecret', {isArray: false, matcher: /string/}],
   ]),
-  output: {
-    baseType: ConstType.OBJECT,
-    isArray: false,
-  },
 };

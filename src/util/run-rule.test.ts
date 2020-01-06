@@ -65,7 +65,6 @@ test('@hive/util/run-rule', () => {
         ['a', {isArray: false, matcher: /number/}],
         ['b', {isArray: false, matcher: /number/}],
       ]),
-      output: {isArray: false, baseType: ConstType.NUMBER},
       processor: {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a/b.js'},
     };
 

@@ -1,13 +1,9 @@
-import * as path from 'path';
-
 import { assert, setThat, setup, should, test } from '@gs-testing';
 
 import { RenderInput } from '../core/render-input';
-import { BuiltInRootType } from '../core/root-type';
-import { addFile, mockFs } from '../testing/fake-fs';
+import { mockFs } from '../testing/fake-fs';
 import { mockProcess } from '../testing/fake-process';
 
-import { RULE_FILE_NAME } from './read-rule';
 import { validateInputs } from './validate-inputs';
 
 
@@ -173,48 +169,6 @@ test('@hive/util/validate-inputs', () => {
       ]);
       const expected = new Map([
         ['a', {isArray: false, matcher: /number/}],
-      ]);
-
-      assert(validateInputs(actual, expected)).to.emitErrorWithMessage(/is incompatible/);
-    });
-
-    should(`handle MediaTypes`, () => {
-      const content = `
-      load({
-        name: 'loadRule',
-        srcs: ['./file.txt'],
-        output: 'text/plain',
-      });
-      `;
-      addFile(path.join('/a', RULE_FILE_NAME), {content});
-
-      const actual = new Map<string, RenderInput>([
-        ['a', {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a', ruleName: 'loadRule'}],
-      ]);
-      const expected = new Map([
-        ['a', {isArray: false, matcher: /text\/.*/}],
-      ]);
-
-      assert(validateInputs(actual, expected)).to.emitSequence([
-        setThat<string>().beEmpty(),
-      ]);
-    });
-
-    should(`throw error if MediaTypes do not match`, () => {
-      const content = `
-      load({
-        name: 'loadRule',
-        srcs: ['./file.txt'],
-        output: 'text/plain',
-      });
-      `;
-      addFile(path.join('/a', RULE_FILE_NAME), {content});
-
-      const actual = new Map<string, RenderInput>([
-        ['a', {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a', ruleName: 'loadRule'}],
-      ]);
-      const expected = new Map([
-        ['a', {isArray: false, matcher: /image\/.*/}],
       ]);
 
       assert(validateInputs(actual, expected)).to.emitErrorWithMessage(/is incompatible/);

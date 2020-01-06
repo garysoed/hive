@@ -61,7 +61,6 @@ function matchDeclareRule(expected: RuleWithoutType<DeclareRule>): MatcherType<D
     name: expected.name,
     processor: objectThat<FileRef>().haveProperties(expected.processor),
     inputs: matchInputs(expected.inputs),
-    output: objectThat().haveProperties(expected.output),
     type: RuleType.DECLARE,
   });
 }
@@ -121,7 +120,6 @@ test('@hive/config/parse-config', () => {
             ['paramA', {isArray: false, matcher: /number/}],
             ['paramB', {isArray: false, matcher: /boolean/}],
           ]),
-          output: {baseType: ConstType.STRING, isArray: false},
         }),
       ],
       [
@@ -132,7 +130,6 @@ test('@hive/config/parse-config', () => {
           inputs: new Map([
             ['param', {isArray: false, matcher: /boolean/}],
           ]),
-          output: {baseType: ConstType.OBJECT, isArray: true},
         }),
       ],
     ]));

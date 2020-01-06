@@ -6,7 +6,6 @@ import { map } from '@rxjs/operators';
 import { DeclareRule } from '../core/declare-rule';
 import { BuiltInRootType } from '../core/root-type';
 import { RuleType } from '../core/rule-type';
-import { ConstType } from '../core/type/const-type';
 import { ROOT_FILE_NAME } from '../project/find-root';
 import { addFile, mockFs } from '../testing/fake-fs';
 
@@ -33,7 +32,6 @@ test('@hive/util/run-declare', () => {
         ['a', {isArray: false, matcher: /number/}],
         ['b', {isArray: false, matcher: /number/}],
       ]),
-      output: {isArray: false, baseType: ConstType.NUMBER},
       processor: {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a/b.js'},
     };
 

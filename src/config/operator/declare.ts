@@ -6,20 +6,17 @@ import { RuleType } from '../../core/rule-type';
 import { InputType } from '../../core/type/input-type';
 import { parseFileRef } from '../parse/parse-file-ref';
 import { parseInputType } from '../parse/parse-input-type';
-import { parseOutputType } from '../parse/parse-output-type';
 
 
 interface Args {
   readonly inputs: {};
   readonly name: string;
-  readonly output: string;
   readonly processor: string;
 }
 
 const ARGS_TYPE: Type<Args> = HasPropertiesType({
   inputs: InstanceofType(Object),
   name: StringType,
-  output: StringType,
   processor: StringType,
 });
 
@@ -37,7 +34,6 @@ export function declare(args: unknown): DeclareRule {
       $asMap(),
   );
 
-  const output = parseOutputType(args.output);
   const processor = parseFileRef(args.processor);
-  return {inputs, name: args.name, output, processor, type: RuleType.DECLARE};
+  return {inputs, name: args.name, processor, type: RuleType.DECLARE};
 }
