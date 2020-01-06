@@ -1,9 +1,10 @@
 import { google, sheets_v4 } from 'googleapis';
 
+import { arrayOfType, stringType, Type } from '@gs-types';
 import { from as observableFrom, Observable } from '@rxjs';
 import { filter, map, switchMap } from '@rxjs/operators';
 
-import { GoogleSheetsMetadata } from '../contentparser/google-sheets-metadata';
+import { GOOGLE_SHEETS_METADATA_TYPE, GoogleSheetsMetadata } from '../contentparser/google-sheets-metadata';
 import { Processor } from '../core/processor';
 
 import { DEFAULT_GOOGLE_OAUTH_FACTORY, GoogleOauthFactory } from './google-oauth';
@@ -47,10 +48,10 @@ export const LOAD_GOOGLE_SHEETS: Processor = {
 
     return loadGoogleSheets(metadata, ranges, clientId, clientSecret);
   },
-  inputs: new Map([
-    ['metadata', {isArray: false, matcher: /application\/vnd\.google-apps\.spreadsheet/}],
-    ['ranges', {isArray: true, matcher: /string/}],
-    ['clientId', {isArray: false, matcher: /string/}],
-    ['clientSecret', {isArray: false, matcher: /string/}],
+  inputs: new Map<string, Type<unknown>>([
+    ['metadata', GOOGLE_SHEETS_METADATA_TYPE],
+    ['ranges', arrayOfType(stringType)],
+    ['clientId', stringType],
+    ['clientSecret', stringType],
   ]),
 };

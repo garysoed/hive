@@ -1,6 +1,7 @@
 import * as commandLineArgs from 'command-line-args';
 
 import { $, $asArray, $asMap, $join, $map } from '@gs-tools/collect';
+import { Type } from '@gs-types';
 import { combineLatest, Observable, throwError } from '@rxjs';
 import { map, switchMap, take, tap } from '@rxjs/operators';
 import { Logger } from '@santa';
@@ -14,7 +15,6 @@ import { BuiltInRootType, RootType } from '../core/root-type';
 import { Rule } from '../core/rule';
 import { RULE_REF_TYPE, RuleRef } from '../core/rule-ref';
 import { RuleType } from '../core/rule-type';
-import { InputType } from '../core/type/input-type';
 import { MediaTypeType } from '../core/type/media-type-type';
 import { BaseType, OutputType } from '../core/type/output-type';
 import { BUILT_IN_PROCESSOR_TYPE as BUILT_IN_PROCESSOR_ID, BuiltInProcessorId } from '../processor/built-in-processor-id';
@@ -181,9 +181,8 @@ function stringifyGlobRef(globRef: GlobRef): string {
   return `glob(${stringifyRootType(globRef.rootType)}${globRef.globPattern})`;
 }
 
-function stringifyInputType(type: InputType): string {
-  const arrayStr = type.isArray ? '[]' : '';
-  return `${type.matcher.source}:${type.matcher.flags}${arrayStr}`;
+function stringifyInputType(type: Type<unknown>): string {
+  return `${type}`;
 }
 
 function stringifyMap(map: ReadonlyMap<string, string>, separator: string): string {

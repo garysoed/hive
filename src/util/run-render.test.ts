@@ -27,11 +27,10 @@ test('@hive/util/run-render', () => {
       name: 'declareRule',
       processor: '/src/processors/plus.js',
       inputs: {
-        a: 'number',
-        b: 'number',
-        g: 'number',
+        a: type.number,
+        b: type.number,
+        g: type.number,
       },
-      output: 'number',
     });
     `;
     addFile(path.join('/src/declarations', RULE_FILE_NAME), {content: declarationContent});
@@ -85,10 +84,9 @@ test('@hive/util/run-render', () => {
       name: 'declareRule',
       processor: '/src/processors/plus.js',
       inputs: {
-        a: 'number',
-        b: 'number',
+        a: type.number,
+        b: type.number,
       },
-      output: 'number',
     });
     `;
     addFile(path.join('/src/declarations', RULE_FILE_NAME), {content: declarationContent});

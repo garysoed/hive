@@ -1,4 +1,5 @@
 import { assert, mapThat, objectThat, should, test } from '@gs-testing';
+import { arrayOfType, booleanType, numberType } from '@gs-types';
 
 import { DeclareRule } from '../../core/declare-rule';
 import { BuiltInRootType } from '../../core/root-type';
@@ -11,8 +12,8 @@ test('@hive/config/operator/declare', () => {
     const ruleName = 'ruleName';
     const processor = '/path';
     const inputs = {
-      a: 'boolean',
-      b: 'number:[]',
+      a: booleanType,
+      b: arrayOfType(numberType),
     };
     const declareRule = declare({
       name: ruleName,
@@ -24,14 +25,6 @@ test('@hive/config/operator/declare', () => {
       name: ruleName,
       processor: objectThat().haveProperties({path: 'path', rootType: BuiltInRootType.SYSTEM_ROOT}),
     }));
-
-    const a = declareRule.inputs.get('a')!;
-    assert(a.isArray).to.beFalse();
-    assert(a.matcher.source).to.equal('boolean');
-
-    const b = declareRule.inputs.get('b')!;
-    assert(b.isArray).to.beTrue();
-    assert(b.matcher.source).to.equal('number');
   });
 
   should(`handle empty inputs`, () => {

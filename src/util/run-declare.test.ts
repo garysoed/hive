@@ -1,4 +1,5 @@
 import * as path from 'path';
+import {numberType} from '@gs-types';
 
 import { assert, setup, should, test } from '@gs-testing';
 import { map } from '@rxjs/operators';
@@ -29,8 +30,8 @@ test('@hive/util/run-declare', () => {
       type: RuleType.DECLARE,
       name: 'testRule',
       inputs: new Map([
-        ['a', {isArray: false, matcher: /number/}],
-        ['b', {isArray: false, matcher: /number/}],
+        ['a', numberType],
+        ['b', numberType],
       ]),
       processor: {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a/b.js'},
     };

@@ -20,6 +20,7 @@ import { parseConfig } from './parse-config';
 
 
 type RuleWithoutType<R extends Rule> = {[K in Exclude<keyof R, 'type'>]: R[K]};
+type RuleWithoutTypeOrInputs<R extends Rule> = {[K in Exclude<keyof R, 'type'|'inputs'>]: R[K]};
 
 type InputTypes = ReadonlyMap<string, InputType>;
 function matchInputs(expected: InputTypes): MatcherType<Map<string, InputType>> {
@@ -56,11 +57,12 @@ function matchFilePattern(expected: FilePattern): MatcherType<FilePattern> {
   });
 }
 
-function matchDeclareRule(expected: RuleWithoutType<DeclareRule>): MatcherType<DeclareRule> {
+function matchDeclareRule(
+    expected: RuleWithoutTypeOrInputs<DeclareRule>,
+): MatcherType<DeclareRule> {
   return objectThat<DeclareRule>().haveProperties({
     name: expected.name,
     processor: objectThat<FileRef>().haveProperties(expected.processor),
-    inputs: matchInputs(expected.inputs),
     type: RuleType.DECLARE,
   });
 }
@@ -81,7 +83,6 @@ function matchRenderRule(expected: RuleWithoutType<RenderRule>): MatcherType<Ren
   return objectThat<RenderRule>().haveProperties({
     name: expected.name,
     processor,
-    inputs: matchRenderInputs(expected.inputs),
     output: matchFilePattern(expected.output),
     type: RuleType.RENDER,
   });
@@ -94,8 +95,8 @@ test('@hive/config/parse-config', () => {
         name: 'ruleA',
         processor: '/path/to/scriptA',
         inputs: {
-          paramA: 'number',
-          paramB: 'boolean',
+          paramA: type.number,
+          paramB: type.boolean,
         },
         output: 'string',
       });
@@ -104,7 +105,7 @@ test('@hive/config/parse-config', () => {
         name: 'ruleB',
         processor: '@out/path/to/scriptB',
         inputs: {
-          param: 'boolean',
+          param: type.boolean,
         },
         output: 'object[]',
       });
@@ -116,10 +117,6 @@ test('@hive/config/parse-config', () => {
         matchDeclareRule({
           name: 'ruleA',
           processor: {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'path/to/scriptA'},
-          inputs: new Map([
-            ['paramA', {isArray: false, matcher: /number/}],
-            ['paramB', {isArray: false, matcher: /boolean/}],
-          ]),
         }),
       ],
       [
@@ -127,9 +124,6 @@ test('@hive/config/parse-config', () => {
         matchDeclareRule({
           name: 'ruleB',
           processor: {rootType: BuiltInRootType.OUT_DIR, path: 'path/to/scriptB'},
-          inputs: new Map([
-            ['param', {isArray: false, matcher: /boolean/}],
-          ]),
         }),
       ],
     ]));

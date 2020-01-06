@@ -1,11 +1,9 @@
-import { $, $asMap, $map, $recordToMap } from '@gs-tools/collect';
-import { HasPropertiesType, InstanceofType, MapOfType, StringType, Type } from '@gs-types';
+import { $, $recordToMap } from '@gs-tools/collect';
+import { hasPropertiesType, instanceofType, mapOfType, stringType, Type } from '@gs-types';
 
 import { DeclareRule } from '../../core/declare-rule';
 import { RuleType } from '../../core/rule-type';
-import { InputType } from '../../core/type/input-type';
 import { parseFileRef } from '../parse/parse-file-ref';
-import { parseInputType } from '../parse/parse-input-type';
 
 
 interface Args {
@@ -14,25 +12,20 @@ interface Args {
   readonly processor: string;
 }
 
-const ARGS_TYPE: Type<Args> = HasPropertiesType({
-  inputs: InstanceofType(Object),
-  name: StringType,
-  processor: StringType,
+const ARGS_TYPE: Type<Args> = hasPropertiesType({
+  inputs: instanceofType(Object),
+  name: stringType,
+  processor: stringType,
 });
 
-const INPUTS_TYPE: Type<ReadonlyMap<string, string>> = MapOfType(StringType, StringType);
+const INPUTS_TYPE: Type<ReadonlyMap<string, Type<unknown>>> =
+    mapOfType(stringType, instanceofType(Type));
 
 export function declare(args: unknown): DeclareRule {
   ARGS_TYPE.assert(args);
 
-  const inputsMap = $(args.inputs, $recordToMap());
-  INPUTS_TYPE.assert(inputsMap);
-
-  const inputs = $(
-      inputsMap,
-      $map(([key, inputRaw]) => [key, parseInputType(inputRaw)] as [string, InputType]),
-      $asMap(),
-  );
+  const inputs = $(args.inputs, $recordToMap());
+  INPUTS_TYPE.assert(inputs);
 
   const processor = parseFileRef(args.processor);
   return {inputs, name: args.name, processor, type: RuleType.DECLARE};

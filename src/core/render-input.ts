@@ -1,4 +1,4 @@
-import { ArrayOfType, BooleanType, InstanceofType, NumberType, StringType, Type, UnionType } from '@gs-types';
+import { arrayOfType, BooleanType, InstanceofType, NumberType, StringType, Type, UnionType } from '@gs-types';
 
 import { RULE_REF_TYPE, RuleRef } from './rule-ref';
 
@@ -14,11 +14,11 @@ export const RENDER_INPUT_TYPE: Type<RenderInput> = UnionType([
   InstanceofType(Function),
   InstanceofType(Object),
   UnionType([
-    ArrayOfType(BooleanType),
-    ArrayOfType(NumberType),
-    ArrayOfType(StringType),
-    ArrayOfType(InstanceofType(Function)),
-    ArrayOfType(InstanceofType(Object)),
+    arrayOfType(BooleanType),
+    arrayOfType(NumberType),
+    arrayOfType(StringType),
+    arrayOfType(InstanceofType(Function)),
+    arrayOfType(InstanceofType(Object)),
   ]),
   RULE_REF_TYPE,
 ]);

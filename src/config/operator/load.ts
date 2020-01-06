@@ -1,4 +1,4 @@
-import { ArrayOfType, HasPropertiesType, StringType, Type, UnionType } from '@gs-types';
+import { arrayOfType, HasPropertiesType, StringType, Type, UnionType } from '@gs-types';
 
 import { GLOB_REF_TYPE, GlobRef } from '../../core/glob-ref';
 import { LoadRule } from '../../core/load-rule';
@@ -16,7 +16,7 @@ interface Args {
 const ARGS_TYPE: Type<Args> = HasPropertiesType({
   name: StringType,
   output: StringType,
-  srcs: ArrayOfType(UnionType([StringType, GLOB_REF_TYPE])),
+  srcs: arrayOfType(UnionType([StringType, GLOB_REF_TYPE])),
 });
 
 export function load(args: unknown): LoadRule {

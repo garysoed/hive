@@ -1,6 +1,7 @@
 import * as path from 'path';
 
 import { arrayThat, assert, mapThat, setup, should, test } from '@gs-testing';
+import { numberType } from '@gs-types';
 import { of as observableOf } from '@rxjs';
 import { map } from '@rxjs/operators';
 
@@ -62,8 +63,8 @@ test('@hive/util/run-rule', () => {
       type: RuleType.DECLARE,
       name: 'testRule',
       inputs: new Map([
-        ['a', {isArray: false, matcher: /number/}],
-        ['b', {isArray: false, matcher: /number/}],
+        ['a', numberType],
+        ['b', numberType],
       ]),
       processor: {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a/b.js'},
     };
@@ -81,10 +82,9 @@ test('@hive/util/run-rule', () => {
       name: 'declareRule',
       processor: '/src/processors/plus.js',
       inputs: {
-        a: 'number',
-        b: 'number',
+        a: type.number,
+        b: type.number,
       },
-      output: 'number',
     });
     `;
     addFile(path.join('/src/declarations', RULE_FILE_NAME), {content: declarationContent});
