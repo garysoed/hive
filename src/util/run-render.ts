@@ -41,37 +41,38 @@ export function runRender(
           ...rule.inputs,
         ]);
 
-        return combineLatest([
-          validateInputs(allInputs, declaration.inputs),
-          resolveInputs(allInputs, runRuleFn),
-        ])
-        .pipe(
-            switchMap(([repeatedKeys, validatedInputs]) => {
-              const results: Array<Observable<[string, unknown]>> = generateRunSpecs(
-                  validatedInputs,
-                  repeatedKeys,
-                  outputPattern,
-              )
-              .map(runSpec => {
-                const resultRaw = declaration.fn(runSpec.inputs);
-                const result$ = resultRaw instanceof Promise ?
-                    observableFrom(resultRaw) : observableOf(resultRaw);
-                return result$.pipe(
-                    switchMap(result => {
-                      return writeFile(runSpec.outputPath, `${result}`).pipe(
-                          tap(() => LOGGER.success(`Updated: ${runSpec.outputPath}`)),
-                          mapTo([runSpec.outputPath, result] as [string, unknown]),
-                      );
-                    }),
-                );
-              });
+        return resolveInputs(allInputs, runRuleFn).pipe(
+          switchMap(resolvedInputs => {
+            return validateInputs(resolvedInputs, declaration.inputs).pipe(
+                switchMap(repeatedKeys => {
+                  const results: Array<Observable<[string, unknown]>> = generateRunSpecs(
+                      resolvedInputs,
+                      repeatedKeys,
+                      outputPattern,
+                  )
+                  .map(runSpec => {
+                    const resultRaw = declaration.fn(runSpec.inputs);
+                    const result$ = resultRaw instanceof Promise ?
+                        observableFrom(resultRaw) : observableOf(resultRaw);
+                    return result$.pipe(
+                        switchMap(result => {
+                          return writeFile(runSpec.outputPath, `${result}`).pipe(
+                              tap(() => LOGGER.success(`Updated: ${runSpec.outputPath}`)),
+                              mapTo([runSpec.outputPath, result] as [string, unknown]),
+                          );
+                        }),
+                    );
+                  });
 
-              if (results.length === 0) {
-                return observableOf(new Map());
-              }
+                  if (results.length === 0) {
+                    return observableOf(new Map());
+                  }
 
-              return combineLatest(results).pipe(map(results => new Map<string, unknown>(results)));
-            }),
+                  return combineLatest(results);
+                }),
+                map(results => new Map<string, unknown>(results)),
+            );
+          }),
         );
       }),
   );

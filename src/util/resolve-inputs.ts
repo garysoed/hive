@@ -2,8 +2,8 @@ import { combineLatest, Observable, of as observableOf } from '@rxjs';
 import { map, switchMap } from '@rxjs/operators';
 
 import { parseContent } from '../contentparser/parse-content';
-import { RenderInput } from '../core/render-input';
-import { isRuleRef } from '../core/rule-ref';
+import { RenderInput, ResolvedRenderInput } from '../core/render-input';
+import { isRuleRef, RuleRef } from '../core/rule-ref';
 import { RuleType } from '../core/rule-type';
 
 import { readRule } from './read-rule';
@@ -13,15 +13,15 @@ import { RunRuleFn } from './run-rule-fn';
 export function resolveInputs(
     inputs: ReadonlyMap<string, RenderInput>,
     resolveRuleFn: RunRuleFn,
-): Observable<ReadonlyMap<string, unknown>> {
-  const entries: Array<Observable<[string, unknown]>> = [];
+): Observable<ReadonlyMap<string, ResolvedRenderInput>> {
+  const entries: Array<Observable<[string, ResolvedRenderInput]>> = [];
   for (const [key, value] of inputs) {
     if (!isRuleRef(value)) {
       entries.push(observableOf([key, value]));
       continue;
     }
 
-    const value$: Observable<[string, unknown]> = readRule(value).pipe(
+    const value$: Observable<[string, ResolvedRenderInput]> = readRule(value).pipe(
         switchMap(rule => {
           switch (rule.type) {
             case RuleType.DECLARE:

@@ -1,7 +1,7 @@
 import { ConstType } from '../core/type/const-type';
 
 
-export function parseConst(str: string, type: ConstType): unknown {
+export function parseConst(str: string, type: ConstType): boolean|number|Function|object|string {
   switch (type) {
     case ConstType.BOOLEAN:
       return str === 'true';

@@ -1,7 +1,7 @@
 import { combineLatest, Observable, of as observableOf } from '@rxjs';
 import { map } from '@rxjs/operators';
 
-import { RenderInput } from '../core/render-input';
+import { RenderInput, ResolvedRenderInput } from '../core/render-input';
 import { InputType } from '../core/type/input-type';
 import { MediaTypeType } from '../core/type/media-type-type';
 import { BaseType, OutputType } from '../core/type/output-type';
@@ -10,7 +10,7 @@ import { getTypeOfValue } from './get-type-of-value';
 
 
 export function validateInputs(
-    actuals: ReadonlyMap<string, RenderInput>,
+    actuals: ReadonlyMap<string, ResolvedRenderInput>,
     expecteds: ReadonlyMap<string, InputType>,
 ): Observable<ReadonlySet<string>> {
   const actual$List: Array<Observable<[string, OutputType|'emptyArray']>> = [...actuals]

@@ -6,7 +6,7 @@ import { Observable, of as observableOf } from '@rxjs';
 import { DeclareRule } from '../core/declare-rule';
 import { LoadRule } from '../core/load-rule';
 import { Processor } from '../core/processor';
-import { RenderInput } from '../core/render-input';
+import { RenderInput, ResolvedRenderInput } from '../core/render-input';
 import { RenderRule } from '../core/render-rule';
 import { BuiltInRootType } from '../core/root-type';
 import { Rule } from '../core/rule';
@@ -36,7 +36,7 @@ test('@hive/util/resolve-inputs', () => {
     const inputs = new Map<string, RenderInput>([['a', 1], ['b', 'two']]);
 
     assert(resolveInputs(inputs, fakeRunRule)).to.emitSequence([
-      mapThat<string, unknown>().haveExactElements(new Map<string, unknown>([
+      mapThat<string, ResolvedRenderInput>().haveExactElements(new Map<string, ResolvedRenderInput>([
         ['a', 1],
         ['b', 'two'],
       ])),
@@ -80,7 +80,7 @@ test('@hive/util/resolve-inputs', () => {
     ]);
 
     assert(resolveInputs(inputs, fakeRunRule)).to.emitSequence([
-      mapThat<string, unknown>().haveExactElements(new Map<string, unknown>([
+      mapThat<string, ResolvedRenderInput>().haveExactElements(new Map<string, ResolvedRenderInput>([
         ['a', 123],
         ['b', 'randomString'],
       ])),
@@ -133,7 +133,7 @@ test('@hive/util/resolve-inputs', () => {
     ]);
 
     assert(resolveInputs(inputs, fakeRunRule)).to.emitSequence([
-      mapThat<string, unknown>().haveExactElements(new Map<string, unknown>([
+      mapThat<string, ResolvedRenderInput>().haveExactElements(new Map<string, ResolvedRenderInput>([
         ['a', arrayThat().haveExactElements([123, 456])],
       ])),
     ]);
@@ -160,7 +160,7 @@ test('@hive/util/resolve-inputs', () => {
     ]);
 
     assert(resolveInputs(inputs, fakeRunRule)).to.emitSequence([
-      mapThat<string, unknown>().haveExactElements(new Map<string, unknown>([
+      mapThat<string, ResolvedRenderInput>().haveExactElements(new Map<string, ResolvedRenderInput>([
         ['a', fn],
       ])),
     ]);
@@ -186,7 +186,7 @@ test('@hive/util/resolve-inputs', () => {
     ]);
 
     assert(resolveInputs(inputs, fakeRunRule)).to.emitSequence([
-      mapThat<string, unknown>().haveExactElements(new Map<string, unknown>([
+      mapThat<string, ResolvedRenderInput>().haveExactElements(new Map<string, ResolvedRenderInput>([
         ['a', arrayThat().haveExactElements(['content1', 'content2'])],
       ])),
     ]);
