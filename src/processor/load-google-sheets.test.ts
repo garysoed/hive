@@ -9,7 +9,7 @@ import { loadGoogleSheets, SCOPE } from './load-google-sheets';
 
 
 test('@hive/processor/load-google-sheets', () => {
-  should(`emit the correct data`, () => {
+  should(`emit the correct data`, async () => {
     const docId = 'docId';
     const metadata = {doc_id: docId};
     const ranges = ['range1', 'range2'];
@@ -37,12 +37,10 @@ test('@hive/processor/load-google-sheets', () => {
     fake(mockAuth).always()
         .return(observableOf({scopes: new Set([SCOPE]), client: mockClient} as any));
 
-    const spreadsheet$ = new ReplaySubject<sheets_v4.Schema$Spreadsheet>(1);
+    const spreadsheet =
+        await loadGoogleSheets(metadata, ranges, 'clientId', 'clientSecret', () => mockGoogleOauth);
 
-    loadGoogleSheets(metadata, ranges, 'clientId', 'clientSecret', () => mockGoogleOauth)
-        .subscribe(spreadsheet$);
-
-    assert(spreadsheet$).to.emitSequence([data]);
+    assert(spreadsheet).to.equal(JSON.stringify(data));
     assert(mockGet).to.haveBeenCalledWith(objectThat().haveProperties({
       spreadsheetId: docId,
       ranges,

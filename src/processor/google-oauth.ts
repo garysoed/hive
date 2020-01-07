@@ -5,7 +5,7 @@ import * as process from 'process';
 import * as readline from 'readline';
 
 import { cache } from '@gs-tools/data';
-import { assertNonNull } from '@gs-tools/rxjs';
+import { assertNonNull, debug } from '@gs-tools/rxjs';
 import { BehaviorSubject, from as observableFrom, Observable, of as observableOf, ReplaySubject, SchedulerLike, Subject } from '@rxjs';
 import { bufferTime, catchError, filter, map, mapTo, skipUntil, switchMap, take, tap, withLatestFrom } from '@rxjs/operators';
 import { Logger } from '@santa';
@@ -90,8 +90,8 @@ export class GoogleOauth {
 
   private setupOnScopeChange(): void {
     this.onScopeAdded$.pipe(
-        skipUntil(this.onInitialized$),
         bufferTime(SCOPE_CHANGE_DEBOUNCE_MS, this.scheduler),
+        skipUntil(this.onInitialized$),
         withLatestFrom(this.addedScopes$),
         map(([newScopes, addedScopes]) => {
           const scopeToAdd = new Set<string>();
@@ -109,7 +109,10 @@ export class GoogleOauth {
             scope: [...newScopes],
           });
 
-          LOGGER.info(`Please visit:\n\n${authUrl}\n\nand paste the auth code below:`);
+          LOGGER.info(`Please visit:\n\n`);
+          // tslint:disable-next-line: no-console
+          console.log(authUrl);
+          LOGGER.info(`\n\nand paste the auth code below:`);
 
           const readlineInterface = readline.createInterface({
             input: process.stdin,

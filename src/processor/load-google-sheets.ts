@@ -2,7 +2,7 @@ import { google, sheets_v4 } from 'googleapis';
 
 import { arrayOfType, stringType, Type } from '@gs-types';
 import { from as observableFrom, Observable } from '@rxjs';
-import { filter, map, switchMap } from '@rxjs/operators';
+import { filter, map, switchMap, take } from '@rxjs/operators';
 
 import { GOOGLE_SHEETS_METADATA_TYPE, GoogleSheetsMetadata } from '../contentparser/google-sheets-metadata';
 import { Processor } from '../core/processor';
@@ -12,13 +12,13 @@ import { DEFAULT_GOOGLE_OAUTH_FACTORY, GoogleOauthFactory } from './google-oauth
 
 export const SCOPE = 'https://www.googleapis.com/auth/spreadsheets.readonly';
 
-export function loadGoogleSheets(
+export async function loadGoogleSheets(
     metadata: GoogleSheetsMetadata,
     ranges: string[],
     clientId: string,
     clientSecret: string,
     googleOauthFactory: GoogleOauthFactory = DEFAULT_GOOGLE_OAUTH_FACTORY,
-): Observable<sheets_v4.Schema$Spreadsheet> {
+): Promise<string> {
   const oauth = googleOauthFactory(clientId, clientSecret);
   oauth.addScope(SCOPE);
   return oauth.auth
@@ -34,24 +34,26 @@ export function loadGoogleSheets(
                 }),
             );
           }),
-          map(({data}) => data),
-      );
+          map(({data}) => JSON.stringify(data)),
+          take(1),
+      )
+      .toPromise();
 }
 
 
 export const LOAD_GOOGLE_SHEETS: Processor = {
-  fn: inputs => {
+  fn: async inputs => {
     const metadata = inputs.get('metadata');
     const ranges = inputs.get('ranges');
-    const clientId = inputs.get('clientId');
-    const clientSecret = inputs.get('clientSecret');
+    const clientId = inputs.get('oauth.clientId');
+    const clientSecret = inputs.get('oauth.clientSecret');
 
     return loadGoogleSheets(metadata, ranges, clientId, clientSecret);
   },
   inputs: new Map<string, Type<unknown>>([
     ['metadata', GOOGLE_SHEETS_METADATA_TYPE],
     ['ranges', arrayOfType(stringType)],
-    ['clientId', stringType],
-    ['clientSecret', stringType],
+    ['oauth.clientId', stringType],
+    ['oauth.clientSecret', stringType],
   ]),
 };
