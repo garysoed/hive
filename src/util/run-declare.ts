@@ -2,6 +2,7 @@ import { Observable } from '@rxjs';
 import { map, switchMap } from '@rxjs/operators';
 
 import { DeclareRule } from '../core/declare-rule';
+import { OutputFn } from '../core/output-fn';
 import { Processor } from '../core/processor';
 
 import { readFile } from './read-file';
@@ -14,7 +15,15 @@ export function runDeclare(rule: DeclareRule): Observable<Processor> {
       switchMap(filePath => {
         return readFile(filePath).pipe(
             map(fileContent => {
-              return Function(...sortedInputArgs, fileContent);
+              return (...args: unknown[]) => {
+                let returnValue: unknown;
+                const returnFn: OutputFn = value => {
+                  returnValue = value;
+                };
+                Function(...sortedInputArgs, 'output', fileContent)(...args, returnFn);
+
+                return returnValue;
+              };
             }),
         );
       }),

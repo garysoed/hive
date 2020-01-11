@@ -35,7 +35,7 @@ test('@hive/util/run-render', () => {
     `;
     addFile(path.join('/src/declarations', RULE_FILE_NAME), {content: declarationContent});
 
-    const processorContent = `return a + b + g`;
+    const processorContent = `output(a + b + g)`;
     addFile('/src/processors/plus.js', {content: processorContent});
 
     const rule: RenderRule = {
@@ -91,7 +91,7 @@ test('@hive/util/run-render', () => {
     `;
     addFile(path.join('/src/declarations', RULE_FILE_NAME), {content: declarationContent});
 
-    const processorContent = `return Promise.resolve(a + b)`;
+    const processorContent = `output(Promise.resolve(a + b))`;
     addFile('/src/processors/plus.js', {content: processorContent});
 
     const rule: RenderRule = {

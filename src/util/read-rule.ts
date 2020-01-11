@@ -24,7 +24,7 @@ export function readRule(ref: RuleRef): Observable<Rule> {
             map(config => config.get(ref.ruleName)),
             map(rule => {
               if (!rule) {
-                throw new Error(`Cannot find rule ${rule} from ${resolveFileRef}`);
+                throw new Error(`Cannot find rule ${ref.ruleName} from ${resolvedFileRef}`);
               }
 
               return rule;

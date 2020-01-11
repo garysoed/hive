@@ -56,7 +56,7 @@ test('@hive/util/run-rule', () => {
     addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
 
     // tslint:disable-next-line: no-invalid-template-strings
-    const content = 'return `${a + b}`';
+    const content = 'output(`${a + b}`)';
     addFile('/a/b.js', {content});
 
     const rule: DeclareRule = {
@@ -89,7 +89,7 @@ test('@hive/util/run-rule', () => {
     `;
     addFile(path.join('/src/declarations', RULE_FILE_NAME), {content: declarationContent});
 
-    const processorContent = `return a + b`;
+    const processorContent = `output(a + b)`;
     addFile('/src/processors/plus.js', {content: processorContent});
 
     const rule: RenderRule = {

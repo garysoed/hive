@@ -1,7 +1,7 @@
-import { google, sheets_v4 } from 'googleapis';
+import { google } from 'googleapis';
 
 import { arrayOfType, stringType, Type } from '@gs-types';
-import { from as observableFrom, Observable } from '@rxjs';
+import { from as observableFrom } from '@rxjs';
 import { filter, map, switchMap, take } from '@rxjs/operators';
 
 import { GOOGLE_SHEETS_METADATA_TYPE, GoogleSheetsMetadata } from '../contentparser/google-sheets-metadata';
@@ -34,7 +34,7 @@ export async function loadGoogleSheets(
                 }),
             );
           }),
-          map(({data}) => JSON.stringify(data)),
+          map(({data}) => JSON.stringify(data, undefined, 2)),
           take(1),
       )
       .toPromise();

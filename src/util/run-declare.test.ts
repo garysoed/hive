@@ -23,7 +23,7 @@ test('@hive/util/run-declare', () => {
     addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
 
     // tslint:disable-next-line: no-invalid-template-strings
-    const content = 'return `${a + b}`';
+    const content = 'output(`${a + b}`)';
     addFile('/a/b.js', {content});
 
     const rule: DeclareRule = {
