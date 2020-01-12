@@ -1,8 +1,8 @@
 import { GaxiosResponse } from 'gaxios';
 import { google, sheets_v4 } from 'googleapis';
 
-import { assert, createSpy, createSpyInstance, createSpyObject, fake, objectThat, should, spy, Spy, test } from '@gs-testing';
-import { Observable, of as observableOf, ReplaySubject } from '@rxjs';
+import { arrayThat, assert, createSpy, createSpyInstance, createSpyObject, fake, objectThat, should, spy, Spy, test } from '@gs-testing';
+import { Observable, of as observableOf } from '@rxjs';
 
 import { GoogleOauth } from './google-oauth';
 import { loadGoogleSheets, SCOPE } from './load-google-sheets';
@@ -16,7 +16,7 @@ test('@hive/processor/load-google-sheets', () => {
 
     const mockSpreadsheets =
         createSpyObject<sheets_v4.Resource$Spreadsheets>('Spreadsheets', ['get']);
-    const data = {};
+    const data = {sheets: [{}, {}, {}]};
     const mockGet = mockSpreadsheets.get as unknown as
         Spy<Observable<GaxiosResponse<sheets_v4.Schema$Spreadsheet>>, [any]>;
     fake(mockGet).always().return(observableOf({
@@ -40,7 +40,13 @@ test('@hive/processor/load-google-sheets', () => {
     const spreadsheet =
         await loadGoogleSheets(metadata, ranges, 'clientId', 'clientSecret', () => mockGoogleOauth);
 
-    assert(spreadsheet).to.equal(JSON.stringify(data));
+    assert(spreadsheet).to.equal(objectThat().haveProperties({
+      sheets: arrayThat().haveExactElements([
+        objectThat().haveProperties({}),
+        objectThat().haveProperties({}),
+        objectThat().haveProperties({}),
+      ]),
+    }));
     assert(mockGet).to.haveBeenCalledWith(objectThat().haveProperties({
       spreadsheetId: docId,
       ranges,

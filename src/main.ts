@@ -47,7 +47,14 @@ function run(): Observable<unknown> {
 }
 
 const onDone$ = new Subject();
-const consoleLog = new ConsoleDestination({showKey: false});
+const consoleLog = new ConsoleDestination(
+    entry => {
+      if (entry.key === 'authurl') {
+        return {showKey: false, enableFormat: false};
+      }
+      return {showKey: false};
+    },
+);
 ON_LOG_$
     .pipe(takeUntil(onDone$))
     .subscribe(entry => {

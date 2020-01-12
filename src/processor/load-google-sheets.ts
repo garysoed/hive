@@ -18,7 +18,7 @@ export async function loadGoogleSheets(
     clientId: string,
     clientSecret: string,
     googleOauthFactory: GoogleOauthFactory = DEFAULT_GOOGLE_OAUTH_FACTORY,
-): Promise<string> {
+): Promise<object> {
   const oauth = googleOauthFactory(clientId, clientSecret);
   oauth.addScope(SCOPE);
   return oauth.auth
@@ -34,7 +34,7 @@ export async function loadGoogleSheets(
                 }),
             );
           }),
-          map(({data}) => JSON.stringify(data, undefined, 2)),
+          map(({data}) => data),
           take(1),
       )
       .toPromise();

@@ -43,27 +43,30 @@ export function runRender(
 
         return resolveInputs(allInputs, runRuleFn).pipe(
           switchMap(resolvedInputs => {
+            LOGGER.progress(`Running: ${rule.name}`);
             const repeatedKeys = validateInputs(resolvedInputs, declaration.inputs);
-            const results: Array<Observable<[string, unknown]>> = generateRunSpecs(
+            const runSpecs = generateRunSpecs(
                 resolvedInputs,
                 repeatedKeys,
                 outputPattern,
-            )
-            .map(runSpec => {
-              const resultRaw = declaration.fn(runSpec.inputs);
-              const result$ = resultRaw instanceof Promise ?
-                  observableFrom(resultRaw) : observableOf(resultRaw);
-              return result$.pipe(
-                  switchMap(result => {
-                    return writeFile(runSpec.outputPath, `${result}`).pipe(
-                        tap(() => LOGGER.success(`Updated: ${runSpec.outputPath}`)),
-                        mapTo([runSpec.outputPath, result] as [string, unknown]),
-                    );
-                  }),
-              );
-            });
+            );
+            const results: Array<Observable<[string, unknown]>> = runSpecs
+                .map(runSpec => {
+                  const resultRaw = declaration.fn(runSpec.inputs);
+                  const result$ = resultRaw instanceof Promise ?
+                      observableFrom(resultRaw) : observableOf(resultRaw);
+                  return result$.pipe(
+                      switchMap(result => {
+                        return writeFile(runSpec.outputPath, `${result}`).pipe(
+                            tap(() => LOGGER.success(`Updated: ${runSpec.outputPath}`)),
+                            mapTo([runSpec.outputPath, result] as [string, unknown]),
+                        );
+                      }),
+                  );
+                });
 
             if (results.length === 0) {
+              LOGGER.warning(`No results found for ${rule.name}`);
               return observableOf(new Map());
             }
 
