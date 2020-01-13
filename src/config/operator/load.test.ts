@@ -2,7 +2,7 @@ import { anyThat, arrayThat, assert, objectThat, should, test } from '@gs-testin
 import { arrayOfType, numberType } from '@gs-types';
 
 import { BuiltInRootType } from '../../core/root-type';
-import { fromType, Loader } from '../loader';
+import { fromType, Loader } from '../loader/loader';
 
 import { glob } from './glob';
 import { load } from './load';

@@ -5,7 +5,7 @@ import { numberType, stringType } from '@gs-types';
 import { of as observableOf } from '@rxjs';
 import { map } from '@rxjs/operators';
 
-import { fromType } from '../config/loader';
+import { fromType } from '../config/loader/loader';
 import { DeclareRule } from '../core/declare-rule';
 import { LoadRule } from '../core/load-rule';
 import { RenderRule } from '../core/render-rule';

@@ -2,7 +2,7 @@ import { arrayThat, assert, setup, should, test } from '@gs-testing';
 import { stringType } from '@gs-types';
 import { of as observableOf } from '@rxjs';
 
-import { fromType } from '../config/loader';
+import { fromType } from '../config/loader/loader';
 import { LoadRule } from '../core/load-rule';
 import { BuiltInRootType } from '../core/root-type';
 import { RuleType } from '../core/rule-type';

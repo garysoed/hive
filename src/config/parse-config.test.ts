@@ -15,7 +15,7 @@ import { RuleRef } from '../core/rule-ref';
 import { RuleType } from '../core/rule-type';
 import { BUILT_IN_PROCESSOR_TYPE } from '../processor/built-in-processor-id';
 
-import { fromType, Loader } from './loader';
+import { fromType, Loader } from './loader/loader';
 import { parseConfig } from './parse-config';
 
 

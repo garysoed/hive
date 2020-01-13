@@ -1,5 +1,5 @@
 import { Type } from '@gs-types';
-import { compose, Converter , json, reverse, Serializable, withTypeCheck } from '@nabu';
+import { compose, Converter, json, reverse, withTypeCheck } from '@nabu';
 
 export class Loader<T> {
   constructor(

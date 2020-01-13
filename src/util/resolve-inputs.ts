@@ -1,7 +1,7 @@
 import { combineLatest, Observable, of as observableOf } from '@rxjs';
 import { map, switchMap } from '@rxjs/operators';
 
-import { ArrayLoader } from '../config/array-loader';
+import { ArrayLoader } from '../config/loader/array-loader';
 import { RenderInput, ResolvedRenderInput } from '../core/render-input';
 import { isRuleRef } from '../core/rule-ref';
 import { RuleType } from '../core/rule-type';

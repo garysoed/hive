@@ -4,7 +4,7 @@ import { GLOB_REF_TYPE, GlobRef } from '../../core/glob-ref';
 import { LoadRule } from '../../core/load-rule';
 import { ResolvedRenderInput } from '../../core/render-input';
 import { RuleType } from '../../core/rule-type';
-import { Loader } from '../loader';
+import { Loader } from '../loader/loader';
 import { parseFileRef } from '../parse/parse-file-ref';
 
 

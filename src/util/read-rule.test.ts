@@ -2,7 +2,7 @@ import * as path from 'path';
 
 import { anyThat, arrayThat, assert, objectThat, setup, should, test } from '@gs-testing';
 
-import { Loader } from '../config/loader';
+import { Loader } from '../config/loader/loader';
 import { LoadRule } from '../core/load-rule';
 import { BuiltInRootType } from '../core/root-type';
 import { addFile, mockFs } from '../testing/fake-fs';

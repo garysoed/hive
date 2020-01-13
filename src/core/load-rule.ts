@@ -1,5 +1,5 @@
-import { ArrayLoader } from '../config/array-loader';
-import { Loader } from '../config/loader';
+import { ArrayLoader } from '../config/loader/array-loader';
+import { Loader } from '../config/loader/loader';
 import { FileRef } from '../core/file-ref';
 import { GlobRef } from '../core/glob-ref';
 

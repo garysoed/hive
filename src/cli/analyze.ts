@@ -6,7 +6,7 @@ import { combineLatest, Observable, throwError } from '@rxjs';
 import { map, switchMap, take, tap } from '@rxjs/operators';
 import { Logger } from '@santa';
 
-import { Loader } from '../config/loader';
+import { Loader } from '../config/loader/loader';
 import { parseRuleRef } from '../config/parse/parse-rule-ref';
 import { FilePattern } from '../core/file-pattern';
 import { FILE_REF_TYPE, FileRef } from '../core/file-ref';

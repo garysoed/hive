@@ -4,13 +4,13 @@ import { ConfigFile } from '../core/config-file';
 import { Rule } from '../core/rule';
 import { GOOGLE_SHEETS_METADATA_TYPE } from '../thirdparty/google-sheets-metadata';
 
-import { fromItemType } from './array-loader';
-import { fromType } from './loader';
+import { fromItemType } from './loader/array-loader';
+import { fromType } from './loader/loader';
+import { StringLoader } from './loader/string-loader';
 import { declare } from './operator/declare';
 import { glob } from './operator/glob';
 import { load } from './operator/load';
 import { render } from './operator/render';
-import { StringLoader } from './string-loader';
 
 
 export function parseConfig(content: string): ConfigFile {
