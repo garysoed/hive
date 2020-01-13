@@ -1,6 +1,8 @@
 import { arrayThat, assert, setup, should, test } from '@gs-testing';
+import { stringType } from '@gs-types';
 import { of as observableOf } from '@rxjs';
 
+import { fromType } from '../config/loader';
 import { LoadRule } from '../core/load-rule';
 import { BuiltInRootType } from '../core/root-type';
 import { RuleType } from '../core/rule-type';
@@ -25,7 +27,7 @@ test('@hive/util/run-load', () => {
       name: 'loadRule',
       srcs: [{rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a/b/c.txt'}],
       type: RuleType.LOAD,
-      output: {isArray: false, baseType: ConstType.STRING},
+      output: fromType(stringType),
     };
 
     assert(runRule(rule)).to.emitSequence([arrayThat<string>().haveExactElements([content])]);
@@ -47,7 +49,7 @@ test('@hive/util/run-load', () => {
       name: 'loadRule',
       srcs: [{rootType: BuiltInRootType.SYSTEM_ROOT, globPattern: 'a/b/*.txt'}],
       type: RuleType.LOAD,
-      output: {isArray: false, baseType: ConstType.STRING},
+      output: fromType(stringType),
     };
 
     assert(runRule(rule)).to.emitSequence([

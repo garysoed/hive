@@ -1,10 +1,10 @@
 import * as path from 'path';
 
-import { arrayThat, assert, objectThat, setup, should, test } from '@gs-testing';
+import { anyThat, arrayThat, assert, objectThat, setup, should, test } from '@gs-testing';
 
+import { Loader } from '../config/loader';
 import { LoadRule } from '../core/load-rule';
 import { BuiltInRootType } from '../core/root-type';
-import { ConstType } from '../core/type/const-type';
 import { addFile, mockFs } from '../testing/fake-fs';
 import { mockProcess, setCwd } from '../testing/fake-process';
 
@@ -22,7 +22,7 @@ test('@hive/util/read-rule', () => {
       load({
         name: 'rule',
         srcs: ['@out/filename'],
-        output: 'number',
+        output: as.number,
       });
     `;
 
@@ -39,10 +39,10 @@ test('@hive/util/read-rule', () => {
                 rootType: BuiltInRootType.OUT_DIR,
               }),
             ]),
-            output: objectThat().haveProperties({
-              baseType: ConstType.NUMBER,
-              isArray: false,
-            }),
+            output: anyThat<Loader<unknown>>().passPredicate(
+                loader => loader.desc === 'number',
+                'a number loader',
+            ),
           }),
         ]);
   });
@@ -52,7 +52,7 @@ test('@hive/util/read-rule', () => {
       load({
         name: 'rule',
         srcs: ['@out/filename'],
-        output: 'number',
+        output: as.number,
       });
     `;
 

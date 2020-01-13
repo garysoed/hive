@@ -1,16 +1,16 @@
 import * as path from 'path';
 
 import { arrayThat, assert, mapThat, setup, should, test } from '@gs-testing';
-import { numberType } from '@gs-types';
+import { numberType, stringType } from '@gs-types';
 import { of as observableOf } from '@rxjs';
 import { map } from '@rxjs/operators';
 
+import { fromType } from '../config/loader';
 import { DeclareRule } from '../core/declare-rule';
 import { LoadRule } from '../core/load-rule';
 import { RenderRule } from '../core/render-rule';
 import { BuiltInRootType } from '../core/root-type';
 import { RuleType } from '../core/rule-type';
-import { ConstType } from '../core/type/const-type';
 import { ROOT_FILE_NAME } from '../project/find-root';
 import { addFile, mockFs } from '../testing/fake-fs';
 import { addGlobHandler, mockGlob } from '../testing/fake-glob';
@@ -43,7 +43,7 @@ test('@hive/util/run-rule', () => {
       name: 'loadRule',
       srcs: [{rootType: BuiltInRootType.SYSTEM_ROOT, globPattern: 'a/b/*.txt'}],
       type: RuleType.LOAD,
-      output: {isArray: false, baseType: ConstType.STRING},
+      output: fromType(stringType),
     };
 
     assert(runRule(rule)).to.emitSequence([
@@ -85,6 +85,7 @@ test('@hive/util/run-rule', () => {
         a: type.number,
         b: type.number,
       },
+      output: as.number,
     });
     `;
     addFile(path.join('/src/declarations', RULE_FILE_NAME), {content: declarationContent});

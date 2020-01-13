@@ -1,10 +1,12 @@
-import { arrayThat, assert, objectThat, should, test } from '@gs-testing';
+import { anyThat, arrayThat, assert, objectThat, should, test } from '@gs-testing';
+import { arrayOfType, numberType } from '@gs-types';
 
 import { BuiltInRootType } from '../../core/root-type';
-import { ConstType } from '../../core/type/const-type';
+import { fromType, Loader } from '../loader';
 
 import { glob } from './glob';
 import { load } from './load';
+
 
 test('@hive/config/operator/load', () => {
   should(`parse load rule with glob ref correctly`, () => {
@@ -12,14 +14,17 @@ test('@hive/config/operator/load', () => {
     const globRef = glob('/glob/pattern');
     const config = {
       name: ruleName,
-      output: 'number[]',
+      output: fromType(arrayOfType(numberType)),
       srcs: [globRef],
     };
 
     assert(load(config)).to.equal(objectThat().haveProperties({
       name: ruleName,
       srcs: arrayThat().haveExactElements([objectThat().haveProperties(globRef)]),
-      output: objectThat().haveProperties({isArray: true, baseType: ConstType.NUMBER}),
+      output: anyThat<Loader<unknown>>().passPredicate(
+          loader => loader.desc === 'number[]',
+          'a number[] loader',
+      ),
     }));
   });
 
@@ -27,7 +32,7 @@ test('@hive/config/operator/load', () => {
     const ruleName = 'ruleName';
     const config = {
       name: ruleName,
-      output: 'number[]',
+      output: fromType(arrayOfType(numberType)),
       srcs: ['/file/pattern'],
     };
 
@@ -39,7 +44,10 @@ test('@hive/config/operator/load', () => {
           path: 'file/pattern',
         }),
       ]),
-      output: objectThat().haveProperties({baseType: ConstType.NUMBER, isArray: true}),
+      output: anyThat<Loader<unknown>>().passPredicate(
+          loader => loader.desc === 'number[]',
+          'a number[] loader',
+      ),
     }));
   });
 });

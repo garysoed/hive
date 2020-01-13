@@ -6,6 +6,7 @@ import { combineLatest, Observable, throwError } from '@rxjs';
 import { map, switchMap, take, tap } from '@rxjs/operators';
 import { Logger } from '@santa';
 
+import { Loader } from '../config/loader';
 import { parseRuleRef } from '../config/parse/parse-rule-ref';
 import { FilePattern } from '../core/file-pattern';
 import { FILE_REF_TYPE, FileRef } from '../core/file-ref';
@@ -144,7 +145,7 @@ function printRuleDetails(rule: Rule): ReadonlyArray<readonly string[]> {
           $join('\n'),
       );
       lines.push(['Sources', sources]);
-      lines.push(['Output', stringifyOutputType(rule.output)]);
+      lines.push(['Output', stringifyLoader(rule.output)]);
       break;
     case RuleType.RENDER: {
       const inputs: ReadonlyMap<string, string> = $(
@@ -193,9 +194,8 @@ function stringifyMap(map: ReadonlyMap<string, string>, separator: string): stri
   );
 }
 
-function stringifyOutputType(type: OutputType): string {
-  const arrayStr = type.isArray ? '[]' : '';
-  return `${stringifyBaseType(type.baseType)}${arrayStr}`;
+function stringifyLoader(loader: Loader<unknown>): string {
+  return loader.desc;
 }
 
 function stringifyProcessor(processor: RuleRef|BuiltInProcessorId): string {

@@ -10,7 +10,6 @@ import { RenderInput, ResolvedRenderInput } from '../core/render-input';
 import { RenderRule } from '../core/render-rule';
 import { BuiltInRootType } from '../core/root-type';
 import { Rule } from '../core/rule';
-import { ConstType } from '../core/type/const-type';
 import { addFile, mockFs } from '../testing/fake-fs';
 
 import { RULE_FILE_NAME } from './read-rule';
@@ -36,20 +35,21 @@ test('@hive/util/resolve-inputs', () => {
     const inputs = new Map<string, RenderInput>([['a', 1], ['b', 'two']]);
 
     assert(resolveInputs(inputs, fakeRunRule)).to.emitSequence([
-      mapThat<string, ResolvedRenderInput>().haveExactElements(new Map<string, ResolvedRenderInput>([
-        ['a', 1],
-        ['b', 'two'],
-      ])),
+      mapThat<string, ResolvedRenderInput>().haveExactElements(
+          new Map<string, ResolvedRenderInput>([
+            ['a', 1],
+            ['b', 'two'],
+          ])),
     ]);
   });
 
   should(`resolve single file load rule reference inputs correctly`, () => {
     fake(mockResolveRule).always().call(rule => {
       const loadRule = rule as LoadRule;
-      switch (loadRule.output.baseType) {
-        case ConstType.NUMBER:
+      switch (loadRule.output.desc) {
+        case 'number':
           return observableOf(['123']);
-        case ConstType.STRING:
+        case 'string':
           return observableOf(['randomString']);
         default:
           throw new Error('Unsupported');
@@ -60,7 +60,7 @@ test('@hive/util/resolve-inputs', () => {
     load({
       name: 'ruleA',
       srcs: ['/file.txt'],
-      output: 'number',
+      output: as.number,
     });
     `;
     addFile(path.join('/a', RULE_FILE_NAME), {content: contentA});
@@ -69,7 +69,7 @@ test('@hive/util/resolve-inputs', () => {
     load({
       name: 'ruleB',
       srcs: ['/file.txt'],
-      output: 'string',
+      output: as.string,
     });
     `;
     addFile(path.join('/b', RULE_FILE_NAME), {content: contentB});
@@ -80,29 +80,22 @@ test('@hive/util/resolve-inputs', () => {
     ]);
 
     assert(resolveInputs(inputs, fakeRunRule)).to.emitSequence([
-      mapThat<string, ResolvedRenderInput>().haveExactElements(new Map<string, ResolvedRenderInput>([
-        ['a', 123],
-        ['b', 'randomString'],
-      ])),
+      mapThat<string, ResolvedRenderInput>().haveExactElements(
+          new Map<string, ResolvedRenderInput>([
+            ['a', 123],
+            ['b', 'randomString'],
+          ])),
     ]);
   });
 
   should(`emit error if the output is not an array but the sources has multiple contents`, () => {
-    fake(mockResolveRule).always().call(rule => {
-      const loadRule = rule as LoadRule;
-      switch (loadRule.output.baseType) {
-        case ConstType.NUMBER:
-          return observableOf(['123', '234']);
-        default:
-          throw new Error('Unsupported');
-      }
-    });
+    fake(mockResolveRule).always().call(() => observableOf(['123', '234']));
 
     const contentA = `
     load({
       name: 'ruleA',
       srcs: ['/file.txt'],
-      output: 'number',
+      output: as.number,
     });
     `;
     addFile(path.join('/a', RULE_FILE_NAME), {content: contentA});
@@ -115,7 +108,7 @@ test('@hive/util/resolve-inputs', () => {
   });
 
   should(`resolve glob file load rule reference inputs correctly`, () => {
-    fake(mockResolveRule).always().call(rule => {
+    fake(mockResolveRule).always().call(() => {
       return observableOf(['123', '456']);
     });
 
@@ -123,7 +116,7 @@ test('@hive/util/resolve-inputs', () => {
     load({
       name: 'ruleA',
       srcs: [glob('/*.txt')],
-      output: 'number[]',
+      output: as.numberArray,
     });
     `;
     addFile(path.join('/a', RULE_FILE_NAME), {content: contentA});
@@ -133,9 +126,10 @@ test('@hive/util/resolve-inputs', () => {
     ]);
 
     assert(resolveInputs(inputs, fakeRunRule)).to.emitSequence([
-      mapThat<string, ResolvedRenderInput>().haveExactElements(new Map<string, ResolvedRenderInput>([
-        ['a', arrayThat().haveExactElements([123, 456])],
-      ])),
+      mapThat<string, ResolvedRenderInput>().haveExactElements(
+          new Map<string, ResolvedRenderInput>([
+            ['a', arrayThat().haveExactElements([123, 456])],
+          ])),
     ]);
   });
 
@@ -150,7 +144,7 @@ test('@hive/util/resolve-inputs', () => {
       name: 'ruleA',
       processor: '/file.txt',
       inputs: {},
-      output: 'number',
+      output: as.number,
     });
     `;
     addFile(path.join('/a', RULE_FILE_NAME), {content: contentA});
@@ -160,9 +154,10 @@ test('@hive/util/resolve-inputs', () => {
     ]);
 
     assert(resolveInputs(inputs, fakeRunRule)).to.emitSequence([
-      mapThat<string, ResolvedRenderInput>().haveExactElements(new Map<string, ResolvedRenderInput>([
-        ['a', fn],
-      ])),
+      mapThat<string, ResolvedRenderInput>().haveExactElements(
+          new Map<string, ResolvedRenderInput>([
+            ['a', fn],
+          ])),
     ]);
   });
 
@@ -186,9 +181,10 @@ test('@hive/util/resolve-inputs', () => {
     ]);
 
     assert(resolveInputs(inputs, fakeRunRule)).to.emitSequence([
-      mapThat<string, ResolvedRenderInput>().haveExactElements(new Map<string, ResolvedRenderInput>([
-        ['a', arrayThat().haveExactElements(['content1', 'content2'])],
-      ])),
+      mapThat<string, ResolvedRenderInput>().haveExactElements(
+          new Map<string, ResolvedRenderInput>([
+            ['a', arrayThat().haveExactElements(['content1', 'content2'])],
+          ])),
     ]);
   });
 });

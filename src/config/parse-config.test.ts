@@ -1,5 +1,6 @@
 
-import { arrayThat, assert, MatcherType, objectThat, setThat, should, test } from '@gs-testing';
+import { anyThat, arrayThat, assert, MatcherType, objectThat, setThat, should, test } from '@gs-testing';
+import { numberType } from '@gs-types';
 
 import { DeclareRule } from '../core/declare-rule';
 import { FilePattern } from '../core/file-pattern';
@@ -12,9 +13,9 @@ import { BuiltInRootType } from '../core/root-type';
 import { Rule } from '../core/rule';
 import { RuleRef } from '../core/rule-ref';
 import { RuleType } from '../core/rule-type';
-import { ConstType } from '../core/type/const-type';
 import { BUILT_IN_PROCESSOR_TYPE } from '../processor/built-in-processor-id';
 
+import { fromType, Loader } from './loader';
 import { parseConfig } from './parse-config';
 
 
@@ -48,7 +49,7 @@ function matchLoadRule(expected: RuleWithoutType<LoadRule>): MatcherType<LoadRul
   return objectThat<LoadRule>().haveProperties({
     name: expected.name,
     srcs: arrayThat<FileRef|GlobRef>().haveExactElements(srcsMatch),
-    output: objectThat().haveProperties(expected.output),
+    output: expected.output,
     type: RuleType.LOAD,
   });
 }
@@ -112,7 +113,7 @@ test('@hive/config/parse-config', () => {
         srcs: [
           glob('@out/glob/path/*.txt'),
         ],
-        output: 'number',
+        output: as.number,
       });
 
       load({
@@ -120,7 +121,7 @@ test('@hive/config/parse-config', () => {
         srcs: [
           '@out/path/out.txt',
         ],
-        output: 'string[]',
+        output: as.stringArray,
       });
     `;
 
@@ -130,7 +131,10 @@ test('@hive/config/parse-config', () => {
         matchLoadRule({
           name: 'ruleA',
           srcs: [{rootType: BuiltInRootType.OUT_DIR, globPattern: 'glob/path/*.txt'}],
-          output: {baseType: ConstType.NUMBER, isArray: false},
+          output: anyThat<Loader<number>>().passPredicate(
+              loader => loader.desc === 'number',
+              'a number loader',
+          ),
         }),
       ],
       [
@@ -138,7 +142,10 @@ test('@hive/config/parse-config', () => {
         matchLoadRule({
           name: 'ruleB',
           srcs: [{rootType: BuiltInRootType.OUT_DIR, path: 'path/out.txt'}],
-          output: {baseType: ConstType.STRING, isArray: true},
+          output: anyThat<Loader<string[]>>().passPredicate(
+              loader => loader.desc === 'string[]',
+              'a string[] loader',
+          ),
         }),
       ],
     ]));

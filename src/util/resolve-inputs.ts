@@ -1,6 +1,8 @@
+import { ArrayOfType } from '@gs-types';
 import { combineLatest, Observable, of as observableOf } from '@rxjs';
 import { map, switchMap } from '@rxjs/operators';
 
+import { ArrayLoader } from '../config/array-loader';
 import { parseContent } from '../contentparser/parse-content';
 import { RenderInput, ResolvedRenderInput } from '../core/render-input';
 import { isRuleRef } from '../core/rule-ref';
@@ -28,22 +30,22 @@ export function resolveInputs(
               return resolveRuleFn(rule);
             case RuleType.LOAD:
               return resolveRuleFn(rule).pipe(
-                  switchMap(content => {
-                    if (rule.output.isArray) {
-                      const typePerFile = {...rule.output, isArray: false};
-                      const entries = content.map(entry => parseContent(entry, typePerFile));
+                  map(content => {
+                    if (rule.output instanceof ArrayLoader) {
+                      const itemLoader = rule.output.itemLoader;
+                      const entries = content.map(entry => itemLoader.load(entry));
                       if (entries.length <= 0) {
-                        return observableOf([]);
+                        return [];
                       }
 
-                      return combineLatest(entries);
+                      return entries;
                     }
 
                     if (content.length !== 1) {
                       throw new Error(`Rule ${rule.name} has non array output but multiple inputs`);
                     }
 
-                    return parseContent(content[0], rule.output);
+                    return rule.output.load(content[0]);
                   }),
               );
             case RuleType.RENDER:

@@ -3,19 +3,41 @@ import { arrayOfType, booleanType, equalType, hasPropertiesType, instanceofType,
 import { ConfigFile } from '../core/config-file';
 import { Rule } from '../core/rule';
 
+import { fromItemType } from './array-loader';
+import { fromType, Loader } from './loader';
 import { declare } from './operator/declare';
 import { glob } from './operator/glob';
 import { load } from './operator/load';
 import { render } from './operator/render';
+import { StringLoader } from './string-loader';
 
 
 export function parseConfig(content: string): ConfigFile {
-  const fn = Function('declare', 'load', 'render', 'glob', 'type', content);
+  const fn = Function(
+      'declare',
+      'load',
+      'render',
+      // Utils
+      'as',
+      'glob',
+      'type',
+      content,
+  );
   const rules = new Map<string, Rule>();
   fn(
       makeHiveRuleFn(declare, rules),
       makeHiveRuleFn(load, rules),
       makeHiveRuleFn(render, rules),
+      {
+        boolean: fromType(booleanType),
+        number: fromType(numberType),
+        string: new StringLoader(),
+        object: fromType(instanceofType(Object)),
+        booleanArray: fromItemType(booleanType),
+        numberArray: fromItemType(numberType),
+        stringArray: fromItemType(stringType),
+        objectArray: fromItemType(instanceofType(Object)),
+      },
       glob,
       {
         arrayOf: arrayOfType,
