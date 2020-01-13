@@ -4,13 +4,13 @@ import { ConfigFile } from '../core/config-file';
 import { Rule } from '../core/rule';
 import { GOOGLE_SHEETS_METADATA_TYPE } from '../thirdparty/google-sheets-metadata';
 
-import { fromItemType } from './loader/array-loader';
-import { fromType } from './loader/loader';
-import { StringLoader } from './loader/string-loader';
 import { declare } from './operator/declare';
 import { glob } from './operator/glob';
 import { load } from './operator/load';
 import { render } from './operator/render';
+import { fromItemType } from './serializer/array-serializer';
+import { fromType } from './serializer/serializer';
+import { StringSerializer } from './serializer/string-serializer';
 
 
 export function parseConfig(content: string): ConfigFile {
@@ -32,7 +32,7 @@ export function parseConfig(content: string): ConfigFile {
       {
         boolean: fromType(booleanType),
         number: fromType(numberType),
-        string: new StringLoader(),
+        string: new StringSerializer(),
         object: fromType(instanceofType(Object)),
         booleanArray: fromItemType(booleanType),
         numberArray: fromItemType(numberType),

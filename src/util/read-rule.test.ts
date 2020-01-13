@@ -2,7 +2,7 @@ import * as path from 'path';
 
 import { anyThat, arrayThat, assert, objectThat, setup, should, test } from '@gs-testing';
 
-import { Loader } from '../config/loader/loader';
+import { Serializer } from '../config/serializer/serializer';
 import { LoadRule } from '../core/load-rule';
 import { BuiltInRootType } from '../core/root-type';
 import { addFile, mockFs } from '../testing/fake-fs';
@@ -39,7 +39,7 @@ test('@hive/util/read-rule', () => {
                 rootType: BuiltInRootType.OUT_DIR,
               }),
             ]),
-            output: anyThat<Loader<unknown>>().passPredicate(
+            output: anyThat<Serializer<unknown>>().passPredicate(
                 loader => loader.desc === 'number',
                 'a number loader',
             ),

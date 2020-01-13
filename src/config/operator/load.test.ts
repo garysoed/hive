@@ -2,7 +2,7 @@ import { anyThat, arrayThat, assert, objectThat, should, test } from '@gs-testin
 import { arrayOfType, numberType } from '@gs-types';
 
 import { BuiltInRootType } from '../../core/root-type';
-import { fromType, Loader } from '../loader/loader';
+import { fromType, Serializer } from '../serializer/serializer';
 
 import { glob } from './glob';
 import { load } from './load';
@@ -21,7 +21,7 @@ test('@hive/config/operator/load', () => {
     assert(load(config)).to.equal(objectThat().haveProperties({
       name: ruleName,
       srcs: arrayThat().haveExactElements([objectThat().haveProperties(globRef)]),
-      output: anyThat<Loader<unknown>>().passPredicate(
+      output: anyThat<Serializer<unknown>>().passPredicate(
           loader => loader.desc === 'number[]',
           'a number[] loader',
       ),
@@ -44,7 +44,7 @@ test('@hive/config/operator/load', () => {
           path: 'file/pattern',
         }),
       ]),
-      output: anyThat<Loader<unknown>>().passPredicate(
+      output: anyThat<Serializer<unknown>>().passPredicate(
           loader => loader.desc === 'number[]',
           'a number[] loader',
       ),

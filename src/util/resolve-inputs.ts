@@ -1,7 +1,7 @@
 import { combineLatest, Observable, of as observableOf } from '@rxjs';
 import { map, switchMap } from '@rxjs/operators';
 
-import { ArrayLoader } from '../config/loader/array-loader';
+import { ArraySerializer } from '../config/serializer/array-serializer';
 import { RenderInput, ResolvedRenderInput } from '../core/render-input';
 import { isRuleRef } from '../core/rule-ref';
 import { RuleType } from '../core/rule-type';
@@ -29,7 +29,7 @@ export function resolveInputs(
             case RuleType.LOAD:
               return resolveRuleFn(rule).pipe(
                   map(content => {
-                    if (rule.output instanceof ArrayLoader) {
+                    if (rule.output instanceof ArraySerializer) {
                       const itemLoader = rule.output.itemLoader;
                       const entries = content.map(entry => itemLoader.load(entry));
                       if (entries.length <= 0) {

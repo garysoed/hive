@@ -1,7 +1,7 @@
 import { Type } from '@gs-types';
 import { compose, Converter, json, reverse, withTypeCheck } from '@nabu';
 
-export class Loader<T> {
+export class Serializer<T> {
   constructor(
       private readonly converter: Converter<T, string>,
       readonly desc: string,
@@ -17,8 +17,8 @@ export class Loader<T> {
   }
 }
 
-export function fromType<T>(type: Type<T>): Loader<T> {
-  return new Loader(
+export function fromType<T>(type: Type<T>): Serializer<T> {
+  return new Serializer(
       reverse(compose(
           reverse(json()),
           withTypeCheck(type),

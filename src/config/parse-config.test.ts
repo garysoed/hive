@@ -15,8 +15,8 @@ import { RuleRef } from '../core/rule-ref';
 import { RuleType } from '../core/rule-type';
 import { BUILT_IN_PROCESSOR_TYPE } from '../processor/built-in-processor-id';
 
-import { fromType, Loader } from './loader/loader';
 import { parseConfig } from './parse-config';
+import { fromType, Serializer } from './serializer/serializer';
 
 
 type RuleWithoutType<R extends Rule> = {[K in Exclude<keyof R, 'type'>]: R[K]};
@@ -131,7 +131,7 @@ test('@hive/config/parse-config', () => {
         matchLoadRule({
           name: 'ruleA',
           srcs: [{rootType: BuiltInRootType.OUT_DIR, globPattern: 'glob/path/*.txt'}],
-          output: anyThat<Loader<number>>().passPredicate(
+          output: anyThat<Serializer<number>>().passPredicate(
               loader => loader.desc === 'number',
               'a number loader',
           ),
@@ -142,7 +142,7 @@ test('@hive/config/parse-config', () => {
         matchLoadRule({
           name: 'ruleB',
           srcs: [{rootType: BuiltInRootType.OUT_DIR, path: 'path/out.txt'}],
-          output: anyThat<Loader<string[]>>().passPredicate(
+          output: anyThat<Serializer<string[]>>().passPredicate(
               loader => loader.desc === 'string[]',
               'a string[] loader',
           ),

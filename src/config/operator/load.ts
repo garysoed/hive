@@ -4,19 +4,19 @@ import { GLOB_REF_TYPE, GlobRef } from '../../core/glob-ref';
 import { LoadRule } from '../../core/load-rule';
 import { ResolvedRenderInput } from '../../core/render-input';
 import { RuleType } from '../../core/rule-type';
-import { Loader } from '../loader/loader';
 import { parseFileRef } from '../parse/parse-file-ref';
+import { Serializer } from '../serializer/serializer';
 
 
 interface Args {
   readonly name: string;
-  readonly output: Loader<ResolvedRenderInput>;
+  readonly output: Serializer<ResolvedRenderInput>;
   readonly srcs: Array<string|GlobRef>;
 }
 
 const ARGS_TYPE: Type<Args> = hasPropertiesType({
   name: stringType,
-  output: instanceofType<Loader<ResolvedRenderInput>>(Loader),
+  output: instanceofType<Serializer<ResolvedRenderInput>>(Serializer),
   srcs: arrayOfType(unionType([stringType, GLOB_REF_TYPE])),
 });
 

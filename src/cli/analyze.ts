@@ -6,8 +6,8 @@ import { combineLatest, Observable, throwError } from '@rxjs';
 import { map, switchMap, take, tap } from '@rxjs/operators';
 import { Logger } from '@santa';
 
-import { Loader } from '../config/loader/loader';
 import { parseRuleRef } from '../config/parse/parse-rule-ref';
+import { Serializer } from '../config/serializer/serializer';
 import { FilePattern } from '../core/file-pattern';
 import { FILE_REF_TYPE, FileRef } from '../core/file-ref';
 import { GlobRef } from '../core/glob-ref';
@@ -184,7 +184,7 @@ function stringifyMap(map: ReadonlyMap<string, string>, separator: string): stri
   );
 }
 
-function stringifyLoader(loader: Loader<unknown>): string {
+function stringifyLoader(loader: Serializer<unknown>): string {
   return loader.desc;
 }
 

@@ -1,11 +1,11 @@
 import { arrayOfType, Type } from '@gs-types';
 import { compose, Converter, json, reverse, withTypeCheck } from '@nabu';
 
-import { Loader } from './loader';
+import { Serializer } from './serializer';
 
 
-export class ArrayLoader<T> extends Loader<T[]> {
-  readonly itemLoader: Loader<T> = new Loader(this.itemConverter, this.itemDesc);
+export class ArraySerializer<T> extends Serializer<T[]> {
+  readonly itemLoader: Serializer<T> = new Serializer(this.itemConverter, this.itemDesc);
 
   constructor(
       converter: Converter<T[], string>,
@@ -17,9 +17,9 @@ export class ArrayLoader<T> extends Loader<T[]> {
   }
 }
 
-export function fromItemType<T>(itemType: Type<T>): ArrayLoader<T> {
+export function fromItemType<T>(itemType: Type<T>): ArraySerializer<T> {
   const arrayType = arrayOfType(itemType);
-  return new ArrayLoader(
+  return new ArraySerializer(
       reverse(compose(
           reverse(json()),
           withTypeCheck(arrayType),

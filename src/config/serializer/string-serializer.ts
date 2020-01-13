@@ -1,8 +1,8 @@
 import { identity } from '@nabu';
 
-import { Loader } from './loader';
+import { Serializer } from './serializer';
 
-export class StringLoader extends Loader<string> {
+export class StringSerializer extends Serializer<string> {
   constructor() {
     super(
         identity(),
