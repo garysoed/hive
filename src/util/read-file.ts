@@ -18,7 +18,7 @@ export function readFile(filepath: string): Observable<string> {
       },
   )
   .pipe(
-      tap(() => LOGGER.progress(`Detected change to: ${filepath}`)),
+      tap(() => LOGGER.progress(`\nDetected change to: ${filepath}`)),
       startWith({}),
       switchMap(() => {
         return new Observable<string>(subscriber => {
