@@ -4,6 +4,7 @@ import { arrayOfType, stringType, Type } from '@gs-types';
 import { from as observableFrom } from '@rxjs';
 import { filter, map, switchMap, take } from '@rxjs/operators';
 
+import { fromType } from '../config/serializer/serializer';
 import { Processor } from '../core/processor';
 import { GOOGLE_SHEETS_METADATA_TYPE, GoogleSheetsMetadata } from '../thirdparty/google-sheets-metadata';
 
@@ -56,4 +57,5 @@ export const LOAD_GOOGLE_SHEETS: Processor = {
     ['oauth.clientId', stringType],
     ['oauth.clientSecret', stringType],
   ]),
+  output: fromType(GOOGLE_SHEETS_METADATA_TYPE),
 };

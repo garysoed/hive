@@ -31,7 +31,7 @@ export function runRender(
       .pipe(map(root => path.join(root, rule.output.pattern)));
 
   return combineLatest([
-    getDeclaration(rule.processor, runRuleFn),
+    getProcessor(rule.processor, runRuleFn),
     outputPattern$,
     loadProjectConfig(),
   ]).pipe(
@@ -57,7 +57,7 @@ export function runRender(
                       observableFrom(resultRaw) : observableOf(resultRaw);
                   return result$.pipe(
                       switchMap(result => {
-                        return writeFile(runSpec.outputPath, `${result}`).pipe(
+                        return writeFile(runSpec.outputPath, declaration.output.write(result)).pipe(
                             tap(() => LOGGER.success(`Updated: ${runSpec.outputPath}`)),
                             mapTo([runSpec.outputPath, result] as [string, unknown]),
                         );
@@ -79,7 +79,7 @@ export function runRender(
   );
 }
 
-function getDeclaration(
+function getProcessor(
     processorSpec: RuleRef|BuiltInProcessorId,
     runRuleFn: RunRuleFn,
 ): Observable<Processor> {
@@ -95,10 +95,10 @@ function getDeclaration(
     );
   }
 
-  const builtInDeclaration = BUILT_IN_PROCESSOR_MAP.get(processorSpec);
-  if (!builtInDeclaration) {
+  const builtInProcessor = BUILT_IN_PROCESSOR_MAP.get(processorSpec);
+  if (!builtInProcessor) {
     return throwError(new Error(`Invalid built in processor: ${processorSpec}`));
   }
 
-  return observableOf(builtInDeclaration);
+  return observableOf(builtInProcessor);
 }

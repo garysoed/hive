@@ -1,9 +1,10 @@
 import * as path from 'path';
-import {numberType} from '@gs-types';
 
 import { assert, setup, should, test } from '@gs-testing';
+import { numberType } from '@gs-types';
 import { map } from '@rxjs/operators';
 
+import { StringSerializer } from '../config/serializer/string-serializer';
 import { DeclareRule } from '../core/declare-rule';
 import { BuiltInRootType } from '../core/root-type';
 import { RuleType } from '../core/rule-type';
@@ -33,6 +34,7 @@ test('@hive/util/run-declare', () => {
         ['a', numberType],
         ['b', numberType],
       ]),
+      output: new StringSerializer(),
       processor: {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a/b.js'},
     };
 

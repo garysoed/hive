@@ -1,4 +1,5 @@
 import * as path from 'path';
+import { StringSerializer } from 'src/config/serializer/string-serializer';
 
 import { arrayThat, assert, mapThat, setup, should, test } from '@gs-testing';
 import { numberType, stringType } from '@gs-types';
@@ -56,12 +57,13 @@ test('@hive/util/run-rule', () => {
     addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
 
     // tslint:disable-next-line: no-invalid-template-strings
-    const content = 'output(`${a + b}`)';
+    const content = 'output(a + b)';
     addFile('/a/b.js', {content});
 
     const rule: DeclareRule = {
       type: RuleType.DECLARE,
       name: 'testRule',
+      output: fromType(numberType),
       inputs: new Map([
         ['a', numberType],
         ['b', numberType],
@@ -70,7 +72,7 @@ test('@hive/util/run-rule', () => {
     };
 
     assert(runRule(rule).pipe(map(({fn}) => fn(new Map([['a', 1], ['b', 2]])))))
-        .to.emitSequence(['3']);
+        .to.emitSequence([3]);
   });
 
   should(`run render rules correctly`, () => {

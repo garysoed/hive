@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import { assert, mapThat, setup, should, test } from '@gs-testing';
+import { assert, mapThat, objectThat, setup, should, test } from '@gs-testing';
 import { take } from '@rxjs/operators';
 
 import { RenderRule } from '../core/render-rule';
@@ -31,6 +31,7 @@ test('@hive/util/run-render', () => {
         b: type.number,
         g: type.number,
       },
+      output: as.number,
     });
     `;
     addFile(path.join('/src/declarations', RULE_FILE_NAME), {content: declarationContent});
@@ -87,6 +88,7 @@ test('@hive/util/run-render', () => {
         a: type.number,
         b: type.number,
       },
+      output: as.number,
     });
     `;
     addFile(path.join('/src/declarations', RULE_FILE_NAME), {content: declarationContent});
@@ -128,6 +130,62 @@ test('@hive/util/run-render', () => {
     assert(getFile('/out/1_3.txt')!.content).to.equal('4');
     assert(getFile('/out/2_0.txt')!.content).to.equal('2');
     assert(getFile('/out/2_3.txt')!.content).to.equal('5');
+  });
+
+  should(`handle processing results that are Objects`, async () => {
+    const configContent = JSON.stringify({outdir: '/out'});
+    addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
+
+    const declarationContent = `
+    declare({
+      name: 'declareRule',
+      processor: '/src/processors/plus.js',
+      inputs: {
+        a: type.number,
+        b: type.number,
+      },
+      output: as.object,
+    });
+    `;
+    addFile(path.join('/src/declarations', RULE_FILE_NAME), {content: declarationContent});
+
+    const processorContent = `output({result: a + b})`;
+    addFile('/src/processors/plus.js', {content: processorContent});
+
+    const rule: RenderRule = {
+      name: 'renderRule',
+      inputs: new Map([
+        ['a', [0, 1, 2]],
+        ['b', [0, 3]],
+      ]),
+      processor: {
+        ruleName: 'declareRule',
+        rootType: BuiltInRootType.SYSTEM_ROOT,
+        path: 'src/declarations',
+      },
+      output: {
+        rootType: BuiltInRootType.OUT_DIR,
+        pattern: '{a}_{b}.txt',
+        substitutionKeys: new Set(['a', 'b']),
+      },
+      type: RuleType.RENDER,
+    };
+
+    const resultsMap = await runRule(rule).pipe(take(1)).toPromise();
+
+    assert(resultsMap.get('/out/0_0.txt')).to.equal(objectThat().haveProperties({result: 0}));
+    assert(resultsMap.get('/out/0_3.txt')).to.equal(objectThat().haveProperties({result: 3}));
+    assert(resultsMap.get('/out/1_0.txt')).to.equal(objectThat().haveProperties({result: 1}));
+    assert(resultsMap.get('/out/1_3.txt')).to.equal(objectThat().haveProperties({result: 4}));
+    assert(resultsMap.get('/out/2_0.txt')).to.equal(objectThat().haveProperties({result: 2}));
+    assert(resultsMap.get('/out/2_3.txt')).to.equal(objectThat().haveProperties({result: 5}));
+
+    assert(getFile('/out/0_0.txt')!.content).to.equal(JSON.stringify({result: 0}));
+    assert(getFile('/out/0_3.txt')!.content).to.equal(JSON.stringify({result: 3}));
+    assert(getFile('/out/1_0.txt')!.content).to.equal(JSON.stringify({result: 1}));
+    assert(getFile('/out/1_3.txt')!.content).to.equal(JSON.stringify({result: 4}));
+    assert(getFile('/out/2_0.txt')!.content).to.equal(JSON.stringify({result: 2}));
+    assert(getFile('/out/2_3.txt')!.content).to.equal(JSON.stringify({result: 5}));
   });
 
   should(`emit error if the processor is not a declare rule`, () => {

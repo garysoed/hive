@@ -75,7 +75,7 @@ test('@hive/config/parse-config', () => {
           paramA: type.number,
           paramB: type.boolean,
         },
-        output: 'string',
+        output: as.string,
       });
 
       declare({
@@ -84,7 +84,7 @@ test('@hive/config/parse-config', () => {
         inputs: {
           param: type.boolean,
         },
-        output: 'object[]',
+        output: as.objectArray,
       });
     `;
 
@@ -93,6 +93,10 @@ test('@hive/config/parse-config', () => {
         'ruleA',
         matchDeclareRule({
           name: 'ruleA',
+          output: anyThat<Serializer<string>>().passPredicate(
+              s => s.desc === 'string',
+              'is string serializer',
+          ),
           processor: {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'path/to/scriptA'},
         }),
       ],
@@ -100,6 +104,10 @@ test('@hive/config/parse-config', () => {
         'ruleB',
         matchDeclareRule({
           name: 'ruleB',
+          output: anyThat<Serializer<string>>().passPredicate(
+              s => s.desc === 'object[]',
+              'is object[] serializer',
+          ),
           processor: {rootType: BuiltInRootType.OUT_DIR, path: 'path/to/scriptB'},
         }),
       ],

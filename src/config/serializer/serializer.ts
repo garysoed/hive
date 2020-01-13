@@ -15,6 +15,15 @@ export class Serializer<T> {
 
     return result.result;
   }
+
+  write(target: T): string {
+    const result = this.converter.convertForward(target);
+    if (!result.success) {
+      throw new Error(`${target} is not of type ${this.desc}`);
+    }
+
+    return result.result;
+  }
 }
 
 export function fromType<T>(type: Type<T>): Serializer<T> {
