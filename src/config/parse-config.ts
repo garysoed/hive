@@ -1,8 +1,8 @@
 import { arrayOfType, booleanType, equalType, hasPropertiesType, instanceofType, intersectType, iterableOfType, mapOfType, nullType, numberType, setOfType, stringType, undefinedType, unionType, unknownType } from '@gs-types';
 
-import { GOOGLE_SHEETS_METADATA_TYPE } from '../contentparser/google-sheets-metadata';
 import { ConfigFile } from '../core/config-file';
 import { Rule } from '../core/rule';
+import { GOOGLE_SHEETS_METADATA_TYPE } from '../thirdparty/google-sheets-metadata';
 
 import { fromItemType } from './array-loader';
 import { fromType } from './loader';

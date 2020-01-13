@@ -4,8 +4,8 @@ import { arrayOfType, stringType, Type } from '@gs-types';
 import { from as observableFrom } from '@rxjs';
 import { filter, map, switchMap, take } from '@rxjs/operators';
 
-import { GOOGLE_SHEETS_METADATA_TYPE, GoogleSheetsMetadata } from '../contentparser/google-sheets-metadata';
 import { Processor } from '../core/processor';
+import { GOOGLE_SHEETS_METADATA_TYPE, GoogleSheetsMetadata } from '../thirdparty/google-sheets-metadata';
 
 import { DEFAULT_GOOGLE_OAUTH_FACTORY, GoogleOauthFactory } from './google-oauth';
 
