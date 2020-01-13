@@ -16,8 +16,6 @@ import { BuiltInRootType, RootType } from '../core/root-type';
 import { Rule } from '../core/rule';
 import { RULE_REF_TYPE, RuleRef } from '../core/rule-ref';
 import { RuleType } from '../core/rule-type';
-import { MediaTypeType } from '../core/type/media-type-type';
-import { BaseType, OutputType } from '../core/type/output-type';
 import { BUILT_IN_PROCESSOR_TYPE as BUILT_IN_PROCESSOR_ID, BuiltInProcessorId } from '../processor/built-in-processor-id';
 import { findRoot } from '../project/find-root';
 import { loadProjectConfig } from '../project/load-project-config';
@@ -159,14 +157,6 @@ function printRuleDetails(rule: Rule): ReadonlyArray<readonly string[]> {
     }
   }
   return lines;
-}
-
-function stringifyBaseType(baseType: BaseType): string {
-  if (!(baseType instanceof MediaTypeType)) {
-    return baseType;
-  }
-
-  return baseType.stringify();
 }
 
 function stringifyFilePattern(filePattern: FilePattern): string {

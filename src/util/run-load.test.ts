@@ -6,7 +6,6 @@ import { fromType } from '../config/loader';
 import { LoadRule } from '../core/load-rule';
 import { BuiltInRootType } from '../core/root-type';
 import { RuleType } from '../core/rule-type';
-import { ConstType } from '../core/type/const-type';
 import { addFile, mockFs } from '../testing/fake-fs';
 import { addGlobHandler, mockGlob } from '../testing/fake-glob';
 

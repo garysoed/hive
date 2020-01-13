@@ -1,10 +1,11 @@
 import { arrayOfType, booleanType, equalType, hasPropertiesType, instanceofType, intersectType, iterableOfType, mapOfType, nullType, numberType, setOfType, stringType, undefinedType, unionType, unknownType } from '@gs-types';
 
+import { GOOGLE_SHEETS_METADATA_TYPE } from '../contentparser/google-sheets-metadata';
 import { ConfigFile } from '../core/config-file';
 import { Rule } from '../core/rule';
 
 import { fromItemType } from './array-loader';
-import { fromType, Loader } from './loader';
+import { fromType } from './loader';
 import { declare } from './operator/declare';
 import { glob } from './operator/glob';
 import { load } from './operator/load';
@@ -37,6 +38,9 @@ export function parseConfig(content: string): ConfigFile {
         numberArray: fromItemType(numberType),
         stringArray: fromItemType(stringType),
         objectArray: fromItemType(instanceofType(Object)),
+        google: {
+          sheets: fromType(GOOGLE_SHEETS_METADATA_TYPE),
+        },
       },
       glob,
       {
