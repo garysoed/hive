@@ -6,5 +6,5 @@ export interface Processor {
   readonly inputs: ReadonlyMap<string, Type<unknown>>;
   readonly output: Serializer<unknown>;
 
-  fn(inputs: ReadonlyMap<string, any>): unknown;
+  fn(inputs: ReadonlyMap<string, unknown>): unknown;
 }

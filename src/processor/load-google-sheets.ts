@@ -41,6 +41,7 @@ export async function loadGoogleSheets(
       .toPromise();
 }
 
+const RANGES_TYPE: Type<string[]> = arrayOfType(stringType);
 
 export const LOAD_GOOGLE_SHEETS: Processor = {
   fn: async inputs => {
@@ -49,11 +50,16 @@ export const LOAD_GOOGLE_SHEETS: Processor = {
     const clientId = inputs.get('oauth.clientId');
     const clientSecret = inputs.get('oauth.clientSecret');
 
+    GOOGLE_SHEETS_METADATA_TYPE.assert(metadata);
+    RANGES_TYPE.assert(ranges);
+    stringType.assert(clientId);
+    stringType.assert(clientSecret);
+
     return loadGoogleSheets(metadata, ranges, clientId, clientSecret);
   },
   inputs: new Map<string, Type<unknown>>([
     ['metadata', GOOGLE_SHEETS_METADATA_TYPE],
-    ['ranges', arrayOfType(stringType)],
+    ['ranges', RANGES_TYPE],
     ['oauth.clientId', stringType],
     ['oauth.clientSecret', stringType],
   ]),
