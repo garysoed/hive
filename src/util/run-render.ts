@@ -26,12 +26,13 @@ const LOGGER = new Logger('@hive/util/run-render');
 export function runRender(
     rule: RenderRule,
     runRuleFn: RunRuleFn,
+    cwd: string,
 ): Observable<ReadonlyMap<string, unknown>> {
-  const outputPattern$ = resolveRoot(rule.output.rootType)
+  const outputPattern$ = resolveRoot(rule.output.rootType, cwd)
       .pipe(map(root => path.join(root, rule.output.pattern)));
 
   return combineLatest([
-    getProcessor(rule.processor, runRuleFn),
+    getProcessor(rule.processor, runRuleFn, cwd),
     outputPattern$,
     loadProjectConfig(),
   ]).pipe(
@@ -41,7 +42,7 @@ export function runRender(
           ...rule.inputs,
         ]);
 
-        return resolveInputs(allInputs, runRuleFn).pipe(
+        return resolveInputs(allInputs, runRuleFn, cwd).pipe(
           switchMap(resolvedInputs => {
             LOGGER.progress(`Running: ${rule.name}`);
             const repeatedKeys = validateInputs(resolvedInputs, declaration.inputs);
@@ -82,15 +83,16 @@ export function runRender(
 function getProcessor(
     processorSpec: RuleRef|BuiltInProcessorId,
     runRuleFn: RunRuleFn,
+    cwd: string,
 ): Observable<Processor> {
   if (!BUILT_IN_PROCESSOR_TYPE.check(processorSpec)) {
-    return readRule(processorSpec).pipe(
-        switchMap(processor => {
+    return readRule(processorSpec, cwd).pipe(
+        switchMap(({rule: processor, path}) => {
           if (processor.type !== RuleType.DECLARE) {
             throw new Error(`Rule ${processorSpec} should be a declare rule, but not`);
           }
 
-          return runRuleFn(processor);
+          return runRuleFn(processor, path);
         }),
     );
   }

@@ -34,7 +34,8 @@ test('@hive/util/resolve-inputs', () => {
   should(`resolve non rule reference inputs correctly`, () => {
     const inputs = new Map<string, RenderInput>([['a', 1], ['b', 'two']]);
 
-    assert(resolveInputs(inputs, fakeRunRule)).to.emitSequence([
+    const cwd = 'cwd';
+    assert(resolveInputs(inputs, fakeRunRule, cwd)).to.emitSequence([
       mapThat<string, ResolvedRenderInput>().haveExactElements(
           new Map<string, ResolvedRenderInput>([
             ['a', 1],
@@ -79,7 +80,8 @@ test('@hive/util/resolve-inputs', () => {
       ['b', {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'b', ruleName: 'ruleB'}],
     ]);
 
-    assert(resolveInputs(inputs, fakeRunRule)).to.emitSequence([
+    const cwd = 'cwd';
+    assert(resolveInputs(inputs, fakeRunRule, cwd)).to.emitSequence([
       mapThat<string, ResolvedRenderInput>().haveExactElements(
           new Map<string, ResolvedRenderInput>([
             ['a', 123],
@@ -104,7 +106,8 @@ test('@hive/util/resolve-inputs', () => {
       ['a', {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a', ruleName: 'ruleA'}],
     ]);
 
-    assert(resolveInputs(inputs, fakeRunRule)).to.emitErrorWithMessage(/non array output/);
+    const cwd = 'cwd';
+    assert(resolveInputs(inputs, fakeRunRule, cwd)).to.emitErrorWithMessage(/non array output/);
   });
 
   should(`resolve glob file load rule reference inputs correctly`, () => {
@@ -125,7 +128,8 @@ test('@hive/util/resolve-inputs', () => {
       ['a', {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a', ruleName: 'ruleA'}],
     ]);
 
-    assert(resolveInputs(inputs, fakeRunRule)).to.emitSequence([
+    const cwd = 'cwd';
+    assert(resolveInputs(inputs, fakeRunRule, cwd)).to.emitSequence([
       mapThat<string, ResolvedRenderInput>().haveExactElements(
           new Map<string, ResolvedRenderInput>([
             ['a', arrayThat().haveExactElements([123, 456])],
@@ -135,7 +139,7 @@ test('@hive/util/resolve-inputs', () => {
 
   should(`resolve declare rule reference inputs correctly`, () => {
     const fn = () => undefined;
-    fake(mockResolveRule).always().call(rule => {
+    fake(mockResolveRule).always().call(() => {
       return observableOf(fn);
     });
 
@@ -153,7 +157,8 @@ test('@hive/util/resolve-inputs', () => {
       ['a', {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a', ruleName: 'ruleA'}],
     ]);
 
-    assert(resolveInputs(inputs, fakeRunRule)).to.emitSequence([
+    const cwd = 'cwd';
+    assert(resolveInputs(inputs, fakeRunRule, cwd)).to.emitSequence([
       mapThat<string, ResolvedRenderInput>().haveExactElements(
           new Map<string, ResolvedRenderInput>([
             ['a', fn],
@@ -180,7 +185,8 @@ test('@hive/util/resolve-inputs', () => {
       ['a', {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a', ruleName: 'ruleA'}],
     ]);
 
-    assert(resolveInputs(inputs, fakeRunRule)).to.emitSequence([
+    const cwd = 'cwd';
+    assert(resolveInputs(inputs, fakeRunRule, cwd)).to.emitSequence([
       mapThat<string, ResolvedRenderInput>().haveExactElements(
           new Map<string, ResolvedRenderInput>([
             ['a', arrayThat().haveExactElements(['content1', 'content2'])],

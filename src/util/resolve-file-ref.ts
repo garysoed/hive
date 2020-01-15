@@ -8,8 +8,8 @@ import { FileRef } from '../core/file-ref';
 import { resolveRoot } from './resolve-root';
 
 
-export function resolveFileRef(fileref: FileRef): Observable<string> {
-  return resolveRoot(fileref.rootType).pipe(
+export function resolveFileRef(fileref: FileRef, cwd: string): Observable<string> {
+  return resolveRoot(fileref.rootType, cwd).pipe(
       map(rootDir => path.join(rootDir, fileref.path)),
   );
 }

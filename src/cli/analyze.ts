@@ -90,7 +90,7 @@ function getProjectDetails(): Observable<ProjectDetails> {
 }
 
 function getRuleDetails(ruleRaw: string): Observable<Rule> {
-  return readRule(parseRuleRef(ruleRaw));
+  return readRule(parseRuleRef(ruleRaw), process.cwd()).pipe(map(({rule}) => rule));
 }
 
 function printProjectDetails({path, config}: ProjectDetails): ReadonlyArray<readonly string[]> {

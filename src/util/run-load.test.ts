@@ -29,7 +29,8 @@ test('@hive/util/run-load', () => {
       output: fromType(stringType),
     };
 
-    assert(runRule(rule)).to.emitSequence([arrayThat<string>().haveExactElements([content])]);
+    const cwd = 'cwd';
+    assert(runRule(rule, cwd)).to.emitSequence([arrayThat<string>().haveExactElements([content])]);
   });
 
   should(`emit content of all matching files if glob ref was given`, () => {
@@ -51,7 +52,8 @@ test('@hive/util/run-load', () => {
       output: fromType(stringType),
     };
 
-    assert(runRule(rule)).to.emitSequence([
+    const cwd = 'cwd';
+    assert(runRule(rule, cwd)).to.emitSequence([
       arrayThat<string>().haveExactElements([contentC, contentD, contentE]),
     ]);
   });

@@ -47,7 +47,8 @@ test('@hive/util/run-rule', () => {
       output: fromType(stringType),
     };
 
-    assert(runRule(rule)).to.emitSequence([
+    const cwd = 'cwd';
+    assert(runRule(rule, cwd)).to.emitSequence([
       arrayThat<string>().haveExactElements([contentC, contentD, contentE]),
     ]);
   });
@@ -71,7 +72,8 @@ test('@hive/util/run-rule', () => {
       processor: {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a/b.js'},
     };
 
-    assert(runRule(rule).pipe(map(({fn}) => fn(new Map([['a', 1], ['b', 2]])))))
+    const cwd = 'cwd';
+    assert(runRule(rule, cwd).pipe(map(({fn}) => fn(new Map([['a', 1], ['b', 2]])))))
         .to.emitSequence([3]);
   });
 
@@ -114,7 +116,8 @@ test('@hive/util/run-rule', () => {
       type: RuleType.RENDER,
     };
 
-    assert(runRule(rule)).to.emitSequence([
+    const cwd = 'cwd';
+    assert(runRule(rule, cwd)).to.emitSequence([
       mapThat<string, number>().haveExactElements(new Map([
         ['/out/0_0.txt', 0],
         ['/out/0_3.txt', 3],

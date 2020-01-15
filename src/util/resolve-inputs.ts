@@ -13,6 +13,7 @@ import { RunRuleFn } from './run-rule-fn';
 export function resolveInputs(
     inputs: ReadonlyMap<string, RenderInput>,
     resolveRuleFn: RunRuleFn,
+    cwd: string,
 ): Observable<ReadonlyMap<string, ResolvedRenderInput>> {
   const entries: Array<Observable<[string, ResolvedRenderInput]>> = [];
   for (const [key, value] of inputs) {
@@ -21,13 +22,13 @@ export function resolveInputs(
       continue;
     }
 
-    const value$: Observable<[string, ResolvedRenderInput]> = readRule(value).pipe(
-        switchMap(rule => {
+    const value$: Observable<[string, ResolvedRenderInput]> = readRule(value, cwd).pipe(
+        switchMap(({rule, path}) => {
           switch (rule.type) {
             case RuleType.DECLARE:
-              return resolveRuleFn(rule);
+              return resolveRuleFn(rule, path);
             case RuleType.LOAD:
-              return resolveRuleFn(rule).pipe(
+              return resolveRuleFn(rule, path).pipe(
                   map(content => {
                     if (rule.output instanceof ArraySerializer) {
                       const itemLoader = rule.output.itemLoader;
@@ -47,7 +48,7 @@ export function resolveInputs(
                   }),
               );
             case RuleType.RENDER:
-              return resolveRuleFn(rule).pipe(
+              return resolveRuleFn(rule, path).pipe(
                   map(resultsMap => [...resultsMap.values()]),
               );
           }

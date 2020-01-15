@@ -13,16 +13,19 @@ import { runRender } from './run-render';
 import { RunRuleFn } from './run-rule-fn';
 
 
-export function runRule(renderRule: RenderRule): Observable<ReadonlyMap<string, unknown>>;
-export function runRule(declareRule: DeclareRule): Observable<Processor>;
-export function runRule(loadRule: LoadRule): Observable<string|string[]>;
-export function runRule(rule: Rule): Observable<unknown> {
+export function runRule(
+    renderRule: RenderRule,
+    cwd: string,
+): Observable<ReadonlyMap<string, unknown>>;
+export function runRule(declareRule: DeclareRule, cwd: string): Observable<Processor>;
+export function runRule(loadRule: LoadRule, cwd: string): Observable<string|string[]>;
+export function runRule(rule: Rule, cwd: string): Observable<unknown> {
   switch (rule.type) {
     case RuleType.DECLARE:
-      return runDeclare(rule);
+      return runDeclare(rule, cwd);
     case RuleType.LOAD:
-      return runLoad(rule);
+      return runLoad(rule, cwd);
     case RuleType.RENDER:
-      return runRender(rule, runRule as RunRuleFn);
+      return runRender(rule, runRule as RunRuleFn, cwd);
   }
 }

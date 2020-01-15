@@ -11,12 +11,12 @@ import { resolveFileRef } from './resolve-file-ref';
 import { resolveRoot } from './resolve-root';
 
 
-export function runLoad(rule: LoadRule): Observable<string[]> {
+export function runLoad(rule: LoadRule, cwd: string): Observable<string[]> {
   const src$Array: Array<Observable<string[]>> = [];
   for (const src of rule.srcs) {
     if (isFileRef(src)) {
       src$Array.push(
-          resolveFileRef(src).pipe(
+          resolveFileRef(src, cwd).pipe(
               switchMap(path => readFile(path)),
               map(content => [content]),
           ),
@@ -25,7 +25,7 @@ export function runLoad(rule: LoadRule): Observable<string[]> {
     }
 
     src$Array.push(
-        resolveRoot(src.rootType).pipe(
+        resolveRoot(src.rootType, cwd).pipe(
             switchMap(root => globWrapper.glob(src.globPattern, {cwd: root})),
             switchMap((paths: string[]) => {
               if (paths.length <= 0) {

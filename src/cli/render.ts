@@ -44,13 +44,14 @@ export function render(argv: string[]): Observable<string> {
   }
 
   const ruleRef = parseRuleRef(rulePath);
+  const cwd = process.cwd();
 
-  return readRule(ruleRef).pipe(
-      switchMap(rule => {
+  return readRule(ruleRef, cwd).pipe(
+      switchMap(({rule, path}) => {
         if (rule.type !== RuleType.RENDER) {
           throw new Error(`Rule ${rulePath} is not a RENDER rule`);
         }
-        return runRule(rule);
+        return runRule(rule, path);
       }),
       mapTo('done'),
   );

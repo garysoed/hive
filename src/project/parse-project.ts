@@ -1,4 +1,6 @@
-import { $, $recordToMap } from '@gs-tools/collect';
+import * as path from 'path';
+
+import { $, $asMap, $map, $recordToMap } from '@gs-tools/collect';
 import { HasPropertiesType, InstanceofType, StringType, Type, UndefinedType, UnionType } from '@gs-types';
 
 import { PROJECT_CONFIG_TYPE, ProjectConfig } from './project-config';
@@ -16,7 +18,7 @@ const PROJECT_CONFIG_JSON_TYPE: Type<ProjectConfigJson> = HasPropertiesType({
   roots: UnionType([InstanceofType(Object), UndefinedType]),
 });
 
-export function parseProject(content: string): ProjectConfig {
+export function parseProject(content: string, cwd: string): ProjectConfig {
   const json = JSON.parse(content);
 
   PROJECT_CONFIG_JSON_TYPE.assert(json);
@@ -26,5 +28,17 @@ export function parseProject(content: string): ProjectConfig {
   const config = {globals, outdir: json.outdir, roots};
   PROJECT_CONFIG_TYPE.assert(config);
 
-  return config;
+  const resolvedRoots = $(
+      config.roots,
+      $map(([key, rootKey]) => {
+        if (path.isAbsolute(rootKey)) {
+          return [key, rootKey] as [string, string];
+        }
+
+        return [key, path.join(cwd, rootKey)] as [string, string];
+      }),
+      $asMap(),
+  );
+
+  return {...config, roots: resolvedRoots};
 }

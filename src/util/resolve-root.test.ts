@@ -17,10 +17,10 @@ test('@hive/util/resolve-root', () => {
   });
 
   should(`emit the current directory if root type is CURRENT_DIR`, () => {
-    const current = 'current';
-    setCwd(current);
+    const cwd = 'cwd';
+    setCwd(cwd);
 
-    assert(resolveRoot(BuiltInRootType.CURRENT_DIR)).to.emitSequence([current]);
+    assert(resolveRoot(BuiltInRootType.CURRENT_DIR, cwd)).to.emitSequence([cwd]);
   });
 
   should(`emit the out directory if the root type is OUT_DIR`, () => {
@@ -29,7 +29,8 @@ test('@hive/util/resolve-root', () => {
     const outdir = '/outdir';
     addFile(path.join('/a', ROOT_FILE_NAME), {content: JSON.stringify({outdir})});
 
-    assert(resolveRoot(BuiltInRootType.OUT_DIR)).to.emitSequence([outdir]);
+    const cwd = 'cwd';
+    assert(resolveRoot(BuiltInRootType.OUT_DIR, cwd)).to.emitSequence([outdir]);
   });
 
   should(`emit the out directory relative to the root directory the root type is OUT_DIR`, () => {
@@ -38,7 +39,8 @@ test('@hive/util/resolve-root', () => {
     const outdir = 'outdir';
     addFile(path.join('/a', ROOT_FILE_NAME), {content: JSON.stringify({outdir})});
 
-    assert(resolveRoot(BuiltInRootType.OUT_DIR)).to.emitSequence([path.join('/a', outdir)]);
+    const cwd = 'cwd';
+    assert(resolveRoot(BuiltInRootType.OUT_DIR, cwd)).to.emitSequence([path.join('/a', outdir)]);
   });
 
   should(`emit the project root if the root type is PROJECT_ROOT`, () => {
@@ -47,16 +49,19 @@ test('@hive/util/resolve-root', () => {
 
     addFile(path.join(projectRoot, ROOT_FILE_NAME), {content: `outdir: '/'`});
 
-    assert(resolveRoot(BuiltInRootType.PROJECT_ROOT)).to.emitSequence([projectRoot]);
+    const cwd = 'cwd';
+    assert(resolveRoot(BuiltInRootType.PROJECT_ROOT, cwd)).to.emitSequence([projectRoot]);
   });
 
   should(`emit error if root type is PROJECT_ROOT but cannot find project root`, () => {
-    assert(resolveRoot(BuiltInRootType.PROJECT_ROOT)).to
+    const cwd = 'cwd';
+    assert(resolveRoot(BuiltInRootType.PROJECT_ROOT, cwd)).to
         .emitErrorWithMessage(/Cannot find project root/);
   });
 
   should(`emit "/" if root type is SYSTEM_ROOT`, () => {
-    assert(resolveRoot(BuiltInRootType.SYSTEM_ROOT)).to.emitSequence(['/']);
+    const cwd = 'cwd';
+    assert(resolveRoot(BuiltInRootType.SYSTEM_ROOT, cwd)).to.emitSequence(['/']);
   });
 
   should(`emit custom root if specified`, () => {
@@ -70,7 +75,8 @@ test('@hive/util/resolve-root', () => {
     });
     addFile(path.join('/a', ROOT_FILE_NAME), {content});
 
-    assert(resolveRoot('custom')).to.emitSequence([custom]);
+    const cwd = 'cwd';
+    assert(resolveRoot('custom', cwd)).to.emitSequence([custom]);
   });
 
   should(`emit error if the custom root is not specified`, () => {
@@ -80,6 +86,7 @@ test('@hive/util/resolve-root', () => {
     const content = JSON.stringify({outdir});
     addFile(path.join('/a', ROOT_FILE_NAME), {content});
 
-    assert(resolveRoot('custom')).to.emitErrorWithMessage(/cannot find root/i);
+    const cwd = 'cwd';
+    assert(resolveRoot('custom', cwd)).to.emitErrorWithMessage(/cannot find root/i);
   });
 });

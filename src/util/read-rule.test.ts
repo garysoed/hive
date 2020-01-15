@@ -8,7 +8,7 @@ import { BuiltInRootType } from '../core/root-type';
 import { addFile, mockFs } from '../testing/fake-fs';
 import { mockProcess, setCwd } from '../testing/fake-process';
 
-import { readRule, RULE_FILE_NAME } from './read-rule';
+import { readRule, RULE_FILE_NAME, RuleWithPath } from './read-rule';
 
 
 test('@hive/util/read-rule', () => {
@@ -17,7 +17,7 @@ test('@hive/util/read-rule', () => {
     mockProcess();
   });
 
-  should(`return the correct rule`, () => {
+  should(`emit the correct rule`, () => {
     const content = `
       load({
         name: 'rule',
@@ -26,23 +26,31 @@ test('@hive/util/read-rule', () => {
       });
     `;
 
-    setCwd('cwd');
-    addFile(path.join('cwd/a/b', RULE_FILE_NAME), {content});
+    const cwd = 'cwd';
+    setCwd(cwd);
+    addFile(path.join(cwd, 'a/b', RULE_FILE_NAME), {content});
 
-    assert(readRule({path: 'a/b', rootType: BuiltInRootType.CURRENT_DIR, ruleName: 'rule'})).to
+    const result$ = readRule(
+        {path: 'a/b', rootType: BuiltInRootType.CURRENT_DIR, ruleName: 'rule'},
+        cwd,
+    );
+    assert(result$).to
         .emitSequence([
-          objectThat<LoadRule>().haveProperties({
-            name: 'rule',
-            srcs: arrayThat().haveExactElements([
-              objectThat().haveProperties({
-                path: 'filename',
-                rootType: BuiltInRootType.OUT_DIR,
-              }),
-            ]),
-            output: anyThat<Serializer<unknown>>().passPredicate(
-                loader => loader.desc === 'number',
-                'a number loader',
-            ),
+          objectThat<RuleWithPath>().haveProperties({
+            rule: objectThat<LoadRule>().haveProperties({
+              name: 'rule',
+              srcs: arrayThat().haveExactElements([
+                objectThat().haveProperties({
+                  path: 'filename',
+                  rootType: BuiltInRootType.OUT_DIR,
+                }),
+              ]),
+              output: anyThat<Serializer<unknown>>().passPredicate(
+                  loader => loader.desc === 'number',
+                  'a number loader',
+              ),
+            }),
+            path: path.join(cwd, 'a/b'),
           }),
         ]);
   });
@@ -56,10 +64,15 @@ test('@hive/util/read-rule', () => {
       });
     `;
 
-    setCwd('cwd');
-    addFile(path.join('cwd/a/b', RULE_FILE_NAME), {content});
+    const cwd = 'cwd';
+    setCwd(cwd);
+    addFile(path.join(cwd, 'a/b', RULE_FILE_NAME), {content});
 
-    assert(readRule({path: 'a/b', rootType: BuiltInRootType.CURRENT_DIR, ruleName: 'otherRule'})).to
-        .emitErrorWithMessage(/Cannot find rule/);
+    const result$ = readRule(
+        {path: 'a/b', rootType: BuiltInRootType.CURRENT_DIR, ruleName: 'otherRule'},
+        cwd,
+    );
+
+    assert(result$).to.emitErrorWithMessage(/Cannot find rule/);
   });
 });

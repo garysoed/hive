@@ -7,7 +7,7 @@ import { RenderRule } from '../core/render-rule';
 
 
 export interface RunRuleFn {
-  (renderRule: RenderRule): Observable<ReadonlyMap<string, unknown>>;
-  (declareRule: DeclareRule): Observable<Processor>;
-  (loadRule: LoadRule): Observable<string[]>;
+  (renderRule: RenderRule, cwd: string): Observable<ReadonlyMap<string, unknown>>;
+  (declareRule: DeclareRule, cwd: string): Observable<Processor>;
+  (loadRule: LoadRule, cwd: string): Observable<string[]>;
 }

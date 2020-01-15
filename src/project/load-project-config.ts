@@ -16,10 +16,9 @@ export function loadProjectConfig(): Observable<ProjectConfig> {
           return throwError(new Error('No root folder found'));
         }
 
-        return readFile(path.join(rootPath, ROOT_FILE_NAME));
-      }),
-      map(configStr => {
-        return parseProject(configStr);
+        return readFile(path.join(rootPath, ROOT_FILE_NAME)).pipe(
+            map(configStr => parseProject(configStr, rootPath)),
+        );
       }),
       share(),
   );

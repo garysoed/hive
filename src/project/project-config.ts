@@ -4,9 +4,9 @@ import { RENDER_INPUT_TYPE, RenderInput } from '../core/render-input';
 
 
 export interface ProjectConfig {
-  globals: ReadonlyMap<string, RenderInput>;
-  outdir: string;
-  roots: ReadonlyMap<string, string>;
+  readonly globals: ReadonlyMap<string, RenderInput>;
+  readonly outdir: string;
+  readonly roots: ReadonlyMap<string, string>;
 }
 
 export const PROJECT_CONFIG_TYPE: Type<ProjectConfig> = HasPropertiesType({

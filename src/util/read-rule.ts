@@ -15,8 +15,13 @@ import { resolveFileRef } from './resolve-file-ref';
 export const RULE_FILE_NAME = 'hive.js';
 const LOGGER = new Logger('@hive/util/read-rule');
 
-export function readRule(ref: RuleRef): Observable<Rule> {
-  return resolveFileRef(ref).pipe(
+export interface RuleWithPath {
+  readonly path: string;
+  readonly rule: Rule;
+}
+
+export function readRule(ref: RuleRef, cwd: string): Observable<{path: string; rule: Rule}> {
+  return resolveFileRef(ref, cwd).pipe(
       switchMap(resolvedFileRef => {
         LOGGER.progress(`Reading: ${resolvedFileRef}:${ref.ruleName}`);
         return readFile(path.join(resolvedFileRef, RULE_FILE_NAME)).pipe(
@@ -27,7 +32,7 @@ export function readRule(ref: RuleRef): Observable<Rule> {
                 throw new Error(`Cannot find rule ${ref.ruleName} from ${resolvedFileRef}`);
               }
 
-              return rule;
+              return {rule, path: resolvedFileRef};
             }),
         );
       }),

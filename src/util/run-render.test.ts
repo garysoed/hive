@@ -58,7 +58,8 @@ test('@hive/util/run-render', () => {
       type: RuleType.RENDER,
     };
 
-    assert(runRule(rule)).to.emitSequence([
+    const cwd = 'cwd';
+    assert(runRule(rule, cwd)).to.emitSequence([
       mapThat<string, number>().haveExactElements(new Map([
         ['/out/0_0.txt', 4],
         ['/out/0_3.txt', 7],
@@ -115,7 +116,8 @@ test('@hive/util/run-render', () => {
       type: RuleType.RENDER,
     };
 
-    const resultsMap = await runRule(rule).pipe(take(1)).toPromise();
+    const cwd = 'cwd';
+    const resultsMap = await runRule(rule, cwd).pipe(take(1)).toPromise();
 
     assert(await (resultsMap.get('/out/0_0.txt') as Promise<number>)).to.equal(0);
     assert(await (resultsMap.get('/out/0_3.txt') as Promise<number>)).to.equal(3);
@@ -171,7 +173,8 @@ test('@hive/util/run-render', () => {
       type: RuleType.RENDER,
     };
 
-    const resultsMap = await runRule(rule).pipe(take(1)).toPromise();
+    const cwd = 'cwd';
+    const resultsMap = await runRule(rule, cwd).pipe(take(1)).toPromise();
 
     assert(resultsMap.get('/out/0_0.txt')).to.equal(objectThat().haveProperties({result: 0}));
     assert(resultsMap.get('/out/0_3.txt')).to.equal(objectThat().haveProperties({result: 3}));
@@ -220,6 +223,7 @@ test('@hive/util/run-render', () => {
       type: RuleType.RENDER,
     };
 
-    assert(runRule(rule)).to.emitErrorWithMessage(/should be a declare rule/);
+    const cwd = 'cwd';
+    assert(runRule(rule, cwd)).to.emitErrorWithMessage(/should be a declare rule/);
   });
 });

@@ -9,9 +9,9 @@ import { readFile } from './read-file';
 import { resolveFileRef } from './resolve-file-ref';
 
 
-export function runDeclare(rule: DeclareRule): Observable<Processor> {
+export function runDeclare(rule: DeclareRule, cwd: string): Observable<Processor> {
   const sortedInputArgs = [...rule.inputs.keys()].sort();
-  return resolveFileRef(rule.processor).pipe(
+  return resolveFileRef(rule.processor, cwd).pipe(
       switchMap(filePath => {
         return readFile(filePath).pipe(
             map(fileContent => {

@@ -9,10 +9,10 @@ import { findRoot } from '../project/find-root';
 import { loadProjectConfig } from '../project/load-project-config';
 
 
-export function resolveRoot(rootType: RootType): Observable<string> {
+export function resolveRoot(rootType: RootType, cwd: string): Observable<string> {
   switch (rootType) {
     case BuiltInRootType.CURRENT_DIR:
-      return observableOf(process.cwd());
+      return observableOf(cwd);
     case BuiltInRootType.OUT_DIR:
       return combineLatest([
         loadProjectConfig(),
