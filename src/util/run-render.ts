@@ -1,7 +1,7 @@
 import * as path from 'path';
 
-import { combineLatest, from as observableFrom, Observable, of as observableOf, throwError } from '@rxjs';
-import { map, mapTo, switchMap, tap } from '@rxjs/operators';
+import { combineLatest, from as observableFrom, NEVER, Observable, of as observableOf, throwError } from '@rxjs';
+import { catchError, map, mapTo, switchMap, tap } from '@rxjs/operators';
 import { Logger } from '@santa';
 
 import { Processor } from '../core/processor';
@@ -74,6 +74,10 @@ export function runRender(
             return combineLatest(results).pipe(
               map(results => new Map<string, unknown>(results)),
             );
+          }),
+          catchError(e => {
+            LOGGER.error(e);
+            return NEVER;
           }),
         );
       }),

@@ -1,13 +1,14 @@
 import * as path from 'path';
 
 import { assert, mapThat, objectThat, setup, should, test } from '@gs-testing';
+import { ReplaySubject } from '@rxjs';
 import { take } from '@rxjs/operators';
 
 import { RenderRule } from '../core/render-rule';
 import { BuiltInRootType } from '../core/root-type';
 import { RuleType } from '../core/rule-type';
 import { ROOT_FILE_NAME } from '../project/find-root';
-import { addFile, getFile, mockFs } from '../testing/fake-fs';
+import { addFile, getFile, getWatcherSubject, mockFs } from '../testing/fake-fs';
 
 import { RULE_FILE_NAME } from './read-rule';
 import { runRule } from './run-rule';
@@ -225,5 +226,56 @@ test('@hive/util/run-render', () => {
 
     const cwd = 'cwd';
     assert(runRule(rule, cwd)).to.emitErrorWithMessage(/should be a declare rule/);
+  });
+
+  should(`continue processing if the processor throws`, () => {
+    const configContent = JSON.stringify({outdir: '/out', globals: {}});
+    addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
+
+    const declarationContent = `
+    declare({
+      name: 'declareRule',
+      processor: '/src/processors/error.js',
+      inputs: {
+        a: type.number,
+      },
+      output: as.number,
+    });
+    `;
+    addFile(path.join('/src/declarations', RULE_FILE_NAME), {content: declarationContent});
+
+    const processorContent = `throw new Error(a);`;
+    addFile('/src/processors/error.js', {content: processorContent});
+
+    const rule: RenderRule = {
+      name: 'renderRule',
+      inputs: new Map([
+        ['a', 1],
+      ]),
+      processor: {
+        ruleName: 'declareRule',
+        rootType: BuiltInRootType.SYSTEM_ROOT,
+        path: 'src/declarations',
+      },
+      output: {
+        rootType: BuiltInRootType.OUT_DIR,
+        pattern: 'out.txt',
+        substitutionKeys: new Set(),
+      },
+      type: RuleType.RENDER,
+    };
+
+    const output$ = new ReplaySubject(2);
+    const cwd = 'cwd';
+    runRule(rule, cwd).subscribe(output$);
+
+    addFile('/src/processors/error.js', {content: 'output(2)'});
+    getWatcherSubject('/src/processors/error.js').next();
+
+    assert(output$).to.emitSequence([
+      mapThat<string, number>().haveExactElements(new Map([
+        ['/out/out.txt', 2],
+      ])),
+    ]);
   });
 });
