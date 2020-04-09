@@ -1,6 +1,5 @@
+import { assert, should, test } from 'gs-testing';
 import * as nodePath from 'path';
-
-import { assert, setup, should, test } from '@gs-testing';
 
 import { BuiltInRootType } from '../core/root-type';
 import { ROOT_FILE_NAME } from '../project/find-root';
@@ -9,10 +8,12 @@ import { mockProcess, setCwd } from '../testing/fake-process';
 
 import { resolveFileRef } from './resolve-file-ref';
 
-test('@hive/util/resolve-file-ref', () => {
-  setup(() => {
+
+test('@hive/util/resolve-file-ref', init => {
+  init(() => {
     mockFs();
     mockProcess();
+    return {};
   });
 
   should(`return based on cwd if root type is CURRENT_DIR`, () => {

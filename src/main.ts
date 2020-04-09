@@ -1,8 +1,8 @@
 import * as commandLineArgs from 'command-line-args';
-
-import { EMPTY, Observable, Subject } from '@rxjs';
-import { catchError, takeUntil } from '@rxjs/operators';
-import { ConsoleDestination, Logger, ON_LOG_$ } from '@santa';
+import { EMPTY, Observable, Subject } from 'rxjs';
+import { catchError, takeUntil } from 'rxjs/operators';
+import { Logger, ON_LOG_$ } from 'santa';
+import { ConsoleDestination } from 'santa/export/cli';
 
 import { analyze } from './cli/analyze';
 import { CommandType } from './cli/command-type';

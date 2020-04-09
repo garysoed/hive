@@ -1,6 +1,5 @@
+import { assert, should, test } from 'gs-testing';
 import * as path from 'path';
-
-import { assert, setup, should, test } from '@gs-testing';
 
 import { addFile, mockFs } from '../testing/fake-fs';
 import { mockProcess, setCwd } from '../testing/fake-process';
@@ -8,10 +7,12 @@ import { mockProcess, setCwd } from '../testing/fake-process';
 import { ROOT_FILE_NAME } from './find-root';
 import { getProjectTmpDir, TMP_DIR_NAME } from './get-project-tmp-dir';
 
-test('@hive/project/get-project-tmp-dir', () => {
-  setup(() => {
+
+test('@hive/project/get-project-tmp-dir', init => {
+  init(() => {
     mockFs();
     mockProcess();
+    return {};
   });
 
   should(`emit the correct path`, () => {

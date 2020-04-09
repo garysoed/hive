@@ -1,24 +1,19 @@
-import { assert, setup, should, test } from '@gs-testing';
-import { numberType, stringType } from '@gs-types';
+import { assert, should, test } from 'gs-testing';
+import { numberType, stringType } from 'gs-types';
 
 import { ProcessorSpec } from './processor-spec';
 
-interface TestObject {
-  readonly a: number;
-  readonly b: string;
-}
 
-test('@hive/processor/processor-spec', () => {
-  let spec: ProcessorSpec<TestObject>;
-
-  setup(() => {
-    spec = new ProcessorSpec({a: numberType, b: stringType});
+test('@hive/processor/processor-spec', init => {
+  const _ = init(() => {
+    const spec = new ProcessorSpec({a: numberType, b: stringType});
+    return {spec};
   });
 
   test('checkInputs', () => {
     should(`output the inputs as objects`, () => {
       const inputs = new Map<string, unknown>([['a', 123], ['b', 'abc']]);
-      const obj = spec.checkInputs(inputs);
+      const obj = _.spec.checkInputs(inputs);
 
       assert(obj).to.haveProperties({a: 123, b: 'abc'});
     });
@@ -27,7 +22,7 @@ test('@hive/processor/processor-spec', () => {
       const inputs = new Map<string, unknown>([['a', 123], ['b', 345]]);
 
       assert(() => {
-        spec.checkInputs(inputs);
+        _.spec.checkInputs(inputs);
       }).to.throwErrorWithMessage(/is not of type/);
     });
 
@@ -35,7 +30,7 @@ test('@hive/processor/processor-spec', () => {
       const inputs = new Map<string, unknown>([['a', 123]]);
 
       assert(() => {
-        spec.checkInputs(inputs);
+        _.spec.checkInputs(inputs);
       }).to.throwErrorWithMessage(/is not of type/);
     });
   });

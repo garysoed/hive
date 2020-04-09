@@ -1,4 +1,4 @@
-import { assert, mapThat, objectThat, setThat, should, test } from '@gs-testing';
+import { assert, mapThat, objectThat, setThat, should, test } from 'gs-testing';
 
 import { RenderInput } from '../../core/render-input';
 import { BuiltInRootType } from '../../core/root-type';

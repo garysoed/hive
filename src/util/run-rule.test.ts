@@ -1,10 +1,8 @@
+import { arrayThat, assert, mapThat, should, test } from 'gs-testing';
+import { numberType, stringType } from 'gs-types';
 import * as path from 'path';
-import { StringSerializer } from 'src/config/serializer/string-serializer';
-
-import { arrayThat, assert, mapThat, setup, should, test } from '@gs-testing';
-import { numberType, stringType } from '@gs-types';
-import { of as observableOf } from '@rxjs';
-import { map } from '@rxjs/operators';
+import { of as observableOf } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { fromType } from '../config/serializer/serializer';
 import { DeclareRule } from '../core/declare-rule';
@@ -21,11 +19,12 @@ import { RULE_FILE_NAME } from './read-rule';
 import { runRule } from './run-rule';
 
 
-test('@hive/util/run-rule', () => {
-  setup(() => {
+test('@hive/util/run-rule', init => {
+  init(() => {
     mockFs();
     mockProcess();
     mockGlob();
+    return {};
   });
 
   should(`run load rules correctly`, () => {

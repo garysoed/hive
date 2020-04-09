@@ -1,7 +1,6 @@
 import * as fs from 'fs';
-
-import { fake, spy, SpyObj } from '@gs-testing';
-import { Subject } from '@rxjs';
+import { fake, spy, SpyObj } from 'gs-testing';
+import { Subject } from 'rxjs';
 
 
 interface FakeFile {

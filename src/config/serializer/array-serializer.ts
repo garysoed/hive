@@ -1,5 +1,5 @@
-import { arrayOfType, Type } from '@gs-types';
-import { compose, Converter, json, reverse, withTypeCheck } from '@nabu';
+import { arrayOfType, Type } from 'gs-types';
+import { compose, Converter, json, reverse, withTypeCheck } from 'nabu';
 
 import { Serializer } from './serializer';
 

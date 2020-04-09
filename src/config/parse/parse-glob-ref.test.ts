@@ -1,4 +1,4 @@
-import { assert, objectThat, should, test } from '@gs-testing';
+import { assert, objectThat, should, test } from 'gs-testing';
 
 import { BuiltInRootType } from '../../core/root-type';
 

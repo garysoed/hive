@@ -1,5 +1,5 @@
-import { anyThat, arrayThat, assert, objectThat, should, test } from '@gs-testing';
-import { arrayOfType, numberType } from '@gs-types';
+import { anyThat, arrayThat, assert, objectThat, should, test } from 'gs-testing';
+import { arrayOfType, numberType } from 'gs-types';
 
 import { BuiltInRootType } from '../../core/root-type';
 import { fromType, Serializer } from '../serializer/serializer';

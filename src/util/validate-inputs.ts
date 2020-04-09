@@ -1,4 +1,4 @@
-import { ArrayOfType, Type } from '@gs-types';
+import { ArrayOfType, Type } from 'gs-types';
 
 import { ResolvedRenderInput } from '../core/render-input';
 

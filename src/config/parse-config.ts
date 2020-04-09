@@ -1,4 +1,4 @@
-import { arrayOfType, booleanType, equalType, hasPropertiesType, instanceofType, intersectType, iterableOfType, mapOfType, nullType, numberType, setOfType, stringType, undefinedType, unionType, unknownType } from '@gs-types';
+import { arrayOfType, booleanType, equalType, hasPropertiesType, instanceofType, intersectType, iterableOfType, mapOfType, nullType, numberType, setOfType, stringType, undefinedType, unionType, unknownType } from 'gs-types';
 
 import { ConfigFile } from '../core/config-file';
 import { Rule } from '../core/rule';

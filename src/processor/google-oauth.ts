@@ -1,14 +1,13 @@
 import { Credentials, OAuth2Client } from 'google-auth-library';
 import { google } from 'googleapis';
+import { cache } from 'gs-tools/export/data';
+import { assertNonNull } from 'gs-tools/export/rxjs';
 import * as path from 'path';
 import * as process from 'process';
 import * as readline from 'readline';
-
-import { cache } from '@gs-tools/data';
-import { assertNonNull } from '@gs-tools/rxjs';
-import { BehaviorSubject, from as observableFrom, Observable, of as observableOf, ReplaySubject, SchedulerLike, Subject } from '@rxjs';
-import { bufferTime, catchError, filter, map, mapTo, skipUntil, switchMap, take, tap, withLatestFrom } from '@rxjs/operators';
-import { Logger } from '@santa';
+import { BehaviorSubject, from as observableFrom, Observable, of as observableOf, ReplaySubject, SchedulerLike, Subject } from 'rxjs';
+import { bufferTime, catchError, filter, map, mapTo, skipUntil, switchMap, take, tap, withLatestFrom } from 'rxjs/operators';
+import { Logger } from 'santa';
 
 import { getProjectTmpDir } from '../project/get-project-tmp-dir';
 import { readFile } from '../util/read-file';

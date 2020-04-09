@@ -1,5 +1,5 @@
-import { combineLatest, Observable, of as observableOf } from '@rxjs';
-import { map, switchMap } from '@rxjs/operators';
+import { combineLatest, Observable, of as observableOf } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 
 import { ArraySerializer } from '../config/serializer/array-serializer';
 import { RenderInput, ResolvedRenderInput } from '../core/render-input';

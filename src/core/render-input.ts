@@ -1,4 +1,4 @@
-import { arrayOfType, BooleanType, InstanceofType, NumberType, StringType, Type, UnionType } from '@gs-types';
+import { arrayOfType, booleanType, instanceofType, numberType, stringType, Type, unionType } from 'gs-types';
 
 import { RULE_REF_TYPE, RuleRef } from './rule-ref';
 
@@ -7,18 +7,18 @@ export type RenderInput = boolean|number|string|Function|object|
 
 export type ResolvedRenderInput = Exclude<RenderInput, RuleRef>;
 
-export const RENDER_INPUT_TYPE: Type<RenderInput> = UnionType([
-  BooleanType,
-  NumberType,
-  StringType,
-  InstanceofType(Function),
-  InstanceofType(Object),
-  UnionType([
-    arrayOfType(BooleanType),
-    arrayOfType(NumberType),
-    arrayOfType(StringType),
-    arrayOfType(InstanceofType(Function)),
-    arrayOfType(InstanceofType(Object)),
+export const RENDER_INPUT_TYPE: Type<RenderInput> = unionType([
+  booleanType,
+  numberType,
+  stringType,
+  instanceofType(Function),
+  instanceofType(Object),
+  unionType([
+    arrayOfType(booleanType),
+    arrayOfType(numberType),
+    arrayOfType(stringType),
+    arrayOfType(instanceofType(Function)),
+    arrayOfType(instanceofType(Object)),
   ]),
   RULE_REF_TYPE,
 ]);

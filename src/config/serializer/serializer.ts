@@ -1,5 +1,5 @@
-import { Type } from '@gs-types';
-import { compose, Converter, json, reverse, withTypeCheck } from '@nabu';
+import { Type } from 'gs-types';
+import { compose, Converter, json, reverse, withTypeCheck } from 'nabu';
 
 export class Serializer<T> {
   constructor(

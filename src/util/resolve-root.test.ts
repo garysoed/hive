@@ -1,6 +1,5 @@
+import { assert, should, test } from 'gs-testing';
 import * as path from 'path';
-
-import { assert, setup, should, test } from '@gs-testing';
 
 import { BuiltInRootType } from '../core/root-type';
 import { ROOT_FILE_NAME } from '../project/find-root';
@@ -10,10 +9,11 @@ import { mockProcess, setCwd } from '../testing/fake-process';
 import { resolveRoot } from './resolve-root';
 
 
-test('@hive/util/resolve-root', () => {
-  setup(() => {
+test('@hive/util/resolve-root', init => {
+  init(() => {
     mockFs();
     mockProcess();
+    return {};
   });
 
   should(`emit the current directory if root type is CURRENT_DIR`, () => {

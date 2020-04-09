@@ -1,8 +1,7 @@
 import { google } from 'googleapis';
-
-import { arrayOfType, instanceofType, stringType, Type } from '@gs-types';
-import { from as observableFrom } from '@rxjs';
-import { filter, map, switchMap, take } from '@rxjs/operators';
+import { arrayOfType, instanceofType, stringType, Type } from 'gs-types';
+import { from as observableFrom } from 'rxjs';
+import { filter, map, switchMap, take } from 'rxjs/operators';
 
 import { fromType } from '../config/serializer/serializer';
 import { Processor } from '../core/processor';

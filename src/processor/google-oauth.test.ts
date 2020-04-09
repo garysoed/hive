@@ -1,10 +1,9 @@
 import { GenerateAuthUrlOpts, GetTokenResponse } from 'google-auth-library/build/src/auth/oauth2client';
 import { OAuth2Client } from 'googleapis-common';
+import { arrayThat, assert, createSpyObject, fake, objectThat, resetCalls, setThat, should, Spy, spy, test, TestScheduler } from 'gs-testing';
 import * as path from 'path';
 import * as readline from 'readline';
-
-import { arrayThat, assert, createSpyObject, fake, objectThat, resetCalls, setThat, setup, should, Spy, spy, SpyObj, test, TestScheduler } from '@gs-testing';
-import { of as observableOf, ReplaySubject } from '@rxjs';
+import { of as observableOf, ReplaySubject } from 'rxjs';
 
 import { ROOT_FILE_NAME } from '../project/find-root';
 import { TMP_DIR_NAME } from '../project/get-project-tmp-dir';
@@ -14,24 +13,21 @@ import { mockProcess, setCwd } from '../testing/fake-process';
 import { CredentialsFile, GoogleAuth, GoogleOauth, OAUTH_FILE } from './google-oauth';
 
 
-test('@hive/processor/google-oauth', () => {
+test('@hive/processor/google-oauth', init => {
   const ROOT_DIR = '/';
   const CLIENT_ID = 'clientId';
   const CLIENT_SECRET = 'clientSecret';
-
-  let mockOauthClient: SpyObj<OAuth2Client>;
-  let scheduler: TestScheduler;
 
   function createOauth(): GoogleOauth {
     return new GoogleOauth(
         CLIENT_ID,
         CLIENT_SECRET,
-        () => mockOauthClient,
-        scheduler,
+        () => _.mockOauthClient,
+        _.scheduler,
     );
   }
 
-  setup(() => {
+  const _ = init(() => {
     mockFs();
     mockProcess();
 
@@ -43,8 +39,8 @@ test('@hive/processor/google-oauth', () => {
     `;
     addFile(path.join(ROOT_DIR, ROOT_FILE_NAME), {content});
 
-    scheduler = new TestScheduler();
-    mockOauthClient = createSpyObject<OAuth2Client>(
+    const scheduler = new TestScheduler();
+    const mockOauthClient = createSpyObject<OAuth2Client>(
         'OauthClient',
         [
           'generateAuthUrl',
@@ -52,6 +48,8 @@ test('@hive/processor/google-oauth', () => {
           'setCredentials',
         ],
     );
+
+    return {mockOauthClient, scheduler};
   });
 
   test('initializeAddedScopes', () => {
@@ -67,10 +65,10 @@ test('@hive/processor/google-oauth', () => {
       createOauth().auth.subscribe(auth$);
 
       assert(auth$).to.emitSequence([objectThat<GoogleAuth>().haveProperties({
-        client: mockOauthClient,
+        client: _.mockOauthClient,
         scopes: setThat<string>().haveExactElements(new Set([scope1, scope2])),
       })]);
-      assert(mockOauthClient.setCredentials).to.haveBeenCalledWith(
+      assert(_.mockOauthClient.setCredentials).to.haveBeenCalledWith(
           objectThat<CredentialsFile>().haveProperties({
             scope,
           }));
@@ -81,10 +79,10 @@ test('@hive/processor/google-oauth', () => {
       createOauth().auth.subscribe(auth$);
 
       assert(auth$).to.emitSequence([objectThat<GoogleAuth>().haveProperties({
-        client: mockOauthClient,
+        client: _.mockOauthClient,
         scopes: setThat<string>().beEmpty(),
       })]);
-      assert(mockOauthClient.setCredentials).toNot.haveBeenCalled();
+      assert(_.mockOauthClient.setCredentials).toNot.haveBeenCalled();
     });
 
     should(`skip initialization if tmp dir cannot be found`, () => {
@@ -94,17 +92,17 @@ test('@hive/processor/google-oauth', () => {
       createOauth().auth.subscribe(auth$);
 
       assert(auth$).to.emitSequence([objectThat<GoogleAuth>().haveProperties({
-        client: mockOauthClient,
+        client: _.mockOauthClient,
         scopes: setThat<string>().beEmpty(),
       })]);
-      assert(mockOauthClient.setCredentials).toNot.haveBeenCalled();
+      assert(_.mockOauthClient.setCredentials).toNot.haveBeenCalled();
     });
   });
 
   test('setupOnScopeChange', () => {
     should(`add the new token and emit if a scope was added`, () => {
       const tokens = {};
-      fake(mockOauthClient.getToken as unknown as Spy<Promise<GetTokenResponse>, [string]>)
+      fake(_.mockOauthClient.getToken as unknown as Spy<Promise<GetTokenResponse>, [string]>)
           .always()
           .return(observableOf({tokens}) as any);
       const auth$ = new ReplaySubject<GoogleAuth>(1);
@@ -126,16 +124,16 @@ test('@hive/processor/google-oauth', () => {
       oauth.addScope(scope1);
       oauth.addScope(scope2);
 
-      scheduler.tick(50);
+      _.scheduler.tick(50);
 
       assert(auth$).to.emitSequence([objectThat<GoogleAuth>().haveProperties({
-        client: mockOauthClient,
+        client: _.mockOauthClient,
         scopes: setThat<string>().haveExactElements(new Set([scope1, scope2])),
       })]);
-      assert(mockOauthClient.setCredentials).to.haveBeenCalledWith(tokens);
-      assert(mockOauthClient.getToken as unknown as Spy<Promise<GetTokenResponse>, [string]>)
+      assert(_.mockOauthClient.setCredentials).to.haveBeenCalledWith(tokens);
+      assert(_.mockOauthClient.getToken as unknown as Spy<Promise<GetTokenResponse>, [string]>)
           .to.haveBeenCalledWith(code);
-      assert(mockOauthClient.generateAuthUrl).to.haveBeenCalledWith(
+      assert(_.mockOauthClient.generateAuthUrl).to.haveBeenCalledWith(
           objectThat<GenerateAuthUrlOpts>().haveProperties({
             scope: arrayThat<string>().haveExactElements([scope1, scope2]),
           }));
@@ -153,26 +151,26 @@ test('@hive/processor/google-oauth', () => {
       const oauth = createOauth();
       oauth.auth.subscribe(auth$);
 
-      resetCalls(mockOauthClient.setCredentials);
+      resetCalls(_.mockOauthClient.setCredentials);
 
       oauth.addScope(scope1);
-      scheduler.tick(50);
+      _.scheduler.tick(50);
 
       assert(auth$).to.emitSequence([objectThat<GoogleAuth>().haveProperties({
-        client: mockOauthClient,
+        client: _.mockOauthClient,
         scopes: setThat<string>().haveExactElements(new Set([scope1, scope2])),
       })]);
-      assert(mockOauthClient.setCredentials).toNot.haveBeenCalled();
-      assert(mockOauthClient.getToken as unknown as Spy<Promise<GetTokenResponse>, [string]>)
+      assert(_.mockOauthClient.setCredentials).toNot.haveBeenCalled();
+      assert(_.mockOauthClient.getToken as unknown as Spy<Promise<GetTokenResponse>, [string]>)
           .toNot.haveBeenCalled();
-      assert(mockOauthClient.generateAuthUrl).toNot.haveBeenCalled();
+      assert(_.mockOauthClient.generateAuthUrl).toNot.haveBeenCalled();
     });
   });
 
   test('setupOnUpdateTmpDir', () => {
     should(`update the oauth file after prompting`, () => {
       const tokens = {scope: 'scope1 scope2'};
-      fake(mockOauthClient.getToken as unknown as Spy<Promise<GetTokenResponse>, [string]>)
+      fake(_.mockOauthClient.getToken as unknown as Spy<Promise<GetTokenResponse>, [string]>)
           .always()
           .return(observableOf({tokens}) as any);
       const auth$ = new ReplaySubject<GoogleAuth>(1);
@@ -192,7 +190,7 @@ test('@hive/processor/google-oauth', () => {
       const scope = 'scope';
       oauth.addScope(scope);
 
-      scheduler.tick(50);
+      _.scheduler.tick(50);
 
       const oauthContent = getFile(path.join(ROOT_DIR, TMP_DIR_NAME, OAUTH_FILE))!.content;
       assert(oauthContent).to.equal(JSON.stringify(tokens));

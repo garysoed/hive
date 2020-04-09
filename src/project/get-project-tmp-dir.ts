@@ -1,7 +1,6 @@
+import { mapNonNull } from 'gs-tools/export/rxjs';
 import * as path from 'path';
-
-import { mapNonNull } from '@gs-tools/rxjs';
-import { Observable } from '@rxjs';
+import { Observable } from 'rxjs';
 
 import { findRoot } from './find-root';
 

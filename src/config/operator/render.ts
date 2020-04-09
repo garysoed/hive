@@ -1,5 +1,5 @@
-import { $, $asMap, $map, $recordToMap } from '@gs-tools/collect';
-import { HasPropertiesType, InstanceofType, IntersectType, MapOfType, NotType, StringType, Type } from '@gs-types';
+import { $, $asMap, $map, $recordToMap } from 'gs-tools/export/collect';
+import { hasPropertiesType, instanceofType, intersectType, mapOfType, notType, stringType, Type } from 'gs-types';
 
 import { RENDER_INPUT_TYPE, RenderInput } from '../../core/render-input';
 import { RenderRule } from '../../core/render-rule';
@@ -11,7 +11,7 @@ import { parseRuleRef } from '../parse/parse-rule-ref';
 
 type RenderInputRaw = Exclude<RenderInput, RuleRef>|string;
 const RENDER_INPUT_RAW_TYPE: Type<RenderInputRaw> =
-    IntersectType([RENDER_INPUT_TYPE, NotType(RULE_REF_TYPE)]);
+    intersectType([RENDER_INPUT_TYPE, notType(RULE_REF_TYPE)]);
 
 interface Args {
   readonly inputs: {};
@@ -20,15 +20,15 @@ interface Args {
   readonly processor: string;
 }
 
-const ARGS_TYPE: Type<Args> = HasPropertiesType({
-  inputs: InstanceofType(Object),
-  name: StringType,
-  output: StringType,
-  processor: StringType,
+const ARGS_TYPE: Type<Args> = hasPropertiesType({
+  inputs: instanceofType(Object),
+  name: stringType,
+  output: stringType,
+  processor: stringType,
 });
 
-const INPUTS_TYPE: Type<ReadonlyMap<string, RenderInputRaw>> = MapOfType(
-    StringType,
+const INPUTS_TYPE: Type<ReadonlyMap<string, RenderInputRaw>> = mapOfType(
+    stringType,
     RENDER_INPUT_RAW_TYPE,
 );
 

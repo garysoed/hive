@@ -1,7 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-
-import { Observable } from '@rxjs';
+import { Observable } from 'rxjs';
 
 export function writeFile(filepath: string, content: string): Observable<void> {
   return new Observable<void>(subscriber => {

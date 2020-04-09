@@ -1,5 +1,5 @@
-import { $, $recordToMap } from '@gs-tools/collect';
-import { hasPropertiesType, instanceofType, mapOfType, stringType, Type } from '@gs-types';
+import { $, $recordToMap } from 'gs-tools/export/collect';
+import { hasPropertiesType, instanceofType, mapOfType, stringType, Type } from 'gs-types';
 
 import { DeclareRule } from '../../core/declare-rule';
 import { ResolvedRenderInput } from '../../core/render-input';

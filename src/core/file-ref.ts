@@ -1,4 +1,4 @@
-import { HasPropertiesType, StringType } from '@gs-types';
+import { hasPropertiesType, stringType } from 'gs-types';
 
 import { ROOT_TYPE_TYPE, RootType } from './root-type';
 
@@ -8,8 +8,8 @@ export interface FileRef {
   readonly rootType: RootType;
 }
 
-export const FILE_REF_TYPE = HasPropertiesType<FileRef>({
-  path: StringType,
+export const FILE_REF_TYPE = hasPropertiesType<FileRef>({
+  path: stringType,
   rootType: ROOT_TYPE_TYPE,
 });
 

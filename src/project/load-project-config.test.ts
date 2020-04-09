@@ -1,6 +1,5 @@
+import { assert, objectThat, should, test } from 'gs-testing';
 import * as path from 'path';
-
-import { assert, objectThat, setup, should, test } from '@gs-testing';
 
 import { addFile, mockFs } from '../testing/fake-fs';
 import { mockProcess, setCwd } from '../testing/fake-process';
@@ -10,10 +9,11 @@ import { loadProjectConfig } from './load-project-config';
 import { ProjectConfig } from './project-config';
 
 
-test('@hive/project/load-project-config', () => {
-  setup(() => {
+test('@hive/project/load-project-config', init => {
+  init(() => {
     mockFs();
     mockProcess();
+    return {};
   });
 
   should(`load the project config correctly`, () => {

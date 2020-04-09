@@ -1,8 +1,7 @@
+import { assertNonNull } from 'gs-tools/export/rxjs';
 import * as path from 'path';
-
-import { assertNonNull } from '@gs-tools/rxjs';
-import { combineLatest, Observable, of as observableOf } from '@rxjs';
-import { map } from '@rxjs/operators';
+import { combineLatest, Observable, of as observableOf } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { BuiltInRootType, RootType } from '../core/root-type';
 import { findRoot } from '../project/find-root';

@@ -1,7 +1,6 @@
 import * as glob from 'glob';
-
-import { fake, spy } from '@gs-testing';
-import { EMPTY, Observable } from '@rxjs';
+import { fake, spy } from 'gs-testing';
+import { EMPTY, Observable } from 'rxjs';
 
 import { globWrapper } from '../util/glob-wrapper';
 

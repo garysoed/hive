@@ -1,4 +1,4 @@
-import { Type } from '@gs-types';
+import { Type } from 'gs-types';
 
 import { Serializer } from '../config/serializer/serializer';
 

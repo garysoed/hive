@@ -1,8 +1,7 @@
+import { assert, should, test } from 'gs-testing';
+import { numberType } from 'gs-types';
 import * as path from 'path';
-
-import { assert, setup, should, test } from '@gs-testing';
-import { numberType } from '@gs-types';
-import { map } from '@rxjs/operators';
+import { map } from 'rxjs/operators';
 
 import { StringSerializer } from '../config/serializer/string-serializer';
 import { DeclareRule } from '../core/declare-rule';
@@ -14,9 +13,10 @@ import { addFile, mockFs } from '../testing/fake-fs';
 import { runRule } from './run-rule';
 
 
-test('@hive/util/run-declare', () => {
-  setup(() => {
+test('@hive/util/run-declare', init => {
+  init(() => {
     mockFs();
+    return {};
   });
 
   should(`emit function that runs the processor correctly`, () => {

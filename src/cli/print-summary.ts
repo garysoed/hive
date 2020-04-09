@@ -1,7 +1,6 @@
 import * as commandLineUsage from 'command-line-usage';
-
-import { EMPTY, Observable } from '@rxjs';
-import { Logger } from '@santa';
+import { EMPTY, Observable } from 'rxjs';
+import { Logger } from 'santa';
 
 
 const LOGGER = new Logger('@hive/cli/print-summary');

@@ -1,5 +1,5 @@
-import { Observable } from '@rxjs';
-import { map, switchMap } from '@rxjs/operators';
+import { Observable } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 
 import { DeclareRule } from '../core/declare-rule';
 import { OutputFn } from '../core/output-fn';

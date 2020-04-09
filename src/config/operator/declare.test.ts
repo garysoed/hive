@@ -1,5 +1,5 @@
-import { assert, mapThat, objectThat, should, test } from '@gs-testing';
-import { arrayOfType, booleanType, numberType } from '@gs-types';
+import { assert, mapThat, objectThat, should, test } from 'gs-testing';
+import { arrayOfType, booleanType, numberType } from 'gs-types';
 
 import { DeclareRule } from '../../core/declare-rule';
 import { BuiltInRootType } from '../../core/root-type';

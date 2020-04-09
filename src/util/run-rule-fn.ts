@@ -1,4 +1,4 @@
-import { Observable } from '@rxjs';
+import { Observable } from 'rxjs';
 
 import { DeclareRule } from '../core/declare-rule';
 import { LoadRule } from '../core/load-rule';

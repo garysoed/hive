@@ -1,6 +1,5 @@
 import * as commandLineArgs from 'command-line-args';
-
-import { Observable } from '@rxjs';
+import { Observable } from 'rxjs';
 
 import { CommandType } from './command-type';
 import { printSummary } from './print-summary';

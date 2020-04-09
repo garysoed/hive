@@ -1,14 +1,15 @@
-import { assert, setup, should, test } from '@gs-testing';
-import { ReplaySubject } from '@rxjs';
+import { assert, should, test } from 'gs-testing';
+import { ReplaySubject } from 'rxjs';
 
 import { addFile, getWatcherSubject, mockFs } from '../testing/fake-fs';
 
 import { readFile } from './read-file';
 
 
-test('@hive/util/read-file', () => {
-  setup(() => {
+test('@hive/util/read-file', init => {
+  init(() => {
     mockFs();
+    return {};
   });
 
   should(`emit the file content`, () => {

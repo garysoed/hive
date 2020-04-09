@@ -1,7 +1,6 @@
 import * as path from 'path';
-
-import { Observable } from '@rxjs';
-import { map } from '@rxjs/operators';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { FileRef } from '../core/file-ref';
 

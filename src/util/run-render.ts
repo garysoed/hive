@@ -1,8 +1,7 @@
 import * as path from 'path';
-
-import { combineLatest, from as observableFrom, NEVER, Observable, of as observableOf, throwError } from '@rxjs';
-import { catchError, map, mapTo, switchMap, tap } from '@rxjs/operators';
-import { Logger } from '@santa';
+import { combineLatest, from as observableFrom, NEVER, Observable, of as observableOf, throwError } from 'rxjs';
+import { catchError, map, mapTo, switchMap, tap } from 'rxjs/operators';
+import { Logger } from 'santa';
 
 import { Processor } from '../core/processor';
 import { RenderInput } from '../core/render-input';

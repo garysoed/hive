@@ -1,7 +1,6 @@
 import * as commandLineArgs from 'command-line-args';
-
-import { Observable, throwError } from '@rxjs';
-import { mapTo, switchMap } from '@rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { mapTo, switchMap } from 'rxjs/operators';
 
 import { parseRuleRef } from '../config/parse/parse-rule-ref';
 import { RuleType } from '../core/rule-type';

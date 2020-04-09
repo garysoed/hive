@@ -1,4 +1,4 @@
-import { arrayThat, assert, mapThat, MatcherType, objectThat, should, test } from '@gs-testing';
+import { arrayThat, assert, mapThat, MatcherType, objectThat, should, test } from 'gs-testing';
 
 import { generateRunSpecs, RunSpec } from './generate-run-specs';
 

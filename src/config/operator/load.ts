@@ -1,4 +1,4 @@
-import { arrayOfType, hasPropertiesType, instanceofType, stringType, Type, unionType } from '@gs-types';
+import { arrayOfType, hasPropertiesType, instanceofType, stringType, Type, unionType } from 'gs-types';
 
 import { GLOB_REF_TYPE, GlobRef } from '../../core/glob-ref';
 import { LoadRule } from '../../core/load-rule';

@@ -1,8 +1,7 @@
+import { assert, mapThat, objectThat, should, test } from 'gs-testing';
 import * as path from 'path';
-
-import { assert, mapThat, objectThat, setup, should, test } from '@gs-testing';
-import { ReplaySubject } from '@rxjs';
-import { take } from '@rxjs/operators';
+import { ReplaySubject } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 import { RenderRule } from '../core/render-rule';
 import { BuiltInRootType } from '../core/root-type';
@@ -14,9 +13,10 @@ import { RULE_FILE_NAME } from './read-rule';
 import { runRule } from './run-rule';
 
 
-test('@hive/util/run-render', () => {
-  setup(() => {
+test('@hive/util/run-render', init => {
+  init(() => {
     mockFs();
+    return {};
   });
 
   should(`emit map of file names to their content`, () => {

@@ -1,13 +1,14 @@
-import { assert, setup, should, test } from '@gs-testing';
+import { assert, should, test } from 'gs-testing';
 
 import { getFile, hasDir, mockFs } from '../testing/fake-fs';
 
 import { writeFile } from './write-file';
 
 
-test('@hive/util/write-file', () => {
-  setup(() => {
+test('@hive/util/write-file', init => {
+  init(() => {
     mockFs();
+    return {};
   });
 
   should(`write the file correctly`, () => {

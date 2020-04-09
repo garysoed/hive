@@ -1,4 +1,4 @@
-import { HasPropertiesType, SetOfType, StringType } from '@gs-types';
+import { hasPropertiesType, setOfType, stringType } from 'gs-types';
 
 import { ROOT_TYPE_TYPE, RootType } from './root-type';
 
@@ -9,10 +9,10 @@ export interface FilePattern {
   readonly substitutionKeys: ReadonlySet<string>;
 }
 
-const FILE_PATTERN_TYPE = HasPropertiesType<FilePattern>({
-  pattern: StringType,
+const FILE_PATTERN_TYPE = hasPropertiesType<FilePattern>({
+  pattern: stringType,
   rootType: ROOT_TYPE_TYPE,
-  substitutionKeys: SetOfType<string>(StringType),
+  substitutionKeys: setOfType<string>(stringType),
 });
 
 export function isFilePattern(target: unknown): target is FilePattern {

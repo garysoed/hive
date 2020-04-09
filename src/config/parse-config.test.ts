@@ -1,6 +1,5 @@
 
-import { anyThat, arrayThat, assert, MatcherType, objectThat, setThat, should, test } from '@gs-testing';
-import { numberType } from '@gs-types';
+import { anyThat, arrayThat, assert, MatcherType, objectThat, setThat, should, test } from 'gs-testing';
 
 import { DeclareRule } from '../core/declare-rule';
 import { FilePattern } from '../core/file-pattern';
@@ -16,7 +15,7 @@ import { RuleType } from '../core/rule-type';
 import { BUILT_IN_PROCESSOR_TYPE } from '../processor/built-in-processor-id';
 
 import { parseConfig } from './parse-config';
-import { fromType, Serializer } from './serializer/serializer';
+import { Serializer } from './serializer/serializer';
 
 
 type RuleWithoutType<R extends Rule> = {[K in Exclude<keyof R, 'type'>]: R[K]};

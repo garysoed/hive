@@ -1,7 +1,6 @@
 import * as path from 'path';
-
-import { Observable, throwError } from '@rxjs';
-import { map, share, switchMap } from '@rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { map, share, switchMap } from 'rxjs/operators';
 
 import { readFile } from '../util/read-file';
 

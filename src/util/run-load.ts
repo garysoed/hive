@@ -1,6 +1,6 @@
-import { $, $asArray, $flat } from '@gs-tools/collect';
-import { combineLatest, Observable, of as observableOf } from '@rxjs';
-import { map, switchMap } from '@rxjs/operators';
+import { $, $asArray, $flat } from 'gs-tools/export/collect';
+import { combineLatest, Observable, of as observableOf } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 
 import { isFileRef } from '../core/file-ref';
 import { LoadRule } from '../core/load-rule';

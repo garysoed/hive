@@ -1,8 +1,7 @@
 import { GaxiosResponse } from 'gaxios';
 import { google, sheets_v4 } from 'googleapis';
-
-import { arrayThat, assert, createSpy, createSpyInstance, createSpyObject, fake, objectThat, should, spy, Spy, test } from '@gs-testing';
-import { Observable, of as observableOf } from '@rxjs';
+import { arrayThat, assert, createSpy, createSpyInstance, createSpyObject, fake, objectThat, should, spy, Spy, test } from 'gs-testing';
+import { Observable, of as observableOf } from 'rxjs';
 
 import { GoogleOauth } from './google-oauth';
 import { loadGoogleSheets, SCOPE } from './load-google-sheets';

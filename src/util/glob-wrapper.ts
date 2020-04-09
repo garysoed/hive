@@ -1,6 +1,5 @@
 import * as glob from 'glob';
-
-import { Observable } from '@rxjs';
+import { Observable } from 'rxjs';
 
 export const globWrapper = {
   glob(pattern: string, options: glob.IOptions): Observable<string[]> {

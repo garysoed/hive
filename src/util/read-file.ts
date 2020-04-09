@@ -1,8 +1,7 @@
 import * as fs from 'fs';
-
-import { fromEventPattern, Observable } from '@rxjs';
-import { startWith, switchMap, tap } from '@rxjs/operators';
-import { Logger } from '@santa';
+import { fromEventPattern, Observable } from 'rxjs';
+import { startWith, switchMap, tap } from 'rxjs/operators';
+import { Logger } from 'santa';
 
 const LOGGER = new Logger('@hive/util/read-file');
 

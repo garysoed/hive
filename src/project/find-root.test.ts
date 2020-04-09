@@ -1,16 +1,17 @@
+import { assert, should, test } from 'gs-testing';
 import * as path from 'path';
-
-import { assert, setup, should, test } from '@gs-testing';
 
 import { addFile, mockFs } from '../testing/fake-fs';
 import { mockProcess, setCwd } from '../testing/fake-process';
 
 import { findRoot, ROOT_FILE_NAME } from './find-root';
 
-test('@hive/project/find-root', () => {
-  setup(() => {
+
+test('@hive/project/find-root', init => {
+  init(() => {
     mockFs();
     mockProcess();
+    return {};
   });
 
   should(`return the correct project root`, () => {

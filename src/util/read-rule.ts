@@ -1,8 +1,7 @@
 import * as path from 'path';
-
-import { Observable } from '@rxjs';
-import { map, switchMap } from '@rxjs/operators';
-import { Logger } from '@santa';
+import { Observable } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
+import { Logger } from 'santa';
 
 import { parseConfig } from '../config/parse-config';
 import { Rule } from '../core/rule';

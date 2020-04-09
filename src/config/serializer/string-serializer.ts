@@ -1,4 +1,4 @@
-import { identity } from '@nabu';
+import { identity } from 'nabu';
 
 import { Serializer } from './serializer';
 

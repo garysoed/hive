@@ -1,4 +1,4 @@
-import { EnumType, StringType, Type, UnionType } from '@gs-types';
+import { enumType, stringType, Type, unionType } from 'gs-types';
 
 export enum BuiltInRootType {
   CURRENT_DIR = 1,
@@ -9,7 +9,7 @@ export enum BuiltInRootType {
 
 export type RootType = BuiltInRootType|string;
 
-export const ROOT_TYPE_TYPE: Type<RootType> = UnionType([
-  EnumType(BuiltInRootType),
-  StringType,
+export const ROOT_TYPE_TYPE: Type<RootType> = unionType([
+  enumType(BuiltInRootType),
+  stringType,
 ]);

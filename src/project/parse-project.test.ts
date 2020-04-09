@@ -1,6 +1,5 @@
+import { assert, mapThat, objectThat, should, test } from 'gs-testing';
 import * as path from 'path';
-
-import { assert, mapThat, objectThat, should, test } from '@gs-testing';
 
 import { parseProject } from './parse-project';
 

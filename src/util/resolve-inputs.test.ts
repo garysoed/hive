@@ -1,7 +1,6 @@
+import { arrayThat, assert, createSpy, fake, mapThat, should, test } from 'gs-testing';
 import * as path from 'path';
-
-import { arrayThat, assert, createSpy, fake, mapThat, setup, should, Spy, test } from '@gs-testing';
-import { Observable, of as observableOf } from '@rxjs';
+import { Observable, of as observableOf } from 'rxjs';
 
 import { DeclareRule } from '../core/declare-rule';
 import { LoadRule } from '../core/load-rule';
@@ -16,19 +15,18 @@ import { RULE_FILE_NAME } from './read-rule';
 import { resolveInputs } from './resolve-inputs';
 
 
-test('@hive/util/resolve-inputs', () => {
-  let mockResolveRule: Spy<Observable<unknown>, [Rule]>;
-
+test('@hive/util/resolve-inputs', init => {
   function fakeRunRule(renderRule: RenderRule): Observable<ReadonlyMap<string, string>>;
   function fakeRunRule(declareRule: DeclareRule): Observable<Processor>;
   function fakeRunRule(loadRule: LoadRule): Observable<string[]>;
   function fakeRunRule(rule: Rule): Observable<unknown> {
-    return mockResolveRule(rule);
+    return _.mockResolveRule(rule);
   }
 
-  setup(() => {
+  const _ = init(() => {
     mockFs();
-    mockResolveRule = createSpy('ResolveRule');
+    const mockResolveRule = createSpy<Observable<unknown>, [Rule]>('ResolveRule');
+    return {mockResolveRule};
   });
 
   should(`resolve non rule reference inputs correctly`, () => {
@@ -45,7 +43,7 @@ test('@hive/util/resolve-inputs', () => {
   });
 
   should(`resolve single file load rule reference inputs correctly`, () => {
-    fake(mockResolveRule).always().call(rule => {
+    fake(_.mockResolveRule).always().call(rule => {
       const loadRule = rule as LoadRule;
       switch (loadRule.output.desc) {
         case 'number':
@@ -91,7 +89,7 @@ test('@hive/util/resolve-inputs', () => {
   });
 
   should(`emit error if the output is not an array but the sources has multiple contents`, () => {
-    fake(mockResolveRule).always().call(() => observableOf(['123', '234']));
+    fake(_.mockResolveRule).always().call(() => observableOf(['123', '234']));
 
     const contentA = `
     load({
@@ -111,7 +109,7 @@ test('@hive/util/resolve-inputs', () => {
   });
 
   should(`resolve glob file load rule reference inputs correctly`, () => {
-    fake(mockResolveRule).always().call(() => {
+    fake(_.mockResolveRule).always().call(() => {
       return observableOf(['123', '456']);
     });
 
@@ -139,7 +137,7 @@ test('@hive/util/resolve-inputs', () => {
 
   should(`resolve declare rule reference inputs correctly`, () => {
     const fn = () => undefined;
-    fake(mockResolveRule).always().call(() => {
+    fake(_.mockResolveRule).always().call(() => {
       return observableOf(fn);
     });
 
@@ -167,7 +165,7 @@ test('@hive/util/resolve-inputs', () => {
   });
 
   should(`resolve render rule reference inputs correctly`, () => {
-    fake(mockResolveRule).always().call(rule => {
+    fake(_.mockResolveRule).always().call(rule => {
       return observableOf(new Map([['file1', 'content1'], ['file2', 'content2']]));
     });
 

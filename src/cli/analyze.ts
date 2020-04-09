@@ -1,10 +1,9 @@
 import * as commandLineArgs from 'command-line-args';
-
-import { $, $asArray, $asMap, $join, $map } from '@gs-tools/collect';
-import { Type } from '@gs-types';
-import { combineLatest, Observable, throwError } from '@rxjs';
-import { map, switchMap, take, tap } from '@rxjs/operators';
-import { Logger } from '@santa';
+import { $, $asArray, $asMap, $join, $map } from 'gs-tools/export/collect';
+import { Type } from 'gs-types';
+import { combineLatest, Observable, throwError } from 'rxjs';
+import { map, switchMap, take, tap } from 'rxjs/operators';
+import { Logger } from 'santa';
 
 import { parseRuleRef } from '../config/parse/parse-rule-ref';
 import { Serializer } from '../config/serializer/serializer';

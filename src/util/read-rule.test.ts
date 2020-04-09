@@ -1,6 +1,5 @@
+import { anyThat, arrayThat, assert, objectThat, should, test } from 'gs-testing';
 import * as path from 'path';
-
-import { anyThat, arrayThat, assert, objectThat, setup, should, test } from '@gs-testing';
 
 import { Serializer } from '../config/serializer/serializer';
 import { LoadRule } from '../core/load-rule';
@@ -11,10 +10,11 @@ import { mockProcess, setCwd } from '../testing/fake-process';
 import { readRule, RULE_FILE_NAME, RuleWithPath } from './read-rule';
 
 
-test('@hive/util/read-rule', () => {
-  setup(() => {
+test('@hive/util/read-rule', init => {
+  init(() => {
     mockFs();
     mockProcess();
+    return {};
   });
 
   should(`emit the correct rule`, () => {

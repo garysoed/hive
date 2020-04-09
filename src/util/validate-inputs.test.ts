@@ -1,5 +1,5 @@
-import { assert, setThat, setup, should, test } from '@gs-testing';
-import { arrayOfType, numberType, stringType, Type } from '@gs-types';
+import { assert, should, test } from 'gs-testing';
+import { arrayOfType, numberType, stringType, Type } from 'gs-types';
 
 import { RenderInput } from '../core/render-input';
 import { mockFs } from '../testing/fake-fs';
@@ -8,10 +8,11 @@ import { mockProcess } from '../testing/fake-process';
 import { validateInputs } from './validate-inputs';
 
 
-test('@hive/util/validate-inputs', () => {
-  setup(() => {
+test('@hive/util/validate-inputs', init => {
+  init(() => {
     mockFs();
     mockProcess();
+    return {};
   });
 
   test('validateInputs', () => {

@@ -1,4 +1,4 @@
-import { HasPropertiesType, StringType } from '@gs-types';
+import { hasPropertiesType, stringType } from 'gs-types';
 
 import { ROOT_TYPE_TYPE, RootType } from './root-type';
 
@@ -8,8 +8,8 @@ export interface GlobRef {
   rootType: RootType;
 }
 
-export const GLOB_REF_TYPE = HasPropertiesType<GlobRef>({
-  globPattern: StringType,
+export const GLOB_REF_TYPE = hasPropertiesType<GlobRef>({
+  globPattern: stringType,
   rootType: ROOT_TYPE_TYPE,
 });
 

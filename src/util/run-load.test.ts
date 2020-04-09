@@ -1,6 +1,6 @@
-import { arrayThat, assert, setup, should, test } from '@gs-testing';
-import { stringType } from '@gs-types';
-import { of as observableOf } from '@rxjs';
+import { arrayThat, assert, should, test } from 'gs-testing';
+import { stringType } from 'gs-types';
+import { of as observableOf } from 'rxjs';
 
 import { fromType } from '../config/serializer/serializer';
 import { LoadRule } from '../core/load-rule';
@@ -12,10 +12,11 @@ import { addGlobHandler, mockGlob } from '../testing/fake-glob';
 import { runRule } from './run-rule';
 
 
-test('@hive/util/run-load', () => {
-  setup(() => {
+test('@hive/util/run-load', init => {
+  init(() => {
     mockFs();
     mockGlob();
+    return {};
   });
 
   should(`emit content of file if file ref was given`, () => {
