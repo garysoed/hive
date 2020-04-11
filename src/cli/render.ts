@@ -1,10 +1,10 @@
 import * as commandLineArgs from 'command-line-args';
-import { Observable, throwError } from 'rxjs';
+import { EMPTY, merge, Observable, throwError } from 'rxjs';
 import { mapTo, switchMap } from 'rxjs/operators';
 
 import { parseRuleRef } from '../config/parse/parse-rule-ref';
 import { RuleType } from '../core/rule-type';
-import { readRule } from '../util/read-rule';
+import { readRules } from '../util/read-rules';
 import { runRule } from '../util/run-rule';
 
 import { CommandType } from './command-type';
@@ -45,12 +45,16 @@ export function render(argv: string[]): Observable<string> {
   const ruleRef = parseRuleRef(rulePath);
   const cwd = process.cwd();
 
-  return readRule(ruleRef, cwd).pipe(
-      switchMap(({rule, path}) => {
-        if (rule.type !== RuleType.RENDER) {
-          throw new Error(`Rule ${rulePath} is not a RENDER rule`);
-        }
-        return runRule(rule, path);
+  return readRules(ruleRef, cwd).pipe(
+      switchMap(({rules, path}) => {
+        const obsList = rules.map(rule => {
+          if (rule.type !== RuleType.RENDER) {
+            return EMPTY;
+          }
+          return runRule(rule, path);
+        });
+
+        return merge(...obsList);
       }),
       mapTo('done'),
   );

@@ -8,6 +8,7 @@ import { Rule } from '../core/rule';
 import { RuleRef } from '../core/rule-ref';
 
 import { readFile } from './read-file';
+import { readRules } from './read-rules';
 import { resolveFileRef } from './resolve-file-ref';
 
 
@@ -19,21 +20,14 @@ export interface RuleWithPath {
   readonly rule: Rule;
 }
 
-export function readRule(ref: RuleRef, cwd: string): Observable<{path: string; rule: Rule}> {
-  return resolveFileRef(ref, cwd).pipe(
-      switchMap(resolvedFileRef => {
-        LOGGER.progress(`Reading: ${resolvedFileRef}:${ref.ruleName}`);
-        return readFile(path.join(resolvedFileRef, RULE_FILE_NAME)).pipe(
-            map(fileContent => parseConfig(fileContent)),
-            map(config => config.get(ref.ruleName)),
-            map(rule => {
-              if (!rule) {
-                throw new Error(`Cannot find rule ${ref.ruleName} from ${resolvedFileRef}`);
-              }
+export function readRule(ref: RuleRef, cwd: string): Observable<RuleWithPath> {
+  return readRules(ref, cwd).pipe(
+      map(({rules, path}) => {
+        if (rules.length !== 1) {
+          throw new Error('Multiple rules are not supported');
+        }
 
-              return {rule, path: resolvedFileRef};
-            }),
-        );
+        return {path, rule: rules[0]};
       }),
   );
 }
