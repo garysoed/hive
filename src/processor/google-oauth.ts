@@ -45,7 +45,6 @@ export class GoogleOauth {
       clientId: string,
       clientSecret: string,
       createOauth2Client: OauthClientFactory = DEFAULT_OAUTH_FACTORY,
-      private readonly scheduler?: SchedulerLike,
   ) {
     this.oauth2Client = createOauth2Client(clientId, clientSecret);
     this.initializeAddedScopes();
@@ -90,7 +89,7 @@ export class GoogleOauth {
 
   private setupOnScopeChange(): void {
     this.onScopeAdded$.pipe(
-        bufferTime(SCOPE_CHANGE_DEBOUNCE_MS, this.scheduler),
+        bufferTime(SCOPE_CHANGE_DEBOUNCE_MS),
         skipUntil(this.onInitialized$),
         withLatestFrom(this.addedScopes$),
         map(([newScopes, addedScopes]) => {

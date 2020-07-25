@@ -5,7 +5,7 @@ import { generateRunSpecs, RunSpec } from './generate-run-specs';
 
 function matchRunSpec(inputs: Map<string, unknown>, outputPath: string): MatcherType<RunSpec> {
   return objectThat<RunSpec>().haveProperties({
-    inputs: mapThat().haveExactElements(inputs),
+    inputs: mapThat<string, unknown>().haveExactElements(inputs),
     outputPath,
   });
 }

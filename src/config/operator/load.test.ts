@@ -1,6 +1,9 @@
 import { anyThat, arrayThat, assert, objectThat, should, test } from 'gs-testing';
 import { arrayOfType, numberType } from 'gs-types';
 
+import { FileRef } from '../../core/file-ref';
+import { GlobRef } from '../../core/glob-ref';
+import { LoadRule } from '../../core/load-rule';
 import { BuiltInRootType } from '../../core/root-type';
 import { fromType, Serializer } from '../serializer/serializer';
 
@@ -18,10 +21,10 @@ test('@hive/config/operator/load', () => {
       srcs: [globRef],
     };
 
-    assert(load(config)).to.equal(objectThat().haveProperties({
+    assert(load(config)).to.equal(objectThat<LoadRule>().haveProperties({
       name: ruleName,
-      srcs: arrayThat().haveExactElements([objectThat().haveProperties(globRef)]),
-      output: anyThat<Serializer<unknown>>().passPredicate(
+      srcs: arrayThat<GlobRef>().haveExactElements([objectThat<GlobRef>().haveProperties(globRef)]),
+      output: anyThat<Serializer<number[]>>().passPredicate(
           loader => loader.desc === 'number[]',
           'a number[] loader',
       ),
@@ -36,15 +39,15 @@ test('@hive/config/operator/load', () => {
       srcs: ['/file/pattern'],
     };
 
-    assert(load(config)).to.equal(objectThat().haveProperties({
+    assert(load(config)).to.equal(objectThat<LoadRule>().haveProperties({
       name: ruleName,
-      srcs: arrayThat().haveExactElements([
-        objectThat().haveProperties({
+      srcs: arrayThat<FileRef>().haveExactElements([
+        objectThat<FileRef>().haveProperties({
           rootType: BuiltInRootType.SYSTEM_ROOT,
           path: 'file/pattern',
         }),
       ]),
-      output: anyThat<Serializer<unknown>>().passPredicate(
+      output: anyThat<Serializer<number[]>>().passPredicate(
           loader => loader.desc === 'number[]',
           'a number[] loader',
       ),

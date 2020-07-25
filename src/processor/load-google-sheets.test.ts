@@ -1,6 +1,8 @@
 import { GaxiosResponse } from 'gaxios';
 import { google, sheets_v4 } from 'googleapis';
 import { arrayThat, assert, createSpy, createSpyInstance, createSpyObject, fake, objectThat, should, spy, Spy, test } from 'gs-testing';
+import { Merge, RawSheet } from 'gs-tools/export/gapi';
+import { CellData, ExtendedValue, GridData, RowData } from 'gs-tools/src/gapi/type/sheets';
 import { Observable, of as observableOf } from 'rxjs';
 
 import { GoogleOauth } from './google-oauth';
@@ -15,7 +17,34 @@ test('@hive/processor/load-google-sheets', () => {
 
     const mockSpreadsheets =
         createSpyObject<sheets_v4.Resource$Spreadsheets>('Spreadsheets', ['get']);
-    const data = {sheets: [{}, {}, {}]};
+    const data = {
+      sheets: [
+        {
+          merges: [
+            {startRowIndex: 0, endRowIndex: 1, startColumnIndex: 2, endColumnIndex: 3},
+            {},
+          ],
+        },
+        {
+          data: [
+            {
+              rowData: [
+                {
+                  values: [
+                    {effectiveValue: {boolValue: true}},
+                    {effectiveValue: {numberValue: 12}},
+                    {effectiveValue: {stringValue: 'str'}},
+                  ],
+                },
+                {},
+              ],
+            },
+            {},
+          ],
+        },
+        {},
+      ],
+    };
     const mockGet = mockSpreadsheets.get as unknown as
         Spy<Observable<GaxiosResponse<sheets_v4.Schema$Spreadsheet>>, [any]>;
     fake(mockGet).always().return(observableOf({
@@ -30,7 +59,7 @@ test('@hive/processor/load-google-sheets', () => {
     fake(spyGoogleSheets).always().return({spreadsheets: mockSpreadsheets} as any);
 
     const mockGoogleOauth = createSpyInstance(GoogleOauth);
-    const mockClient = {};
+    const mockClient = 'client';
     const mockAuth = createSpy('auth');
     Object.defineProperty(mockGoogleOauth, 'auth', {get: mockAuth});
     fake(mockAuth).always()
@@ -39,13 +68,44 @@ test('@hive/processor/load-google-sheets', () => {
     const spreadsheet =
         await loadGoogleSheets(metadata, ranges, 'clientId', 'clientSecret', () => mockGoogleOauth);
 
-    assert(spreadsheet).to.equal(objectThat().haveProperties({
-      sheets: arrayThat().haveExactElements([
-        objectThat().haveProperties({}),
-        objectThat().haveProperties({}),
-        objectThat().haveProperties({}),
-      ]),
-    }));
+    assert(spreadsheet).to.haveExactElements([
+      objectThat<RawSheet>().haveProperties({
+        merges: arrayThat<Merge>().haveExactElements([
+          objectThat<Merge>().haveProperties({
+            startRowIndex: 0,
+            endRowIndex: 1,
+            startColumnIndex: 2,
+            endColumnIndex: 3,
+          }),
+        ]),
+        data: arrayThat<GridData>().beEmpty(),
+      }),
+      objectThat<RawSheet>().haveProperties({
+        data: arrayThat<GridData>().haveExactElements([
+          objectThat<GridData>().haveProperties({
+            rowData: arrayThat<RowData>().haveExactElements([
+              objectThat<RowData>().haveProperties({
+                values: arrayThat<CellData>().haveExactElements([
+                  objectThat<CellData>().haveProperties({
+                    effectiveValue: objectThat<ExtendedValue>().haveProperties({boolValue: true}),
+                  }),
+                  objectThat<CellData>().haveProperties({
+                    effectiveValue: objectThat<ExtendedValue>().haveProperties({numberValue: 12}),
+                  }),
+                  objectThat<CellData>().haveProperties({
+                    effectiveValue: objectThat<ExtendedValue>()
+                        .haveProperties({stringValue: 'str'}),
+                  }),
+                ]),
+              }),
+              objectThat<RowData>().haveProperties({}),
+            ]),
+          }),
+          objectThat<GridData>().haveProperties({}),
+        ]),
+      }),
+      objectThat<RawSheet>().haveProperties({}),
+    ]);
     assert(mockGet).to.haveBeenCalledWith(objectThat().haveProperties({
       spreadsheetId: docId,
       ranges,

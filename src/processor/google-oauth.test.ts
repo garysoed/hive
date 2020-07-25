@@ -1,6 +1,6 @@
 import { GenerateAuthUrlOpts, GetTokenResponse } from 'google-auth-library/build/src/auth/oauth2client';
 import { OAuth2Client } from 'googleapis-common';
-import { arrayThat, assert, createSpyObject, fake, objectThat, resetCalls, setThat, should, Spy, spy, test, TestScheduler } from 'gs-testing';
+import { arrayThat, assert, createSpyObject, fake, mockTime, objectThat, resetCalls, setThat, should, Spy, spy, test } from 'gs-testing';
 import * as path from 'path';
 import * as readline from 'readline';
 import { of as observableOf, ReplaySubject } from 'rxjs';
@@ -23,7 +23,6 @@ test('@hive/processor/google-oauth', init => {
         CLIENT_ID,
         CLIENT_SECRET,
         () => _.mockOauthClient,
-        _.scheduler,
     );
   }
 
@@ -39,7 +38,7 @@ test('@hive/processor/google-oauth', init => {
     `;
     addFile(path.join(ROOT_DIR, ROOT_FILE_NAME), {content});
 
-    const scheduler = new TestScheduler();
+    const fakeTime = mockTime(global);
     const mockOauthClient = createSpyObject<OAuth2Client>(
         'OauthClient',
         [
@@ -49,7 +48,7 @@ test('@hive/processor/google-oauth', init => {
         ],
     );
 
-    return {mockOauthClient, scheduler};
+    return {fakeTime, mockOauthClient};
   });
 
   test('initializeAddedScopes', () => {
@@ -124,7 +123,7 @@ test('@hive/processor/google-oauth', init => {
       oauth.addScope(scope1);
       oauth.addScope(scope2);
 
-      _.scheduler.tick(50);
+      _.fakeTime.tick(50);
 
       assert(auth$).to.emitSequence([objectThat<GoogleAuth>().haveProperties({
         client: _.mockOauthClient,
@@ -154,7 +153,7 @@ test('@hive/processor/google-oauth', init => {
       resetCalls(_.mockOauthClient.setCredentials);
 
       oauth.addScope(scope1);
-      _.scheduler.tick(50);
+      _.fakeTime.tick(50);
 
       assert(auth$).to.emitSequence([objectThat<GoogleAuth>().haveProperties({
         client: _.mockOauthClient,
@@ -190,7 +189,7 @@ test('@hive/processor/google-oauth', init => {
       const scope = 'scope';
       oauth.addScope(scope);
 
-      _.scheduler.tick(50);
+      _.fakeTime.tick(50);
 
       const oauthContent = getFile(path.join(ROOT_DIR, TMP_DIR_NAME, OAUTH_FILE))!.content;
       assert(oauthContent).to.equal(JSON.stringify(tokens));

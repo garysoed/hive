@@ -29,7 +29,7 @@ function matchFilePattern(expected: FilePattern): MatcherType<FilePattern> {
   return objectThat<FilePattern>().haveProperties({
     pattern: expected.pattern,
     rootType: expected.rootType,
-    substitutionKeys: setThat().haveExactElements(expected.substitutionKeys),
+    substitutionKeys: setThat<string>().haveExactElements(expected.substitutionKeys),
   });
 }
 

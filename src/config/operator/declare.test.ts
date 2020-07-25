@@ -1,7 +1,8 @@
 import { assert, mapThat, objectThat, should, test } from 'gs-testing';
-import { arrayOfType, booleanType, numberType } from 'gs-types';
+import { arrayOfType, booleanType, numberType, Type } from 'gs-types';
 
 import { DeclareRule } from '../../core/declare-rule';
+import { FileRef } from '../../core/file-ref';
 import { BuiltInRootType } from '../../core/root-type';
 import { fromType } from '../serializer/serializer';
 
@@ -25,7 +26,10 @@ test('@hive/config/operator/declare', () => {
 
     assert(declareRule).to.equal(objectThat<DeclareRule>().haveProperties({
       name: ruleName,
-      processor: objectThat().haveProperties({path: 'path', rootType: BuiltInRootType.SYSTEM_ROOT}),
+      processor: objectThat<FileRef>().haveProperties({
+        path: 'path',
+        rootType: BuiltInRootType.SYSTEM_ROOT,
+      }),
     }));
   });
 
@@ -39,10 +43,13 @@ test('@hive/config/operator/declare', () => {
       output: fromType(booleanType),
     });
 
-    assert(declareRule).to.equal(objectThat().haveProperties({
+    assert(declareRule).to.equal(objectThat<DeclareRule>().haveProperties({
       name: ruleName,
-      processor: objectThat().haveProperties({path: 'path', rootType: BuiltInRootType.SYSTEM_ROOT}),
-      inputs: mapThat().beEmpty(),
+      processor: objectThat<FileRef>().haveProperties({
+        path: 'path',
+        rootType: BuiltInRootType.SYSTEM_ROOT,
+      }),
+      inputs: mapThat<string, Type<unknown>>().beEmpty(),
     }));
   });
 });

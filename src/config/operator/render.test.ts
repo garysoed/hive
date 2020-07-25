@@ -1,7 +1,10 @@
 import { assert, mapThat, objectThat, setThat, should, test } from 'gs-testing';
 
+import { FilePattern } from '../../core/file-pattern';
 import { RenderInput } from '../../core/render-input';
+import { RenderRule } from '../../core/render-rule';
 import { BuiltInRootType } from '../../core/root-type';
+import { RuleRef } from '../../core/rule-ref';
 
 import { render } from './render';
 
@@ -17,21 +20,21 @@ test('@hive/config/operator/render', () => {
     };
     const renderRule = render(config);
 
-    assert(renderRule).to.equal(objectThat().haveProperties({
+    assert(renderRule).to.equal(objectThat<RenderRule>().haveProperties({
       name: ruleName,
-      processor: objectThat().haveProperties({
+      processor: objectThat<RuleRef>().haveProperties({
         rootType: BuiltInRootType.OUT_DIR,
         path: 'path/to/rule',
         ruleName: 'rule',
       }),
-      inputs: mapThat().haveExactElements(new Map<string, RenderInput>([
+      inputs: mapThat<string, RenderInput>().haveExactElements(new Map<string, RenderInput>([
         ['inputA', 1],
         ['inputB', 'two'],
       ])),
-      output: objectThat().haveProperties({
+      output: objectThat<FilePattern>().haveProperties({
         rootType: BuiltInRootType.SYSTEM_ROOT,
         pattern: 'path/to/{out}',
-        substitutionKeys: setThat().haveExactElements(new Set(['out'])),
+        substitutionKeys: setThat<string>().haveExactElements(new Set(['out'])),
       }),
     }));
   });
@@ -47,18 +50,18 @@ test('@hive/config/operator/render', () => {
 
     const renderRule = render(config);
 
-    assert(renderRule).to.equal(objectThat().haveProperties({
+    assert(renderRule).to.equal(objectThat<RenderRule>().haveProperties({
       name: ruleName,
-      processor: objectThat().haveProperties({
+      processor: objectThat<RuleRef>().haveProperties({
         rootType: BuiltInRootType.OUT_DIR,
         path: 'path/to/rule',
         ruleName: 'rule',
       }),
-      inputs: mapThat().beEmpty(),
-      output: objectThat().haveProperties({
+      inputs: mapThat<string, RenderInput>().beEmpty(),
+      output: objectThat<FilePattern>().haveProperties({
         rootType: BuiltInRootType.SYSTEM_ROOT,
         pattern: 'path/to/{out}',
-        substitutionKeys: setThat().haveExactElements(new Set(['out'])),
+        substitutionKeys: setThat<string>().haveExactElements(new Set(['out'])),
       }),
     }));
   });

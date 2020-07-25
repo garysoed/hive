@@ -1,5 +1,6 @@
 import { google } from 'googleapis';
-import { arrayOfType, instanceofType, stringType, Type } from 'gs-types';
+import { Merge, RawSheet } from 'gs-tools/export/gapi';
+import { arrayOfType, booleanType, instanceofType, numberType, stringType, Type } from 'gs-types';
 import { from as observableFrom } from 'rxjs';
 import { filter, map, switchMap, take } from 'rxjs/operators';
 
@@ -19,7 +20,7 @@ export async function loadGoogleSheets(
     clientId: string,
     clientSecret: string,
     googleOauthFactory: GoogleOauthFactory = DEFAULT_GOOGLE_OAUTH_FACTORY,
-): Promise<object> {
+): Promise<readonly RawSheet[]> {
   const oauth = googleOauthFactory(clientId, clientSecret);
   oauth.addScope(SCOPE);
   return oauth.auth
@@ -35,7 +36,47 @@ export async function loadGoogleSheets(
                 }),
             );
           }),
-          map(({data}) => data),
+          map(({data}) => {
+            return (data.sheets ?? []).map(sheet => {
+              const merges = (sheet.merges ?? [])
+                  .map(merge => {
+                    const {startRowIndex, endRowIndex} = merge;
+                    const {startColumnIndex, endColumnIndex} = merge;
+                    if (!numberType.check(startRowIndex) ||
+                        !numberType.check(endRowIndex) ||
+                        !numberType.check(startColumnIndex) ||
+                        !numberType.check(endColumnIndex)) {
+                      return null;
+                    }
+
+                    return {startRowIndex, endRowIndex, startColumnIndex, endColumnIndex};
+                  })
+                  .filter((merge): merge is Merge => !!merge);
+
+              const data = (sheet.data ?? [])
+                  .map(data => {
+                    const rowData = (data.rowData ?? []).map(data => {
+                      const values = (data.values ?? []).map(value => {
+                        const boolValue = value.effectiveValue?.boolValue;
+                        const numberValue = value.effectiveValue?.numberValue;
+                        const stringValue = value.effectiveValue?.stringValue;
+                        const effectiveValue = {
+                          boolValue: booleanType.check(boolValue) ? boolValue : undefined,
+                          numberValue: numberType.check(numberValue) ? numberValue : undefined,
+                          stringValue: stringType.check(stringValue) ? stringValue : undefined,
+                        };
+
+                        return {effectiveValue};
+                      });
+
+                      return {values};
+                    });
+
+                    return {rowData};
+                  });
+              return {merges, data};
+            });
+          }),
           take(1),
       )
       .toPromise();

@@ -2,6 +2,7 @@ import { anyThat, arrayThat, assert, objectThat, should, test } from 'gs-testing
 import * as path from 'path';
 
 import { Serializer } from '../config/serializer/serializer';
+import { FileRef } from '../core/file-ref';
 import { LoadRule } from '../core/load-rule';
 import { BuiltInRootType } from '../core/root-type';
 import { addFile, mockFs } from '../testing/fake-fs';
@@ -39,13 +40,13 @@ test('@hive/util/read-rule', init => {
           objectThat<RuleWithPath>().haveProperties({
             rule: objectThat<LoadRule>().haveProperties({
               name: 'rule',
-              srcs: arrayThat().haveExactElements([
-                objectThat().haveProperties({
+              srcs: arrayThat<FileRef>().haveExactElements([
+                objectThat<FileRef>().haveProperties({
                   path: 'filename',
                   rootType: BuiltInRootType.OUT_DIR,
                 }),
               ]),
-              output: anyThat<Serializer<unknown>>().passPredicate(
+              output: anyThat<Serializer<number>>().passPredicate(
                   loader => loader.desc === 'number',
                   'a number loader',
               ),

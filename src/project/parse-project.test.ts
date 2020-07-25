@@ -1,7 +1,10 @@
 import { assert, mapThat, objectThat, should, test } from 'gs-testing';
 import * as path from 'path';
 
+import { RenderInput } from '../core/render-input';
+
 import { parseProject } from './parse-project';
+import { ProjectConfig } from './project-config';
 
 
 test('@hive/project/parse-project', () => {
@@ -22,13 +25,13 @@ test('@hive/project/parse-project', () => {
     });
 
     const cwd = 'cwd';
-    assert(parseProject(content, cwd)).to.equal(objectThat().haveProperties({
+    assert(parseProject(content, cwd)).to.equal(objectThat<ProjectConfig>().haveProperties({
       outdir,
-      globals: mapThat().haveExactElements(new Map<string, unknown>([
+      globals: mapThat<string, RenderInput>().haveExactElements(new Map<string, RenderInput>([
         ['a', 1],
         ['b', 'abc'],
       ])),
-      roots: mapThat().haveExactElements(new Map<string, unknown>([
+      roots: mapThat<string, string>().haveExactElements(new Map<string, string>([
         ['rootA', path.join(cwd, rootA)],
         ['rootB', path.join(cwd, rootB)],
       ])),
@@ -40,7 +43,7 @@ test('@hive/project/parse-project', () => {
     const content = JSON.stringify({outdir});
 
     const cwd = 'cwd';
-    assert(parseProject(content, cwd)).to.equal(objectThat().haveProperties({
+    assert(parseProject(content, cwd)).to.equal(objectThat<ProjectConfig>().haveProperties({
       outdir,
     }));
   });
