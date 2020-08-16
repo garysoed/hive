@@ -1,5 +1,5 @@
 import * as commandLineArgs from 'command-line-args';
-import { $, $asArray, $asMap, $join, $map } from 'gs-tools/export/collect';
+import { $asArray, $asMap, $join, $map, $pipe } from 'gs-tools/export/collect';
 import { Type } from 'gs-types';
 import { combineLatest, Observable, throwError } from 'rxjs';
 import { map, switchMap, take, tap } from 'rxjs/operators';
@@ -95,7 +95,7 @@ function getRuleDetails(ruleRaw: string): Observable<Rule> {
 function printProjectDetails({path, config}: ProjectDetails): ReadonlyArray<readonly string[]> {
   const roots = stringifyMap(config.roots, ' -> ');
   const globals = stringifyMap(
-      $(
+      $pipe(
           config.globals,
           $map(([key, value]) => [key, `${value}`] as [string, string]),
           $asMap(),
@@ -119,7 +119,7 @@ function printRuleDetails(rule: Rule): ReadonlyArray<readonly string[]> {
 
   switch (rule.type) {
     case RuleType.DECLARE: {
-      const inputs: ReadonlyMap<string, string> = $(
+      const inputs: ReadonlyMap<string, string> = $pipe(
           rule.inputs,
           $map(([key, value]) => [key, stringifyInputType(value)] as [string, string]),
           $asMap(),
@@ -129,7 +129,7 @@ function printRuleDetails(rule: Rule): ReadonlyArray<readonly string[]> {
       break;
     }
     case RuleType.LOAD:
-      const sources = $(
+      const sources = $pipe(
           rule.srcs,
           $map(src => {
             if (FILE_REF_TYPE.check(src)) {
@@ -145,7 +145,7 @@ function printRuleDetails(rule: Rule): ReadonlyArray<readonly string[]> {
       lines.push(['Output', stringifyLoader(rule.output)]);
       break;
     case RuleType.RENDER: {
-      const inputs: ReadonlyMap<string, string> = $(
+      const inputs: ReadonlyMap<string, string> = $pipe(
           rule.inputs,
           $map(([key, value]) => [key, `${stringifyRenderInput(value)}`] as [string, string]),
           $asMap(),
@@ -175,7 +175,7 @@ function stringifyInputType(type: Type<unknown>): string {
 }
 
 function stringifyMap(map: ReadonlyMap<string, string>, separator: string): string {
-  return $(
+  return $pipe(
       map,
       $map(([key, value]) => `${key}${separator}${value}`),
       $asArray(),

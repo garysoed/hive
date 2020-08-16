@@ -1,4 +1,4 @@
-import { $, $asArray, $flat } from 'gs-tools/export/collect';
+import { $asArray, $flat, $pipe } from 'gs-tools/export/collect';
 import { combineLatest, Observable, of as observableOf } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 
@@ -40,6 +40,6 @@ export function runLoad(rule: LoadRule, cwd: string): Observable<string[]> {
   }
 
   return combineLatest(src$Array).pipe(
-      map(contents => $(contents, $flat(), $asArray())),
+      map(contents => $pipe(contents, $flat(), $asArray())),
   );
 }

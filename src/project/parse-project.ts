@@ -1,4 +1,4 @@
-import { $, $asMap, $map, $recordToMap } from 'gs-tools/export/collect';
+import { $asMap, $map, $pipe, $recordToMap } from 'gs-tools/export/collect';
 import { hasPropertiesType, instanceofType, stringType, Type, undefinedType, unionType } from 'gs-types';
 import * as path from 'path';
 
@@ -21,13 +21,13 @@ export function parseProject(content: string, cwd: string): ProjectConfig {
   const json = JSON.parse(content);
 
   PROJECT_CONFIG_JSON_TYPE.assert(json);
-  const globals = $(json.globals || {}, $recordToMap());
-  const roots = $(json.roots || {}, $recordToMap());
+  const globals = $pipe(json.globals || {}, $recordToMap());
+  const roots = $pipe(json.roots || {}, $recordToMap());
 
   const config = {globals, outdir: json.outdir, roots};
   PROJECT_CONFIG_TYPE.assert(config);
 
-  const resolvedRoots = $(
+  const resolvedRoots = $pipe(
       config.roots,
       $map(([key, rootKey]) => {
         if (path.isAbsolute(rootKey)) {

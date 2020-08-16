@@ -1,4 +1,4 @@
-import { $, $recordToMap } from 'gs-tools/export/collect';
+import { $pipe, $recordToMap } from 'gs-tools/export/collect';
 import { hasPropertiesType, instanceofType, mapOfType, stringType, Type } from 'gs-types';
 
 import { DeclareRule } from '../../core/declare-rule';
@@ -28,7 +28,7 @@ const INPUTS_TYPE: Type<ReadonlyMap<string, Type<unknown>>> =
 export function declare(args: unknown): DeclareRule {
   ARGS_TYPE.assert(args);
 
-  const inputs = $(args.inputs, $recordToMap());
+  const inputs = $pipe(args.inputs, $recordToMap());
   INPUTS_TYPE.assert(inputs);
 
   const processor = parseFileRef(args.processor);

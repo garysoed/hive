@@ -1,4 +1,4 @@
-import { $, $asMap, $map, $recordToMap } from 'gs-tools/export/collect';
+import { $asMap, $map, $pipe, $recordToMap } from 'gs-tools/export/collect';
 import { hasPropertiesType, instanceofType, intersectType, mapOfType, notType, stringType, Type } from 'gs-types';
 
 import { RENDER_INPUT_TYPE, RenderInput } from '../../core/render-input';
@@ -35,10 +35,10 @@ const INPUTS_TYPE: Type<ReadonlyMap<string, RenderInputRaw>> = mapOfType(
 export function render(args: unknown): RenderRule {
   ARGS_TYPE.assert(args);
 
-  const inputsMap = $(args.inputs, $recordToMap());
+  const inputsMap = $pipe(args.inputs, $recordToMap());
   INPUTS_TYPE.assert(inputsMap);
 
-  const inputs = $(
+  const inputs = $pipe(
       inputsMap,
       $map<[string, RenderInputRaw], [string, RenderInput]>(([key, value]) => {
         if (typeof value !== 'string') {
