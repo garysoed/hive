@@ -1,11 +1,12 @@
-import { assertNonNull } from 'gs-tools/export/rxjs';
 import * as path from 'path';
-import { combineLatest, Observable, of as observableOf } from 'rxjs';
-import { map } from 'rxjs/operators';
 
-import { BuiltInRootType, RootType } from '../core/root-type';
-import { findRoot } from '../project/find-root';
-import { loadProjectConfig } from '../project/load-project-config';
+import {assertNonNull} from 'gs-tools/export/rxjs';
+import {combineLatest, Observable, of as observableOf} from 'rxjs';
+import {map} from 'rxjs/operators';
+
+import {BuiltInRootType, RootType} from '../core/root-type';
+import {findRoot} from '../project/find-root';
+import {loadProjectConfig} from '../project/load-project-config';
 
 
 export function resolveRoot(rootType: RootType, cwd: string): Observable<string> {
@@ -17,14 +18,14 @@ export function resolveRoot(rootType: RootType, cwd: string): Observable<string>
         loadProjectConfig(),
         findRoot(),
       ])
-      .pipe(
-          map(([config, root]) => {
-            if (path.isAbsolute(config.outdir)) {
-              return config.outdir;
-            }
-            return path.join(root || '', config.outdir);
-          }),
-      );
+          .pipe(
+              map(([config, root]) => {
+                if (path.isAbsolute(config.outdir)) {
+                  return config.outdir;
+                }
+                return path.join(root || '', config.outdir);
+              }),
+          );
     case BuiltInRootType.PROJECT_ROOT:
       return findRoot().pipe(assertNonNull('Cannot find project root'));
     case BuiltInRootType.SYSTEM_ROOT:

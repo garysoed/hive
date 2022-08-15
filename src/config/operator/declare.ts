@@ -1,11 +1,12 @@
-import { $pipe, $recordToMap } from 'gs-tools/export/collect';
-import { hasPropertiesType, instanceofType, mapOfType, stringType, Type } from 'gs-types';
+import {$recordToMap} from 'gs-tools/export/collect';
+import {$pipe} from 'gs-tools/export/typescript';
+import {hasPropertiesType, instanceofType, mapOfType, stringType, Type} from 'gs-types';
 
-import { DeclareRule } from '../../core/declare-rule';
-import { ResolvedRenderInput } from '../../core/render-input';
-import { RuleType } from '../../core/rule-type';
-import { parseFileRef } from '../parse/parse-file-ref';
-import { Serializer } from '../serializer/serializer';
+import {DeclareRule} from '../../core/declare-rule';
+import {ResolvedRenderInput} from '../../core/render-input';
+import {RuleType} from '../../core/rule-type';
+import {parseFileRef} from '../parse/parse-file-ref';
+import {Serializer} from '../serializer/serializer';
 
 
 interface Args {
@@ -22,8 +23,8 @@ const ARGS_TYPE: Type<Args> = hasPropertiesType({
   processor: stringType,
 });
 
-const INPUTS_TYPE: Type<ReadonlyMap<string, Type<unknown>>> =
-    mapOfType(stringType, instanceofType(Type));
+const INPUTS_TYPE: Type<ReadonlyMap<string, Type<unknown>>>
+    = mapOfType(stringType, instanceofType(Type));
 
 export function declare(args: unknown): DeclareRule {
   ARGS_TYPE.assert(args);

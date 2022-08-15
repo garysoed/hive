@@ -1,17 +1,18 @@
-import { $asMap, $map, $pipe, $recordToMap } from 'gs-tools/export/collect';
-import { hasPropertiesType, instanceofType, intersectType, mapOfType, notType, stringType, Type } from 'gs-types';
+import {$asMap, $map, $recordToMap} from 'gs-tools/export/collect';
+import {$pipe} from 'gs-tools/export/typescript';
+import {hasPropertiesType, instanceofType, intersectType, mapOfType, notType, stringType, Type} from 'gs-types';
 
-import { RENDER_INPUT_TYPE, RenderInput } from '../../core/render-input';
-import { RenderRule } from '../../core/render-rule';
-import { RULE_REF_TYPE, RuleRef } from '../../core/rule-ref';
-import { RuleType } from '../../core/rule-type';
-import { BUILT_IN_PROCESSOR_TYPE, BuiltInProcessorId } from '../../processor/built-in-processor-id';
-import { parseFilePattern } from '../parse/parse-file-pattern';
-import { parseRuleRef } from '../parse/parse-rule-ref';
+import {RENDER_INPUT_TYPE, RenderInput} from '../../core/render-input';
+import {RenderRule} from '../../core/render-rule';
+import {RULE_REF_TYPE, RuleRef} from '../../core/rule-ref';
+import {RuleType} from '../../core/rule-type';
+import {BUILT_IN_PROCESSOR_TYPE, BuiltInProcessorId} from '../../processor/built-in-processor-id';
+import {parseFilePattern} from '../parse/parse-file-pattern';
+import {parseRuleRef} from '../parse/parse-rule-ref';
 
 type RenderInputRaw = Exclude<RenderInput, RuleRef>|string;
-const RENDER_INPUT_RAW_TYPE: Type<RenderInputRaw> =
-    intersectType([RENDER_INPUT_TYPE, notType(RULE_REF_TYPE)]);
+const RENDER_INPUT_RAW_TYPE: Type<RenderInputRaw>
+    = intersectType([RENDER_INPUT_TYPE, notType(RULE_REF_TYPE)]);
 
 interface Args {
   readonly inputs: {};

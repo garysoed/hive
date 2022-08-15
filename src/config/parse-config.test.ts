@@ -1,21 +1,20 @@
+import {anyThat, arrayThat, assert, MatcherType, objectThat, setThat, should, test} from 'gs-testing';
 
-import { anyThat, arrayThat, assert, MatcherType, objectThat, setThat, should, test } from 'gs-testing';
+import {DeclareRule} from '../core/declare-rule';
+import {FilePattern} from '../core/file-pattern';
+import {FileRef} from '../core/file-ref';
+import {GlobRef} from '../core/glob-ref';
+import {LoadRule} from '../core/load-rule';
+import {RenderInput} from '../core/render-input';
+import {RenderRule} from '../core/render-rule';
+import {BuiltInRootType} from '../core/root-type';
+import {Rule} from '../core/rule';
+import {RuleRef} from '../core/rule-ref';
+import {RuleType} from '../core/rule-type';
+import {BUILT_IN_PROCESSOR_TYPE} from '../processor/built-in-processor-id';
 
-import { DeclareRule } from '../core/declare-rule';
-import { FilePattern } from '../core/file-pattern';
-import { FileRef } from '../core/file-ref';
-import { GlobRef } from '../core/glob-ref';
-import { LoadRule } from '../core/load-rule';
-import { RenderInput } from '../core/render-input';
-import { RenderRule } from '../core/render-rule';
-import { BuiltInRootType } from '../core/root-type';
-import { Rule } from '../core/rule';
-import { RuleRef } from '../core/rule-ref';
-import { RuleType } from '../core/rule-type';
-import { BUILT_IN_PROCESSOR_TYPE } from '../processor/built-in-processor-id';
-
-import { parseConfig } from './parse-config';
-import { Serializer } from './serializer/serializer';
+import {parseConfig} from './parse-config';
+import {Serializer} from './serializer/serializer';
 
 
 type RuleWithoutType<R extends Rule> = {[K in Exclude<keyof R, 'type'>]: R[K]};
@@ -54,8 +53,8 @@ function matchLoadRule(expected: RuleWithoutType<LoadRule>): MatcherType<LoadRul
 }
 
 function matchRenderRule(expected: RuleWithoutType<RenderRule>): MatcherType<RenderRule> {
-  const processor = BUILT_IN_PROCESSOR_TYPE.check(expected.processor) ?
-      expected.processor : matchRuleRef(expected.processor);
+  const processor = BUILT_IN_PROCESSOR_TYPE.check(expected.processor)
+    ? expected.processor : matchRuleRef(expected.processor);
   return objectThat<RenderRule>().haveProperties({
     name: expected.name,
     processor,
@@ -65,7 +64,7 @@ function matchRenderRule(expected: RuleWithoutType<RenderRule>): MatcherType<Ren
 }
 
 test('@hive/config/parse-config', () => {
-  should(`parse declares correctly`, () => {
+  should('parse declares correctly', () => {
     const CONTENT = `
       declare({
         name: 'ruleA',
@@ -113,7 +112,7 @@ test('@hive/config/parse-config', () => {
     ]));
   });
 
-  should(`parse load rules correctly`, () => {
+  should('parse load rules correctly', () => {
     const CONTENT = `
       load({
         name: 'ruleA',
@@ -158,7 +157,7 @@ test('@hive/config/parse-config', () => {
     ]));
   });
 
-  should(`parse renders correctly`, () => {
+  should('parse renders correctly', () => {
     const CONTENT = `
       render({
         name: 'ruleA',

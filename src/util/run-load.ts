@@ -1,4 +1,5 @@
-import { $asArray, $flat, $pipe } from 'gs-tools/export/collect';
+import { $asArray, $flat, } from 'gs-tools/export/collect';
+import {$pipe} from 'gs-tools/export/typescript';
 import { combineLatest, Observable, of as observableOf } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 

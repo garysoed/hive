@@ -1,16 +1,16 @@
-import { assert, mapThat, objectThat, should, test } from 'gs-testing';
 import * as path from 'path';
-import { ReplaySubject } from 'rxjs';
-import { take } from 'rxjs/operators';
 
-import { RenderRule } from '../core/render-rule';
-import { BuiltInRootType } from '../core/root-type';
-import { RuleType } from '../core/rule-type';
-import { ROOT_FILE_NAME } from '../project/find-root';
-import { addFile, getFile, getWatcherSubject, mockFs } from '../testing/fake-fs';
+import {assert, mapThat, should, test} from 'gs-testing';
+import {ReplaySubject} from 'rxjs';
 
-import { RULE_FILE_NAME } from './read-rule';
-import { runRule } from './run-rule';
+import {RenderRule} from '../core/render-rule';
+import {BuiltInRootType} from '../core/root-type';
+import {RuleType} from '../core/rule-type';
+import {ROOT_FILE_NAME} from '../project/find-root';
+import {addFile, getFile, getWatcherSubject, mockFs} from '../testing/fake-fs';
+
+import {RULE_FILE_NAME} from './read-rule';
+import {runRule} from './run-rule';
 
 
 test('@hive/util/run-render', init => {
@@ -19,7 +19,7 @@ test('@hive/util/run-render', init => {
     return {};
   });
 
-  should(`emit map of file names to their content`, () => {
+  should('emit map of file names to their content', () => {
     const configContent = JSON.stringify({outdir: '/out', globals: {a: 10, g: 4}});
     addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
 
@@ -37,7 +37,7 @@ test('@hive/util/run-render', init => {
     `;
     addFile(path.join('/src/declarations', RULE_FILE_NAME), {content: declarationContent});
 
-    const processorContent = `output(a + b + g)`;
+    const processorContent = 'output(a + b + g)';
     addFile('/src/processors/plus.js', {content: processorContent});
 
     const rule: RenderRule = {
@@ -78,7 +78,7 @@ test('@hive/util/run-render', init => {
     assert(getFile('/out/2_3.txt')!.content).to.equal('9');
   });
 
-  should(`handle processing results that are Promises`, async () => {
+  should('handle processing results that are Promises', async () => {
     const configContent = JSON.stringify({outdir: '/out'});
     addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
 
@@ -95,7 +95,7 @@ test('@hive/util/run-render', init => {
     `;
     addFile(path.join('/src/declarations', RULE_FILE_NAME), {content: declarationContent});
 
-    const processorContent = `output(Promise.resolve(a + b))`;
+    const processorContent = 'output(Promise.resolve(a + b))';
     addFile('/src/processors/plus.js', {content: processorContent});
 
     const rule: RenderRule = {
@@ -118,14 +118,17 @@ test('@hive/util/run-render', init => {
     };
 
     const cwd = 'cwd';
-    const resultsMap = await runRule(rule, cwd).pipe(take(1)).toPromise();
-
-    assert(await (resultsMap.get('/out/0_0.txt') as Promise<number>)).to.equal(0);
-    assert(await (resultsMap.get('/out/0_3.txt') as Promise<number>)).to.equal(3);
-    assert(await (resultsMap.get('/out/1_0.txt') as Promise<number>)).to.equal(1);
-    assert(await (resultsMap.get('/out/1_3.txt') as Promise<number>)).to.equal(4);
-    assert(await (resultsMap.get('/out/2_0.txt') as Promise<number>)).to.equal(2);
-    assert(await (resultsMap.get('/out/2_3.txt') as Promise<number>)).to.equal(5);
+    const resultsMap$ = runRule(rule, cwd);
+    assert(resultsMap$).to.emitWith(mapThat<string, unknown>().haveExactElements(new Map(
+        [
+          ['/out/0_0.txt', 0],
+          ['/out/0_3.txt', 3],
+          ['/out/1_0.txt', 1],
+          ['/out/1_3.txt', 4],
+          ['/out/2_0.txt', 2],
+          ['/out/2_3.txt', 5],
+        ],
+    )));
 
     assert(getFile('/out/0_0.txt')!.content).to.equal('0');
     assert(getFile('/out/0_3.txt')!.content).to.equal('3');
@@ -135,7 +138,7 @@ test('@hive/util/run-render', init => {
     assert(getFile('/out/2_3.txt')!.content).to.equal('5');
   });
 
-  should(`handle processing results that are Objects`, async () => {
+  should('handle processing results that are Objects', async () => {
     const configContent = JSON.stringify({outdir: '/out'});
     addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
 
@@ -152,7 +155,7 @@ test('@hive/util/run-render', init => {
     `;
     addFile(path.join('/src/declarations', RULE_FILE_NAME), {content: declarationContent});
 
-    const processorContent = `output({result: a + b})`;
+    const processorContent = 'output({result: a + b})';
     addFile('/src/processors/plus.js', {content: processorContent});
 
     const rule: RenderRule = {
@@ -175,14 +178,17 @@ test('@hive/util/run-render', init => {
     };
 
     const cwd = 'cwd';
-    const resultsMap = await runRule(rule, cwd).pipe(take(1)).toPromise();
-
-    assert(resultsMap.get('/out/0_0.txt')).to.equal(objectThat().haveProperties({result: 0}));
-    assert(resultsMap.get('/out/0_3.txt')).to.equal(objectThat().haveProperties({result: 3}));
-    assert(resultsMap.get('/out/1_0.txt')).to.equal(objectThat().haveProperties({result: 1}));
-    assert(resultsMap.get('/out/1_3.txt')).to.equal(objectThat().haveProperties({result: 4}));
-    assert(resultsMap.get('/out/2_0.txt')).to.equal(objectThat().haveProperties({result: 2}));
-    assert(resultsMap.get('/out/2_3.txt')).to.equal(objectThat().haveProperties({result: 5}));
+    const resultsMap$ = runRule(rule, cwd);
+    assert(resultsMap$).to.emitWith(mapThat<string, unknown>().haveExactElements(new Map(
+        [
+          ['/out/0_0.txt', 0],
+          ['/out/0_3.txt', 3],
+          ['/out/1_0.txt', 1],
+          ['/out/1_3.txt', 4],
+          ['/out/2_0.txt', 2],
+          ['/out/2_3.txt', 5],
+        ],
+    )));
 
     assert(getFile('/out/0_0.txt')!.content).to.equal(JSON.stringify({result: 0}));
     assert(getFile('/out/0_3.txt')!.content).to.equal(JSON.stringify({result: 3}));
@@ -192,7 +198,7 @@ test('@hive/util/run-render', init => {
     assert(getFile('/out/2_3.txt')!.content).to.equal(JSON.stringify({result: 5}));
   });
 
-  should(`emit error if the processor is not a declare rule`, () => {
+  should('emit error if the processor is not a declare rule', () => {
     const configContent = JSON.stringify({outdir: '/out'});
     addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
 
@@ -228,7 +234,7 @@ test('@hive/util/run-render', init => {
     assert(runRule(rule, cwd)).to.emitErrorWithMessage(/should be a declare rule/);
   });
 
-  should(`continue processing if the processor throws`, () => {
+  should('continue processing if the processor throws', () => {
     const configContent = JSON.stringify({outdir: '/out', globals: {}});
     addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
 
@@ -244,7 +250,7 @@ test('@hive/util/run-render', init => {
     `;
     addFile(path.join('/src/declarations', RULE_FILE_NAME), {content: declarationContent});
 
-    const processorContent = `throw new Error(a);`;
+    const processorContent = 'throw new Error(a);';
     addFile('/src/processors/error.js', {content: processorContent});
 
     const rule: RenderRule = {

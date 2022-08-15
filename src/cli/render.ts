@@ -1,13 +1,14 @@
 import * as commandLineArgs from 'command-line-args';
-import { EMPTY, merge, Observable, throwError } from 'rxjs';
-import { mapTo, switchMap } from 'rxjs/operators';
+import * as commandLineUsage from 'command-line-usage';
+import {EMPTY, merge, Observable, throwError} from 'rxjs';
+import {mapTo, switchMap} from 'rxjs/operators';
 
-import { parseRuleRef } from '../config/parse/parse-rule-ref';
-import { RuleType } from '../core/rule-type';
-import { readRules } from '../util/read-rules';
-import { runRule } from '../util/run-rule';
+import {parseRuleRef} from '../config/parse/parse-rule-ref';
+import {RuleType} from '../core/rule-type';
+import {readRules} from '../util/read-rules';
+import {runRule} from '../util/run-rule';
 
-import { CommandType } from './command-type';
+import {CommandType} from './command-type';
 
 
 const RULE_OPTION = 'rule';
@@ -20,13 +21,13 @@ const OPTIONS = [
 
 export const CLI = {
   title: 'Hive: Render',
-  body: () => ([
+  body: (): readonly commandLineUsage.Section[] => ([
     {
       header: 'OPTIONS',
       content: [
         {
           name: 'path_to_render_rule',
-          description: `Path to the rule to be rendered. E.g.: @out/path/to:render_rule`,
+          description: 'Path to the rule to be rendered. E.g.: @out/path/to:render_rule',
         },
       ],
     },
@@ -36,7 +37,7 @@ export const CLI = {
 };
 
 export function render(argv: string[]): Observable<string> {
-  const options = commandLineArgs(OPTIONS, {argv, stopAtFirstUnknown: true});
+  const options = commandLineArgs.default(OPTIONS, {argv, stopAtFirstUnknown: true});
   const rulePath = options[RULE_OPTION];
   if (typeof rulePath !== 'string') {
     return throwError(new Error(`Path ${rulePath} is invalid`));

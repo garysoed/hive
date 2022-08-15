@@ -1,14 +1,14 @@
-import { arrayOfType, Type } from 'gs-types';
-import { compose, Converter, json, reverse, withTypeCheck } from 'nabu';
+import {arrayOfType, Type} from 'gs-types';
+import {compose, Converter, json, reverse, withTypeCheck} from 'nabu';
 
-import { Serializer } from './serializer';
+import {Serializer} from './serializer';
 
 
-export class ArraySerializer<T> extends Serializer<T[]> {
+export class ArraySerializer<T> extends Serializer<readonly T[]> {
   readonly itemLoader: Serializer<T> = new Serializer(this.itemConverter, this.itemDesc);
 
   constructor(
-      converter: Converter<T[], string>,
+      converter: Converter<readonly T[], string>,
       private readonly itemConverter: Converter<T, string>,
       desc: string,
       private readonly itemDesc: string,

@@ -29,7 +29,7 @@ export const CLI = {
 };
 
 export function help(argv: string[]): Observable<unknown> {
-  const options = commandLineArgs(OPTIONS, {argv, stopAtFirstUnknown: true});
+  const options = commandLineArgs.default(OPTIONS, {argv, stopAtFirstUnknown: true});
   switch (options[COMMAND_OPTION]) {
     // case CommandType.ANALYZE:
     //   return printSummary(ANALYZE_CLI);

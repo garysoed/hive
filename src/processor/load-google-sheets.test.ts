@@ -1,22 +1,22 @@
-import { GaxiosResponse } from 'gaxios';
-import { google, sheets_v4 } from 'googleapis';
-import { arrayThat, assert, createSpy, createSpyInstance, createSpyObject, fake, objectThat, should, spy, Spy, test } from 'gs-testing';
-import { Merge, RawSheet } from 'gs-tools/export/gapi';
-import { CellData, ExtendedValue, GridData, RowData } from 'gs-tools/src/gapi/type/sheets';
-import { Observable, of as observableOf } from 'rxjs';
+import {GaxiosResponse} from 'gaxios';
+import {google, sheets_v4} from 'googleapis';
+import {arrayThat, assert, createSpy, createSpyInstance, createSpyObject, fake, objectThat, should, spy, Spy, test} from 'gs-testing';
+import {Merge, RawSheet} from 'gs-tools/export/gapi';
+import {CellData, ExtendedValue, GridData, RowData} from 'gs-tools/src/gapi/type/sheets';
+import {Observable, of as observableOf} from 'rxjs';
 
-import { GoogleOauth } from './google-oauth';
-import { loadGoogleSheets, SCOPE } from './load-google-sheets';
+import {GoogleOauth} from './google-oauth';
+import {loadGoogleSheets, SCOPE} from './load-google-sheets';
 
 
 test('@hive/processor/load-google-sheets', () => {
-  should(`emit the correct data`, async () => {
+  should('emit the correct data', async () => {
     const docId = 'docId';
     const metadata = {doc_id: docId};
     const ranges = ['range1', 'range2'];
 
-    const mockSpreadsheets =
-        createSpyObject<sheets_v4.Resource$Spreadsheets>('Spreadsheets', ['get']);
+    const mockSpreadsheets
+        = createSpyObject<sheets_v4.Resource$Spreadsheets>('Spreadsheets', ['get']);
     const data = {
       sheets: [
         {
@@ -53,6 +53,7 @@ test('@hive/processor/load-google-sheets', () => {
       statusText: '',
       headers: [],
       data,
+      request: {responseURL: 'request'},
     }));
 
     const spyGoogleSheets = spy(google, 'sheets');
@@ -65,8 +66,8 @@ test('@hive/processor/load-google-sheets', () => {
     fake(mockAuth).always()
         .return(observableOf({scopes: new Set([SCOPE]), client: mockClient} as any));
 
-    const spreadsheet =
-        await loadGoogleSheets(metadata, ranges, 'clientId', 'clientSecret', () => mockGoogleOauth);
+    const spreadsheet
+        = await loadGoogleSheets(metadata, ranges, 'clientId', 'clientSecret', () => mockGoogleOauth);
 
     assert(spreadsheet).to.haveExactElements([
       objectThat<RawSheet>().haveProperties({

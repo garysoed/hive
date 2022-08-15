@@ -1,16 +1,16 @@
-import { Observable } from 'rxjs';
+import {Observable} from 'rxjs';
 
-import { DeclareRule } from '../core/declare-rule';
-import { LoadRule } from '../core/load-rule';
-import { Processor } from '../core/processor';
-import { RenderRule } from '../core/render-rule';
-import { Rule } from '../core/rule';
-import { RuleType } from '../core/rule-type';
+import {DeclareRule} from '../core/declare-rule';
+import {LoadRule} from '../core/load-rule';
+import {Processor} from '../core/processor';
+import {RenderRule} from '../core/render-rule';
+import {Rule} from '../core/rule';
+import {RuleType} from '../core/rule-type';
 
-import { runDeclare } from './run-declare';
-import { runLoad } from './run-load';
-import { runRender } from './run-render';
-import { RunRuleFn } from './run-rule-fn';
+import {runDeclare} from './run-declare';
+import {runLoad} from './run-load';
+import {runRender} from './run-render';
+import {RunRuleFn} from './run-rule-fn';
 
 
 export function runRule(

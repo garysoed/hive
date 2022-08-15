@@ -1,27 +1,28 @@
 import * as commandLineArgs from 'command-line-args';
-import { $asArray, $asMap, $join, $map, $pipe } from 'gs-tools/export/collect';
-import { Type } from 'gs-types';
-import { combineLatest, Observable, throwError } from 'rxjs';
-import { map, switchMap, take, tap } from 'rxjs/operators';
-import { Logger } from 'santa';
+import {$asArray, $asMap, $join, $map} from 'gs-tools/export/collect';
+import {$pipe} from 'gs-tools/export/typescript';
+import {Type} from 'gs-types';
+import {combineLatest, Observable, throwError} from 'rxjs';
+import {map, switchMap, take, tap} from 'rxjs/operators';
+import {Logger} from 'santa';
 
-import { parseRuleRef } from '../config/parse/parse-rule-ref';
-import { Serializer } from '../config/serializer/serializer';
-import { FilePattern } from '../core/file-pattern';
-import { FILE_REF_TYPE, FileRef } from '../core/file-ref';
-import { GlobRef } from '../core/glob-ref';
-import { RenderInput } from '../core/render-input';
-import { BuiltInRootType, RootType } from '../core/root-type';
-import { Rule } from '../core/rule';
-import { RULE_REF_TYPE, RuleRef } from '../core/rule-ref';
-import { RuleType } from '../core/rule-type';
-import { BUILT_IN_PROCESSOR_TYPE as BUILT_IN_PROCESSOR_ID, BuiltInProcessorId } from '../processor/built-in-processor-id';
-import { findRoot } from '../project/find-root';
-import { loadProjectConfig } from '../project/load-project-config';
-import { ProjectConfig } from '../project/project-config';
-import { readRule } from '../util/read-rule';
+import {parseRuleRef} from '../config/parse/parse-rule-ref';
+import {Serializer} from '../config/serializer/serializer';
+import {FilePattern} from '../core/file-pattern';
+import {FILE_REF_TYPE, FileRef} from '../core/file-ref';
+import {GlobRef} from '../core/glob-ref';
+import {RenderInput} from '../core/render-input';
+import {BuiltInRootType, RootType} from '../core/root-type';
+import {Rule} from '../core/rule';
+import {RULE_REF_TYPE, RuleRef} from '../core/rule-ref';
+import {RuleType} from '../core/rule-type';
+import {BUILT_IN_PROCESSOR_TYPE as BUILT_IN_PROCESSOR_ID, BuiltInProcessorId} from '../processor/built-in-processor-id';
+import {findRoot} from '../project/find-root';
+import {loadProjectConfig} from '../project/load-project-config';
+import {ProjectConfig} from '../project/project-config';
+import {readRule} from '../util/read-rule';
 
-import { CommandType } from './command-type';
+import {CommandType} from './command-type';
 
 
 const LOGGER = new Logger('@hive/cli/analyze');
@@ -42,14 +43,14 @@ interface ProjectDetails {
 
 export const CLI = {
   title: 'Hive: Analyze',
-  body: () => ({
+  body: (): {} => ({
   }),
   summary: 'Analyzes a rule or a project',
   synopsis: `$ hive ${CommandType.ANALYZE} <type> [<path_to_rule>]`,
 };
 
 export function analyze(argv: string[]): Observable<unknown> {
-  const options = commandLineArgs(OPTIONS, {argv, stopAtFirstUnknown: true});
+  const options = commandLineArgs.default(OPTIONS, {argv, stopAtFirstUnknown: true});
   const [type, rulePath] = options[ALL_OPTIONS];
   switch (type) {
     case 'project':
@@ -128,7 +129,7 @@ function printRuleDetails(rule: Rule): ReadonlyArray<readonly string[]> {
       lines.push(['Inputs', stringifyMap(inputs, ': ')]);
       break;
     }
-    case RuleType.LOAD:
+    case RuleType.LOAD: {
       const sources = $pipe(
           rule.srcs,
           $map(src => {
@@ -144,6 +145,7 @@ function printRuleDetails(rule: Rule): ReadonlyArray<readonly string[]> {
       lines.push(['Sources', sources]);
       lines.push(['Output', stringifyLoader(rule.output)]);
       break;
+    }
     case RuleType.RENDER: {
       const inputs: ReadonlyMap<string, string> = $pipe(
           rule.inputs,

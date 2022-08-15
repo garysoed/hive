@@ -1,12 +1,13 @@
-import { assert, objectThat, should, test } from 'gs-testing';
 import * as path from 'path';
 
-import { addFile, mockFs } from '../testing/fake-fs';
-import { mockProcess, setCwd } from '../testing/fake-process';
+import {assert, objectThat, should, test} from 'gs-testing';
 
-import { ROOT_FILE_NAME } from './find-root';
-import { loadProjectConfig } from './load-project-config';
-import { ProjectConfig } from './project-config';
+import {addFile, mockFs} from '../testing/fake-fs';
+import {mockProcess, setCwd} from '../testing/fake-process';
+
+import {ROOT_FILE_NAME} from './find-root';
+import {loadProjectConfig} from './load-project-config';
+import {ProjectConfig} from './project-config';
 
 
 test('@hive/project/load-project-config', init => {
@@ -16,7 +17,7 @@ test('@hive/project/load-project-config', init => {
     return {};
   });
 
-  should(`load the project config correctly`, () => {
+  should('load the project config correctly', () => {
     setCwd('/a/b/c');
 
     const dir = 'dir';
@@ -30,7 +31,7 @@ test('@hive/project/load-project-config', init => {
     ]);
   });
 
-  should(`emit error if root folder was not found`, () => {
+  should('emit error if root folder was not found', () => {
     setCwd('/a/b/c');
 
     assert(loadProjectConfig()).to.emitErrorWithMessage(/No root folder/);

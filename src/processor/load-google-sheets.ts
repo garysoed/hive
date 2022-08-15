@@ -1,15 +1,15 @@
-import { google } from 'googleapis';
-import { Merge, RawSheet } from 'gs-tools/export/gapi';
-import { arrayOfType, booleanType, instanceofType, numberType, stringType, Type } from 'gs-types';
-import { from as observableFrom } from 'rxjs';
-import { filter, map, switchMap, take } from 'rxjs/operators';
+import {google} from 'googleapis';
+import {Merge, RawSheet} from 'gs-tools/export/gapi';
+import {arrayOfType, booleanType, instanceofType, numberType, stringType, Type} from 'gs-types';
+import {from as observableFrom, firstValueFrom} from 'rxjs';
+import {filter, map, switchMap} from 'rxjs/operators';
 
-import { fromType } from '../config/serializer/serializer';
-import { Processor } from '../core/processor';
-import { GOOGLE_SHEETS_METADATA_TYPE, GoogleSheetsMetadata } from '../thirdparty/google-sheets-metadata';
+import {fromType} from '../config/serializer/serializer';
+import {Processor} from '../core/processor';
+import {GoogleSheetsMetadata, GOOGLE_SHEETS_METADATA_TYPE} from '../thirdparty/google-sheets-metadata';
 
-import { DEFAULT_GOOGLE_OAUTH_FACTORY, GoogleOauthFactory } from './google-oauth';
-import { ProcessorSpec } from './processor-spec';
+import {DEFAULT_GOOGLE_OAUTH_FACTORY, GoogleOauthFactory} from './google-oauth';
+import {ProcessorSpec} from './processor-spec';
 
 
 export const SCOPE = 'https://www.googleapis.com/auth/spreadsheets.readonly';
@@ -23,7 +23,7 @@ export async function loadGoogleSheets(
 ): Promise<readonly RawSheet[]> {
   const oauth = googleOauthFactory(clientId, clientSecret);
   oauth.addScope(SCOPE);
-  return oauth.auth
+  return firstValueFrom(oauth.auth
       .pipe(
           filter(({scopes}) => scopes.has(SCOPE)),
           switchMap(({client}) => {
@@ -42,10 +42,10 @@ export async function loadGoogleSheets(
                   .map(merge => {
                     const {startRowIndex, endRowIndex} = merge;
                     const {startColumnIndex, endColumnIndex} = merge;
-                    if (!numberType.check(startRowIndex) ||
-                        !numberType.check(endRowIndex) ||
-                        !numberType.check(startColumnIndex) ||
-                        !numberType.check(endColumnIndex)) {
+                    if (!numberType.check(startRowIndex)
+                        || !numberType.check(endRowIndex)
+                        || !numberType.check(startColumnIndex)
+                        || !numberType.check(endColumnIndex)) {
                       return null;
                     }
 
@@ -77,12 +77,10 @@ export async function loadGoogleSheets(
               return {merges, data};
             });
           }),
-          take(1),
-      )
-      .toPromise();
+      ));
 }
 
-const RANGES_TYPE: Type<string[]> = arrayOfType(stringType);
+const RANGES_TYPE: Type<readonly string[]> = arrayOfType(stringType);
 const SPEC = new ProcessorSpec({
   'metadata': GOOGLE_SHEETS_METADATA_TYPE,
   'ranges': RANGES_TYPE,
@@ -96,7 +94,7 @@ export const LOAD_GOOGLE_SHEETS: Processor = {
 
     return loadGoogleSheets(
         validatedInputs.metadata,
-        validatedInputs.ranges,
+        [...validatedInputs.ranges],
         validatedInputs['oauth.clientId'],
         validatedInputs['oauth.clientSecret'],
     );

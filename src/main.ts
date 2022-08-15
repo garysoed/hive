@@ -1,14 +1,14 @@
 import * as commandLineArgs from 'command-line-args';
-import { EMPTY, Observable, Subject } from 'rxjs';
-import { catchError, takeUntil } from 'rxjs/operators';
-import { Logger, ON_LOG_$ } from 'santa';
-import { ConsoleDestination } from 'santa/export/cli';
+import {EMPTY, Observable, Subject} from 'rxjs';
+import {catchError, takeUntil} from 'rxjs/operators';
+import {Logger, ON_LOG_$} from 'santa';
+import {CliDestination} from 'santa/export/cli';
 
-import { analyze } from './cli/analyze';
-import { CommandType } from './cli/command-type';
-import { CLI as HELP_CLI, help } from './cli/help';
-import { printSummary } from './cli/print-summary';
-import { render } from './cli/render';
+import {analyze} from './cli/analyze';
+import {CommandType} from './cli/command-type';
+import {CLI as HELP_CLI, help} from './cli/help';
+import {printSummary} from './cli/print-summary';
+import {render} from './cli/render';
 
 
 const LOGGER = new Logger('@hive/main');
@@ -22,11 +22,11 @@ const OPTIONS = [
 ];
 const CLI = {
   body: HELP_CLI.body,
-  summary: `{bold hive} - Manages a chain of rendering processes to render your documents.`,
-  synopsis: `$ {bold hive} {underline command} [command options]`,
+  summary: '{bold hive} - Manages a chain of rendering processes to render your documents.',
+  synopsis: '$ {bold hive} {underline command} [command options]',
 };
 
-const options = commandLineArgs(OPTIONS, {stopAtFirstUnknown: true});
+const options = commandLineArgs.default(OPTIONS, {stopAtFirstUnknown: true});
 
 /**
  * Completes whenever running is done.
@@ -47,7 +47,7 @@ function run(): Observable<unknown> {
 }
 
 const onDone$ = new Subject();
-const consoleLog = new ConsoleDestination(
+const consoleLog = new CliDestination(
     entry => {
       if (entry.key === 'authurl') {
         return {showKey: false, enableFormat: false};
@@ -69,5 +69,5 @@ run()
         }),
     )
     .subscribe({complete: () => {
-      onDone$.next();
+      onDone$.next({});
     }});
