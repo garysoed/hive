@@ -1,4 +1,5 @@
 import * as commandLineArgs from 'command-line-args';
+import {Vine} from 'grapevine';
 import {$asArray, $asMap, $join, $map} from 'gs-tools/export/collect';
 import {$pipe} from 'gs-tools/export/typescript';
 import {Type} from 'gs-types';
@@ -49,17 +50,17 @@ export const CLI = {
   synopsis: `$ hive ${CommandType.ANALYZE} <type> [<path_to_rule>]`,
 };
 
-export function analyze(argv: string[]): Observable<unknown> {
+export function analyze(vine: Vine, argv: string[]): Observable<unknown> {
   const options = commandLineArgs.default(OPTIONS, {argv, stopAtFirstUnknown: true});
   const [type, rulePath] = options[ALL_OPTIONS];
   switch (type) {
     case 'project':
-      return getProjectDetails().pipe(
+      return getProjectDetails(vine).pipe(
           map(details => printProjectDetails(details)),
           tap(message => LOGGER.info(message)),
       );
     case 'rule':
-      return combineLatest([getProjectDetails(), getRuleDetails(rulePath)]).pipe(
+      return combineLatest([getProjectDetails(vine), getRuleDetails(vine, rulePath)]).pipe(
           map(([project, rule]) => [
             ['=== PROJECT ==='],
             ...printProjectDetails(project),
@@ -73,24 +74,24 @@ export function analyze(argv: string[]): Observable<unknown> {
       );
   }
 
-  return throwError(`Analyze is not supported for type ${type}`);
+  return throwError(() => `Analyze is not supported for type ${type}`);
 }
 
-function getProjectDetails(): Observable<ProjectDetails> {
-  return findRoot().pipe(
+function getProjectDetails(vine: Vine): Observable<ProjectDetails> {
+  return findRoot(vine).pipe(
       take(1),
       switchMap(path => {
         if (!path) {
-          return throwError(new Error('No project roots found'));
+          return throwError(() => new Error('No project roots found'));
         }
 
-        return loadProjectConfig().pipe(map(config => ({path, config})));
+        return loadProjectConfig(vine).pipe(map(config => ({path, config})));
       }),
   );
 }
 
-function getRuleDetails(ruleRaw: string): Observable<Rule> {
-  return readRule(parseRuleRef(ruleRaw), process.cwd()).pipe(map(({rule}) => rule));
+function getRuleDetails(vine: Vine, ruleRaw: string): Observable<Rule> {
+  return readRule(vine, parseRuleRef(ruleRaw), process.cwd()).pipe(map(({rule}) => rule));
 }
 
 function printProjectDetails({path, config}: ProjectDetails): ReadonlyArray<readonly string[]> {

@@ -1,31 +1,40 @@
-import { assert, should, test } from 'gs-testing';
-import { numberType } from 'gs-types';
 import * as path from 'path';
-import { map } from 'rxjs/operators';
 
-import { StringSerializer } from '../config/serializer/string-serializer';
-import { DeclareRule } from '../core/declare-rule';
-import { BuiltInRootType } from '../core/root-type';
-import { RuleType } from '../core/rule-type';
-import { ROOT_FILE_NAME } from '../project/find-root';
-import { addFile, mockFs } from '../testing/fake-fs';
+import {Vine} from 'grapevine';
+import {assert, should, test} from 'gs-testing';
+import {FakeFs} from 'gs-testing/export/fake';
+import {numberType} from 'gs-types';
+import {map} from 'rxjs/operators';
 
-import { runRule } from './run-rule';
+import {StringSerializer} from '../config/serializer/string-serializer';
+import {DeclareRule} from '../core/declare-rule';
+import {BuiltInRootType} from '../core/root-type';
+import {RuleType} from '../core/rule-type';
+import {$fs} from '../external/fs';
+import {ROOT_FILE_NAME} from '../project/find-root';
+
+import {runRule} from './run-rule';
 
 
 test('@hive/util/run-declare', init => {
-  init(() => {
-    mockFs();
-    return {};
+  const _ = init(() => {
+    const fakeFs = new FakeFs();
+    const vine = new Vine({
+      appName: 'test',
+      overrides: [
+        {override: $fs, withValue: fakeFs},
+      ],
+    });
+    return {fakeFs, vine};
   });
 
-  should(`emit function that runs the processor correctly`, () => {
+  should('emit function that runs the processor correctly', () => {
     const configContent = JSON.stringify({outdir: 'out'});
-    addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
+    _.fakeFs.addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
 
     // tslint:disable-next-line: no-invalid-template-strings
     const content = 'output(`${a + b}`)';
-    addFile('/a/b.js', {content});
+    _.fakeFs.addFile('/a/b.js', {content});
 
     const rule: DeclareRule = {
       type: RuleType.DECLARE,
@@ -39,7 +48,7 @@ test('@hive/util/run-declare', init => {
     };
 
     const cwd = 'cwd';
-    assert(runRule(rule, cwd).pipe(map(({fn}) => fn(new Map([['a', 1], ['b', 2]])))))
+    assert(runRule(_.vine, rule, cwd).pipe(map(({fn}) => fn(_.vine, new Map([['a', 1], ['b', 2]])))))
         .to.emitSequence(['3']);
   });
 });

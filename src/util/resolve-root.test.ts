@@ -1,70 +1,79 @@
-import { assert, should, test } from 'gs-testing';
 import * as path from 'path';
 
-import { BuiltInRootType } from '../core/root-type';
-import { ROOT_FILE_NAME } from '../project/find-root';
-import { addFile, mockFs } from '../testing/fake-fs';
-import { mockProcess, setCwd } from '../testing/fake-process';
+import {Vine} from 'grapevine';
+import {assert, should, test} from 'gs-testing';
+import {FakeFs} from 'gs-testing/export/fake';
 
-import { resolveRoot } from './resolve-root';
+import {BuiltInRootType} from '../core/root-type';
+import {$fs} from '../external/fs';
+import {ROOT_FILE_NAME} from '../project/find-root';
+import {mockProcess, setCwd} from '../testing/fake-process';
+
+import {resolveRoot} from './resolve-root';
 
 
 test('@hive/util/resolve-root', init => {
-  init(() => {
-    mockFs();
+  const _ = init(() => {
+    const fakeFs = new FakeFs();
+    const vine = new Vine({
+      appName: 'test',
+      overrides: [
+        {override: $fs, withValue: fakeFs},
+      ],
+    });
     mockProcess();
-    return {};
+    return {fakeFs, vine};
   });
 
-  should(`emit the current directory if root type is CURRENT_DIR`, () => {
+  should('emit the current directory if root type is CURRENT_DIR', () => {
     const cwd = 'cwd';
     setCwd(cwd);
 
-    assert(resolveRoot(BuiltInRootType.CURRENT_DIR, cwd)).to.emitSequence([cwd]);
+    assert(resolveRoot(_.vine, BuiltInRootType.CURRENT_DIR, cwd)).to.emitSequence([cwd]);
   });
 
-  should(`emit the out directory if the root type is OUT_DIR`, () => {
+  should('emit the out directory if the root type is OUT_DIR', () => {
     setCwd('/a/b/c');
 
     const outdir = '/outdir';
-    addFile(path.join('/a', ROOT_FILE_NAME), {content: JSON.stringify({outdir})});
+    _.fakeFs.addFile(path.join('/a', ROOT_FILE_NAME), {content: JSON.stringify({outdir})});
 
     const cwd = 'cwd';
-    assert(resolveRoot(BuiltInRootType.OUT_DIR, cwd)).to.emitSequence([outdir]);
+    assert(resolveRoot(_.vine, BuiltInRootType.OUT_DIR, cwd)).to.emitSequence([outdir]);
   });
 
-  should(`emit the out directory relative to the root directory the root type is OUT_DIR`, () => {
+  should('emit the out directory relative to the root directory the root type is OUT_DIR', () => {
     setCwd('/a/b/c');
 
     const outdir = 'outdir';
-    addFile(path.join('/a', ROOT_FILE_NAME), {content: JSON.stringify({outdir})});
+    _.fakeFs.addFile(path.join('/a', ROOT_FILE_NAME), {content: JSON.stringify({outdir})});
 
     const cwd = 'cwd';
-    assert(resolveRoot(BuiltInRootType.OUT_DIR, cwd)).to.emitSequence([path.join('/a', outdir)]);
+    assert(resolveRoot(_.vine, BuiltInRootType.OUT_DIR, cwd)).to.emitSequence([path.join('/a', outdir)]);
   });
 
-  should(`emit the project root if the root type is PROJECT_ROOT`, () => {
+  should('emit the project root if the root type is PROJECT_ROOT', () => {
     const projectRoot = '/a';
     setCwd('/a/b/c');
 
-    addFile(path.join(projectRoot, ROOT_FILE_NAME), {content: `outdir: '/'`});
+    _.fakeFs.addFile(path.join(projectRoot, ROOT_FILE_NAME), {content: 'outdir: \'/\''});
 
     const cwd = 'cwd';
-    assert(resolveRoot(BuiltInRootType.PROJECT_ROOT, cwd)).to.emitSequence([projectRoot]);
+    assert(resolveRoot(_.vine, BuiltInRootType.PROJECT_ROOT, cwd)).to.emitSequence([projectRoot]);
   });
 
-  should(`emit error if root type is PROJECT_ROOT but cannot find project root`, () => {
+  should('emit error if root type is PROJECT_ROOT but cannot find project root', () => {
     const cwd = 'cwd';
-    assert(resolveRoot(BuiltInRootType.PROJECT_ROOT, cwd)).to
+    assert(resolveRoot(_.vine, BuiltInRootType.PROJECT_ROOT, cwd)).to
         .emitErrorWithMessage(/Cannot find project root/);
   });
 
-  should(`emit "/" if root type is SYSTEM_ROOT`, () => {
+  should('emit "/" if root type is SYSTEM_ROOT', () => {
     const cwd = 'cwd';
-    assert(resolveRoot(BuiltInRootType.SYSTEM_ROOT, cwd)).to.emitSequence(['/']);
+    assert(resolveRoot(_.vine, BuiltInRootType.SYSTEM_ROOT, cwd)).to.emitSequence(['/']);
   });
 
-  should(`emit custom root if specified`, () => {
+  should('emit custom root if specified', () => {
     setCwd('/a/b/c');
 
     const outdir = '/outdir';
@@ -73,20 +82,20 @@ test('@hive/util/resolve-root', init => {
       outdir,
       roots: {custom},
     });
-    addFile(path.join('/a', ROOT_FILE_NAME), {content});
+    _.fakeFs.addFile(path.join('/a', ROOT_FILE_NAME), {content});
 
     const cwd = 'cwd';
-    assert(resolveRoot('custom', cwd)).to.emitSequence([custom]);
+    assert(resolveRoot(_.vine, 'custom', cwd)).to.emitSequence([custom]);
   });
 
-  should(`emit error if the custom root is not specified`, () => {
+  should('emit error if the custom root is not specified', () => {
     setCwd('/a/b/c');
 
     const outdir = '/outdir';
     const content = JSON.stringify({outdir});
-    addFile(path.join('/a', ROOT_FILE_NAME), {content});
+    _.fakeFs.addFile(path.join('/a', ROOT_FILE_NAME), {content});
 
     const cwd = 'cwd';
-    assert(resolveRoot('custom', cwd)).to.emitErrorWithMessage(/cannot find root/i);
+    assert(resolveRoot(_.vine, 'custom', cwd)).to.emitErrorWithMessage(/cannot find root/i);
   });
 });

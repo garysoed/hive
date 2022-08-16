@@ -1,16 +1,19 @@
-import { GenerateAuthUrlOpts, GetTokenResponse } from 'google-auth-library/build/src/auth/oauth2client';
-import { OAuth2Client } from 'googleapis-common';
-import { arrayThat, assert, createSpyObject, fake, mockTime, objectThat, resetCalls, setThat, should, Spy, spy, test } from 'gs-testing';
 import * as path from 'path';
 import * as readline from 'readline';
-import { of as observableOf, ReplaySubject } from 'rxjs';
 
-import { ROOT_FILE_NAME } from '../project/find-root';
-import { TMP_DIR_NAME } from '../project/get-project-tmp-dir';
-import { addFile, deleteFile, getFile, mockFs } from '../testing/fake-fs';
-import { mockProcess, setCwd } from '../testing/fake-process';
+import {GenerateAuthUrlOpts, GetTokenResponse} from 'google-auth-library/build/src/auth/oauth2client';
+import {OAuth2Client} from 'googleapis-common';
+import {Vine} from 'grapevine';
+import {arrayThat, assert, createSpyObject, fake, mockTime, objectThat, resetCalls, setThat, should, Spy, spy, test} from 'gs-testing';
+import {FakeFs} from 'gs-testing/export/fake';
+import {of as observableOf, ReplaySubject} from 'rxjs';
 
-import { CredentialsFile, GoogleAuth, GoogleOauth, OAUTH_FILE } from './google-oauth';
+import {$fs} from '../external/fs';
+import {ROOT_FILE_NAME} from '../project/find-root';
+import {TMP_DIR_NAME} from '../project/get-project-tmp-dir';
+import {mockProcess, setCwd} from '../testing/fake-process';
+
+import {CredentialsFile, GoogleAuth, GoogleOauth, OAUTH_FILE} from './google-oauth';
 
 
 test('@hive/processor/google-oauth', init => {
@@ -18,8 +21,9 @@ test('@hive/processor/google-oauth', init => {
   const CLIENT_ID = 'clientId';
   const CLIENT_SECRET = 'clientSecret';
 
-  function createOauth(): GoogleOauth {
+  function createOauth(vine: Vine): GoogleOauth {
     return new GoogleOauth(
+        vine,
         CLIENT_ID,
         CLIENT_SECRET,
         () => _.mockOauthClient,
@@ -27,7 +31,13 @@ test('@hive/processor/google-oauth', init => {
   }
 
   const _ = init(() => {
-    mockFs();
+    const fakeFs = new FakeFs();
+    const vine = new Vine({
+      appName: 'test',
+      overrides: [
+        {override: $fs, withValue: fakeFs},
+      ],
+    });
     mockProcess();
 
     // Create root project.
@@ -36,7 +46,7 @@ test('@hive/processor/google-oauth', init => {
     globals:
     outdir: out/
     `;
-    addFile(path.join(ROOT_DIR, ROOT_FILE_NAME), {content});
+    _.fakeFs.addFile(path.join(ROOT_DIR, ROOT_FILE_NAME), {content});
 
     const fakeTime = mockTime(global);
     const mockOauthClient = createSpyObject<OAuth2Client>(
@@ -48,20 +58,20 @@ test('@hive/processor/google-oauth', init => {
         ],
     );
 
-    return {fakeTime, mockOauthClient};
+    return {fakeFs, fakeTime, mockOauthClient, vine};
   });
 
   test('initializeAddedScopes', () => {
-    should(`initialize using credentials from the oauth file`, () => {
+    should('initialize using credentials from the oauth file', () => {
       const scope1 = 'scope1';
       const scope2 = 'scope2';
       const scope = [scope1, scope2].join(' ');
 
       const content = JSON.stringify({scope});
-      addFile(path.join(ROOT_DIR, TMP_DIR_NAME, OAUTH_FILE), {content});
+      _.fakeFs.addFile(path.join(ROOT_DIR, TMP_DIR_NAME, OAUTH_FILE), {content});
 
       const auth$ = new ReplaySubject<GoogleAuth>(1);
-      createOauth().auth.subscribe(auth$);
+      createOauth(_.vine).auth.subscribe(auth$);
 
       assert(auth$).to.emitSequence([objectThat<GoogleAuth>().haveProperties({
         client: _.mockOauthClient,
@@ -73,9 +83,9 @@ test('@hive/processor/google-oauth', init => {
           }));
     });
 
-    should(`skip initialization if oauth file cannot be found`, () => {
+    should('skip initialization if oauth file cannot be found', () => {
       const auth$ = new ReplaySubject<GoogleAuth>(1);
-      createOauth().auth.subscribe(auth$);
+      createOauth(_.vine).auth.subscribe(auth$);
 
       assert(auth$).to.emitSequence([objectThat<GoogleAuth>().haveProperties({
         client: _.mockOauthClient,
@@ -84,11 +94,11 @@ test('@hive/processor/google-oauth', init => {
       assert(_.mockOauthClient.setCredentials).toNot.haveBeenCalled();
     });
 
-    should(`skip initialization if tmp dir cannot be found`, () => {
-      deleteFile(path.join(ROOT_DIR, ROOT_FILE_NAME));
+    should('skip initialization if tmp dir cannot be found', () => {
+      _.fakeFs.deleteFile(path.join(ROOT_DIR, ROOT_FILE_NAME));
 
       const auth$ = new ReplaySubject<GoogleAuth>(1);
-      createOauth().auth.subscribe(auth$);
+      createOauth(_.vine).auth.subscribe(auth$);
 
       assert(auth$).to.emitSequence([objectThat<GoogleAuth>().haveProperties({
         client: _.mockOauthClient,
@@ -99,13 +109,13 @@ test('@hive/processor/google-oauth', init => {
   });
 
   test('setupOnScopeChange', () => {
-    should(`add the new token and emit if a scope was added`, () => {
+    should('add the new token and emit if a scope was added', () => {
       const tokens = {};
       fake(_.mockOauthClient.getToken as unknown as Spy<Promise<GetTokenResponse>, [string]>)
           .always()
           .return(observableOf({tokens}) as any);
       const auth$ = new ReplaySubject<GoogleAuth>(1);
-      const oauth = createOauth();
+      const oauth = createOauth(_.vine);
       oauth.auth.subscribe(auth$);
 
       const mockReadlineInterface = createSpyObject<readline.Interface>(
@@ -138,16 +148,16 @@ test('@hive/processor/google-oauth', init => {
           }));
     });
 
-    should(`not prompt if scope has been added through initialization`, () => {
+    should('not prompt if scope has been added through initialization', () => {
       const scope1 = 'scope1';
       const scope2 = 'scope2';
       const scope = [scope1, scope2].join(' ');
 
       const content = JSON.stringify({scope});
-      addFile(path.join(ROOT_DIR, TMP_DIR_NAME, OAUTH_FILE), {content});
+      _.fakeFs.addFile(path.join(ROOT_DIR, TMP_DIR_NAME, OAUTH_FILE), {content});
 
       const auth$ = new ReplaySubject<GoogleAuth>(1);
-      const oauth = createOauth();
+      const oauth = createOauth(_.vine);
       oauth.auth.subscribe(auth$);
 
       resetCalls(_.mockOauthClient.setCredentials);
@@ -167,13 +177,13 @@ test('@hive/processor/google-oauth', init => {
   });
 
   test('setupOnUpdateTmpDir', () => {
-    should(`update the oauth file after prompting`, () => {
+    should('update the oauth file after prompting', () => {
       const tokens = {scope: 'scope1 scope2'};
       fake(_.mockOauthClient.getToken as unknown as Spy<Promise<GetTokenResponse>, [string]>)
           .always()
           .return(observableOf({tokens}) as any);
       const auth$ = new ReplaySubject<GoogleAuth>(1);
-      const oauth = createOauth();
+      const oauth = createOauth(_.vine);
       oauth.auth.subscribe(auth$);
 
       const mockReadlineInterface = createSpyObject<readline.Interface>(
@@ -191,7 +201,7 @@ test('@hive/processor/google-oauth', init => {
 
       _.fakeTime.tick(50);
 
-      const oauthContent = getFile(path.join(ROOT_DIR, TMP_DIR_NAME, OAUTH_FILE))!.content;
+      const oauthContent = _.fakeFs.getFile(path.join(ROOT_DIR, TMP_DIR_NAME, OAUTH_FILE))!.content;
       assert(oauthContent).to.equal(JSON.stringify(tokens));
     });
   });

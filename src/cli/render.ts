@@ -1,5 +1,6 @@
 import * as commandLineArgs from 'command-line-args';
 import * as commandLineUsage from 'command-line-usage';
+import {Vine} from 'grapevine';
 import {EMPTY, merge, Observable, throwError} from 'rxjs';
 import {mapTo, switchMap} from 'rxjs/operators';
 
@@ -36,23 +37,23 @@ export const CLI = {
   synopsis: `$ {bold hive} {underline ${CommandType.RENDER}} <path_to_render_rule>`,
 };
 
-export function render(argv: string[]): Observable<string> {
+export function render(vine: Vine, argv: string[]): Observable<string> {
   const options = commandLineArgs.default(OPTIONS, {argv, stopAtFirstUnknown: true});
   const rulePath = options[RULE_OPTION];
   if (typeof rulePath !== 'string') {
-    return throwError(new Error(`Path ${rulePath} is invalid`));
+    return throwError(() => new Error(`Path ${rulePath} is invalid`));
   }
 
   const ruleRef = parseRuleRef(rulePath);
   const cwd = process.cwd();
 
-  return readRules(ruleRef, cwd).pipe(
+  return readRules(vine, ruleRef, cwd).pipe(
       switchMap(({rules, path}) => {
         const obsList = rules.map(rule => {
           if (rule.type !== RuleType.RENDER) {
             return EMPTY;
           }
-          return runRule(rule, path);
+          return runRule(vine, rule, path);
         });
 
         return merge(...obsList);

@@ -1,39 +1,48 @@
-import { arrayThat, assert, createSpy, fake, mapThat, should, test } from 'gs-testing';
 import * as path from 'path';
-import { Observable, of as observableOf } from 'rxjs';
 
-import { DeclareRule } from '../core/declare-rule';
-import { LoadRule } from '../core/load-rule';
-import { Processor } from '../core/processor';
-import { RenderInput, ResolvedRenderInput } from '../core/render-input';
-import { RenderRule } from '../core/render-rule';
-import { BuiltInRootType } from '../core/root-type';
-import { Rule } from '../core/rule';
-import { addFile, mockFs } from '../testing/fake-fs';
+import {Vine} from 'grapevine';
+import {arrayThat, assert, createSpy, fake, mapThat, should, test} from 'gs-testing';
+import {FakeFs} from 'gs-testing/export/fake';
+import {Observable, of} from 'rxjs';
 
-import { RULE_FILE_NAME } from './read-rule';
-import { resolveInputs } from './resolve-inputs';
+import {DeclareRule} from '../core/declare-rule';
+import {LoadRule} from '../core/load-rule';
+import {Processor} from '../core/processor';
+import {RenderInput, ResolvedRenderInput} from '../core/render-input';
+import {RenderRule} from '../core/render-rule';
+import {BuiltInRootType} from '../core/root-type';
+import {Rule} from '../core/rule';
+import {$fs} from '../external/fs';
+
+import {RULE_FILE_NAME} from './read-rule';
+import {resolveInputs} from './resolve-inputs';
 
 
 test('@hive/util/resolve-inputs', init => {
-  function fakeRunRule(renderRule: RenderRule): Observable<ReadonlyMap<string, string>>;
-  function fakeRunRule(declareRule: DeclareRule): Observable<Processor>;
-  function fakeRunRule(loadRule: LoadRule): Observable<string[]>;
-  function fakeRunRule(rule: Rule): Observable<unknown> {
+  function fakeRunRule(vine: Vine, renderRule: RenderRule): Observable<ReadonlyMap<string, string>>;
+  function fakeRunRule(vine: Vine, declareRule: DeclareRule): Observable<Processor>;
+  function fakeRunRule(vine: Vine, loadRule: LoadRule): Observable<string[]>;
+  function fakeRunRule(vine: Vine, rule: Rule): Observable<unknown> {
     return _.mockResolveRule(rule);
   }
 
   const _ = init(() => {
-    mockFs();
+    const fakeFs = new FakeFs();
+    const vine = new Vine({
+      appName: 'test',
+      overrides: [
+        {override: $fs, withValue: fakeFs},
+      ],
+    });
     const mockResolveRule = createSpy<Observable<unknown>, [Rule]>('ResolveRule');
-    return {mockResolveRule};
+    return {fakeFs, mockResolveRule, vine};
   });
 
-  should(`resolve non rule reference inputs correctly`, () => {
+  should('resolve non rule reference inputs correctly', () => {
     const inputs = new Map<string, RenderInput>([['a', 1], ['b', 'two']]);
 
     const cwd = 'cwd';
-    assert(resolveInputs(inputs, fakeRunRule, cwd)).to.emitSequence([
+    assert(resolveInputs(_.vine, inputs, fakeRunRule, cwd)).to.emitSequence([
       mapThat<string, ResolvedRenderInput>().haveExactElements(
           new Map<string, ResolvedRenderInput>([
             ['a', 1],
@@ -42,14 +51,14 @@ test('@hive/util/resolve-inputs', init => {
     ]);
   });
 
-  should(`resolve single file load rule reference inputs correctly`, () => {
+  should('resolve single file load rule reference inputs correctly', () => {
     fake(_.mockResolveRule).always().call(rule => {
       const loadRule = rule as LoadRule;
       switch (loadRule.output.desc) {
         case 'number':
-          return observableOf(['123']);
+          return of(['123']);
         case 'string':
-          return observableOf(['randomString']);
+          return of(['randomString']);
         default:
           throw new Error('Unsupported');
       }
@@ -62,7 +71,7 @@ test('@hive/util/resolve-inputs', init => {
       output: as.number,
     });
     `;
-    addFile(path.join('/a', RULE_FILE_NAME), {content: contentA});
+    _.fakeFs.addFile(path.join('/a', RULE_FILE_NAME), {content: contentA});
 
     const contentB = `
     load({
@@ -71,7 +80,7 @@ test('@hive/util/resolve-inputs', init => {
       output: as.string,
     });
     `;
-    addFile(path.join('/b', RULE_FILE_NAME), {content: contentB});
+    _.fakeFs.addFile(path.join('/b', RULE_FILE_NAME), {content: contentB});
 
     const inputs = new Map<string, RenderInput>([
       ['a', {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a', ruleName: 'ruleA'}],
@@ -79,7 +88,7 @@ test('@hive/util/resolve-inputs', init => {
     ]);
 
     const cwd = 'cwd';
-    assert(resolveInputs(inputs, fakeRunRule, cwd)).to.emitSequence([
+    assert(resolveInputs(_.vine, inputs, fakeRunRule, cwd)).to.emitSequence([
       mapThat<string, ResolvedRenderInput>().haveExactElements(
           new Map<string, ResolvedRenderInput>([
             ['a', 123],
@@ -88,8 +97,8 @@ test('@hive/util/resolve-inputs', init => {
     ]);
   });
 
-  should(`emit error if the output is not an array but the sources has multiple contents`, () => {
-    fake(_.mockResolveRule).always().call(() => observableOf(['123', '234']));
+  should('emit error if the output is not an array but the sources has multiple contents', () => {
+    fake(_.mockResolveRule).always().call(() => of(['123', '234']));
 
     const contentA = `
     load({
@@ -98,19 +107,19 @@ test('@hive/util/resolve-inputs', init => {
       output: as.number,
     });
     `;
-    addFile(path.join('/a', RULE_FILE_NAME), {content: contentA});
+    _.fakeFs.addFile(path.join('/a', RULE_FILE_NAME), {content: contentA});
 
     const inputs = new Map<string, RenderInput>([
       ['a', {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a', ruleName: 'ruleA'}],
     ]);
 
     const cwd = 'cwd';
-    assert(resolveInputs(inputs, fakeRunRule, cwd)).to.emitErrorWithMessage(/non array output/);
+    assert(resolveInputs(_.vine, inputs, fakeRunRule, cwd)).to.emitErrorWithMessage(/non array output/);
   });
 
-  should(`resolve glob file load rule reference inputs correctly`, () => {
+  should('resolve glob file load rule reference inputs correctly', () => {
     fake(_.mockResolveRule).always().call(() => {
-      return observableOf(['123', '456']);
+      return of(['123', '456']);
     });
 
     const contentA = `
@@ -120,14 +129,14 @@ test('@hive/util/resolve-inputs', init => {
       output: as.numberArray,
     });
     `;
-    addFile(path.join('/a', RULE_FILE_NAME), {content: contentA});
+    _.fakeFs.addFile(path.join('/a', RULE_FILE_NAME), {content: contentA});
 
     const inputs = new Map<string, RenderInput>([
       ['a', {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a', ruleName: 'ruleA'}],
     ]);
 
     const cwd = 'cwd';
-    assert(resolveInputs(inputs, fakeRunRule, cwd)).to.emitSequence([
+    assert(resolveInputs(_.vine, inputs, fakeRunRule, cwd)).to.emitSequence([
       mapThat<string, ResolvedRenderInput>().haveExactElements(
           new Map<string, ResolvedRenderInput>([
             ['a', arrayThat().haveExactElements([123, 456])],
@@ -135,10 +144,10 @@ test('@hive/util/resolve-inputs', init => {
     ]);
   });
 
-  should(`resolve declare rule reference inputs correctly`, () => {
-    const fn = () => undefined;
+  should('resolve declare rule reference inputs correctly', () => {
+    const fn = (): undefined => undefined;
     fake(_.mockResolveRule).always().call(() => {
-      return observableOf(fn);
+      return of(fn);
     });
 
     const contentA = `
@@ -149,14 +158,14 @@ test('@hive/util/resolve-inputs', init => {
       output: as.number,
     });
     `;
-    addFile(path.join('/a', RULE_FILE_NAME), {content: contentA});
+    _.fakeFs.addFile(path.join('/a', RULE_FILE_NAME), {content: contentA});
 
     const inputs = new Map<string, RenderInput>([
       ['a', {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a', ruleName: 'ruleA'}],
     ]);
 
     const cwd = 'cwd';
-    assert(resolveInputs(inputs, fakeRunRule, cwd)).to.emitSequence([
+    assert(resolveInputs(_.vine, inputs, fakeRunRule, cwd)).to.emitSequence([
       mapThat<string, ResolvedRenderInput>().haveExactElements(
           new Map<string, ResolvedRenderInput>([
             ['a', fn],
@@ -164,9 +173,9 @@ test('@hive/util/resolve-inputs', init => {
     ]);
   });
 
-  should(`resolve render rule reference inputs correctly`, () => {
-    fake(_.mockResolveRule).always().call(rule => {
-      return observableOf(new Map([['file1', 'content1'], ['file2', 'content2']]));
+  should('resolve render rule reference inputs correctly', () => {
+    fake(_.mockResolveRule).always().call(() => {
+      return of(new Map([['file1', 'content1'], ['file2', 'content2']]));
     });
 
     const contentA = `
@@ -177,14 +186,14 @@ test('@hive/util/resolve-inputs', init => {
       output: '/file.txt',
     });
     `;
-    addFile(path.join('/a', RULE_FILE_NAME), {content: contentA});
+    _.fakeFs.addFile(path.join('/a', RULE_FILE_NAME), {content: contentA});
 
     const inputs = new Map<string, RenderInput>([
       ['a', {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a', ruleName: 'ruleA'}],
     ]);
 
     const cwd = 'cwd';
-    assert(resolveInputs(inputs, fakeRunRule, cwd)).to.emitSequence([
+    assert(resolveInputs(_.vine, inputs, fakeRunRule, cwd)).to.emitSequence([
       mapThat<string, ResolvedRenderInput>().haveExactElements(
           new Map<string, ResolvedRenderInput>([
             ['a', arrayThat().haveExactElements(['content1', 'content2'])],

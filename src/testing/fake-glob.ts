@@ -1,8 +1,8 @@
 import * as glob from 'glob';
-import { fake, spy } from 'gs-testing';
-import { EMPTY, Observable } from 'rxjs';
+import {fake, spy} from 'gs-testing';
+import {EMPTY, Observable} from 'rxjs';
 
-import { globWrapper } from '../util/glob-wrapper';
+import {globWrapper} from '../util/glob-wrapper';
 
 const HANDLERS = new Map<string, Observable<string[]>>();
 

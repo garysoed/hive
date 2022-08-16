@@ -1,16 +1,18 @@
-import { combineLatest, Observable, of as observableOf } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import {Vine} from 'grapevine';
+import {combineLatest, Observable, of as observableOf} from 'rxjs';
+import {map, switchMap} from 'rxjs/operators';
 
-import { ArraySerializer } from '../config/serializer/array-serializer';
-import { RenderInput, ResolvedRenderInput } from '../core/render-input';
-import { isRuleRef } from '../core/rule-ref';
-import { RuleType } from '../core/rule-type';
+import {ArraySerializer} from '../config/serializer/array-serializer';
+import {RenderInput, ResolvedRenderInput} from '../core/render-input';
+import {isRuleRef} from '../core/rule-ref';
+import {RuleType} from '../core/rule-type';
 
-import { readRule } from './read-rule';
-import { RunRuleFn } from './run-rule-fn';
+import {readRule} from './read-rule';
+import {RunRuleFn} from './run-rule-fn';
 
 
 export function resolveInputs(
+    vine: Vine,
     inputs: ReadonlyMap<string, RenderInput>,
     resolveRuleFn: RunRuleFn,
     cwd: string,
@@ -22,13 +24,13 @@ export function resolveInputs(
       continue;
     }
 
-    const value$: Observable<[string, ResolvedRenderInput]> = readRule(value, cwd).pipe(
+    const value$: Observable<[string, ResolvedRenderInput]> = readRule(vine, value, cwd).pipe(
         switchMap(({rule, path}) => {
           switch (rule.type) {
             case RuleType.DECLARE:
-              return resolveRuleFn(rule, path);
+              return resolveRuleFn(vine, rule, path);
             case RuleType.LOAD:
-              return resolveRuleFn(rule, path).pipe(
+              return resolveRuleFn(vine, rule, path).pipe(
                   map(content => {
                     if (rule.output instanceof ArraySerializer) {
                       const itemLoader = rule.output.itemLoader;
@@ -48,7 +50,7 @@ export function resolveInputs(
                   }),
               );
             case RuleType.RENDER:
-              return resolveRuleFn(rule, path).pipe(
+              return resolveRuleFn(vine, rule, path).pipe(
                   map(resultsMap => [...resultsMap.values()]),
               );
           }

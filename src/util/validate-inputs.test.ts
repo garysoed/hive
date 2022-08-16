@@ -1,22 +1,20 @@
-import { assert, should, test } from 'gs-testing';
-import { arrayOfType, numberType, stringType, Type } from 'gs-types';
+import {assert, setup, should, test} from 'gs-testing';
+import {arrayOfType, numberType, stringType, Type} from 'gs-types';
 
-import { RenderInput } from '../core/render-input';
-import { mockFs } from '../testing/fake-fs';
-import { mockProcess } from '../testing/fake-process';
+import {RenderInput} from '../core/render-input';
+import {mockProcess} from '../testing/fake-process';
 
-import { validateInputs } from './validate-inputs';
+import {validateInputs} from './validate-inputs';
 
 
-test('@hive/util/validate-inputs', init => {
-  init(() => {
-    mockFs();
+test('@hive/util/validate-inputs', () => {
+  setup(() => {
     mockProcess();
     return {};
   });
 
   test('validateInputs', () => {
-    should(`emit keys that should be repeated`, () => {
+    should('emit keys that should be repeated', () => {
       const actual = new Map([
         ['a', [1, 2, 3]],
         ['b', ['a', 'b']],
@@ -29,7 +27,7 @@ test('@hive/util/validate-inputs', init => {
       assert(validateInputs(actual, expected)).to.haveExactElements(new Set(['a', 'b']));
     });
 
-    should(`include empty array inputs as repeated keys`, () => {
+    should('include empty array inputs as repeated keys', () => {
       const actual = new Map([
         ['a', []],
         ['b', []],
@@ -42,7 +40,7 @@ test('@hive/util/validate-inputs', init => {
       assert(validateInputs(actual, expected)).to.haveExactElements(new Set(['a', 'b']));
     });
 
-    should(`not add inputs that are the matching type`, () => {
+    should('not add inputs that are the matching type', () => {
       const actual = new Map<string, RenderInput>([
         ['a', 1],
         ['b', 'abc'],
@@ -55,7 +53,7 @@ test('@hive/util/validate-inputs', init => {
       assert(validateInputs(actual, expected)).to.beEmpty();
     });
 
-    should(`not throw if the array type matches the expected type`, () => {
+    should('not throw if the array type matches the expected type', () => {
       const actual = new Map<string, RenderInput>([
         ['a', [1, 2, 3]],
         ['b', ['a', 'b']],
@@ -68,7 +66,7 @@ test('@hive/util/validate-inputs', init => {
       assert(validateInputs(actual, expected)).to.beEmpty();
     });
 
-    should(`match empty array to input with array expected type`, () => {
+    should('match empty array to input with array expected type', () => {
       const actual = new Map<string, RenderInput>([
         ['a', []],
         ['b', []],
@@ -81,7 +79,7 @@ test('@hive/util/validate-inputs', init => {
       assert(validateInputs(actual, expected)).to.beEmpty();
     });
 
-    should(`emit error if the non array type is incompatible`, () => {
+    should('emit error if the non array type is incompatible', () => {
       const actual = new Map<string, RenderInput>([
         ['a', 'abc'],
         ['b', 'abc'],
@@ -94,7 +92,7 @@ test('@hive/util/validate-inputs', init => {
       assert(() => validateInputs(actual, expected)).to.throwErrorWithMessage(/abc is/);
     });
 
-    should(`emit error if the element type of an array is incompatible`, () => {
+    should('emit error if the element type of an array is incompatible', () => {
       const actual = new Map<string, RenderInput>([
         ['a', ['abc']],
         ['b', ['abc']],
@@ -107,7 +105,7 @@ test('@hive/util/validate-inputs', init => {
       assert(() => validateInputs(actual, expected)).to.throwErrorWithMessage(/abc is/);
     });
 
-    should(`emit error if expecting an array but non array is given`, () => {
+    should('emit error if expecting an array but non array is given', () => {
       const actual = new Map<string, RenderInput>([
         ['a', 12],
         ['b', 'abc'],
@@ -120,7 +118,7 @@ test('@hive/util/validate-inputs', init => {
       assert(() => validateInputs(actual, expected)).to.throwErrorWithMessage(/12 is/);
     });
 
-    should(`emit error if a key is missing`, () => {
+    should('emit error if a key is missing', () => {
       const actual = new Map<string, RenderInput>([
         ['a', 12],
       ]);
@@ -132,7 +130,7 @@ test('@hive/util/validate-inputs', init => {
       assert(() => validateInputs(actual, expected)).to.throwErrorWithMessage(/Missing value/);
     });
 
-    should(`handle empty inputs`, () => {
+    should('handle empty inputs', () => {
       const actual = new Map();
       const expected = new Map();
 

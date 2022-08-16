@@ -1,11 +1,12 @@
 import {GaxiosResponse} from 'gaxios';
 import {google, sheets_v4} from 'googleapis';
+import {Vine} from 'grapevine';
 import {arrayThat, assert, createSpy, createSpyInstance, createSpyObject, fake, objectThat, should, spy, Spy, test} from 'gs-testing';
 import {Merge, RawSheet} from 'gs-tools/export/gapi';
 import {CellData, ExtendedValue, GridData, RowData} from 'gs-tools/src/gapi/type/sheets';
 import {Observable, of as observableOf} from 'rxjs';
 
-import {GoogleOauth} from './google-oauth';
+import {$googleOauthFactory, GoogleOauth} from './google-oauth';
 import {loadGoogleSheets, SCOPE} from './load-google-sheets';
 
 
@@ -66,8 +67,15 @@ test('@hive/processor/load-google-sheets', () => {
     fake(mockAuth).always()
         .return(observableOf({scopes: new Set([SCOPE]), client: mockClient} as any));
 
+    const vine = new Vine({
+      appName: 'test',
+      overrides: [
+        {override: $googleOauthFactory, withValue: () => mockGoogleOauth},
+      ],
+    });
+
     const spreadsheet
-        = await loadGoogleSheets(metadata, ranges, 'clientId', 'clientSecret', () => mockGoogleOauth);
+        = await loadGoogleSheets(vine, metadata, ranges, 'clientId', 'clientSecret');
 
     assert(spreadsheet).to.haveExactElements([
       objectThat<RawSheet>().haveProperties({

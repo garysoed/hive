@@ -1,26 +1,28 @@
 import {google} from 'googleapis';
+import {Vine} from 'grapevine';
 import {Merge, RawSheet} from 'gs-tools/export/gapi';
 import {arrayOfType, booleanType, instanceofType, numberType, stringType, Type} from 'gs-types';
-import {from as observableFrom, firstValueFrom} from 'rxjs';
+import {firstValueFrom, from as observableFrom} from 'rxjs';
 import {filter, map, switchMap} from 'rxjs/operators';
 
 import {fromType} from '../config/serializer/serializer';
 import {Processor} from '../core/processor';
 import {GoogleSheetsMetadata, GOOGLE_SHEETS_METADATA_TYPE} from '../thirdparty/google-sheets-metadata';
 
-import {DEFAULT_GOOGLE_OAUTH_FACTORY, GoogleOauthFactory} from './google-oauth';
+import {$googleOauthFactory} from './google-oauth';
 import {ProcessorSpec} from './processor-spec';
 
 
 export const SCOPE = 'https://www.googleapis.com/auth/spreadsheets.readonly';
 
 export async function loadGoogleSheets(
+    vine: Vine,
     metadata: GoogleSheetsMetadata,
     ranges: string[],
     clientId: string,
     clientSecret: string,
-    googleOauthFactory: GoogleOauthFactory = DEFAULT_GOOGLE_OAUTH_FACTORY,
 ): Promise<readonly RawSheet[]> {
+  const googleOauthFactory = $googleOauthFactory.get(vine);
   const oauth = googleOauthFactory(clientId, clientSecret);
   oauth.addScope(SCOPE);
   return firstValueFrom(oauth.auth
@@ -89,10 +91,11 @@ const SPEC = new ProcessorSpec({
 });
 
 export const LOAD_GOOGLE_SHEETS: Processor = {
-  fn: async inputs => {
+  fn: async (vine, inputs) => {
     const validatedInputs = SPEC.checkInputs(inputs);
 
     return loadGoogleSheets(
+        vine,
         validatedInputs.metadata,
         [...validatedInputs.ranges],
         validatedInputs['oauth.clientId'],

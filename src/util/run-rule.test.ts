@@ -1,41 +1,51 @@
-import { arrayThat, assert, mapThat, should, test } from 'gs-testing';
-import { numberType, stringType } from 'gs-types';
 import * as path from 'path';
-import { of as observableOf } from 'rxjs';
-import { map } from 'rxjs/operators';
 
-import { fromType } from '../config/serializer/serializer';
-import { DeclareRule } from '../core/declare-rule';
-import { LoadRule } from '../core/load-rule';
-import { RenderRule } from '../core/render-rule';
-import { BuiltInRootType } from '../core/root-type';
-import { RuleType } from '../core/rule-type';
-import { ROOT_FILE_NAME } from '../project/find-root';
-import { addFile, mockFs } from '../testing/fake-fs';
-import { addGlobHandler, mockGlob } from '../testing/fake-glob';
-import { mockProcess } from '../testing/fake-process';
+import {Vine} from 'grapevine';
+import {arrayThat, assert, mapThat, should, test} from 'gs-testing';
+import {FakeFs} from 'gs-testing/export/fake';
+import {numberType, stringType} from 'gs-types';
+import {of as observableOf} from 'rxjs';
+import {map} from 'rxjs/operators';
 
-import { RULE_FILE_NAME } from './read-rule';
-import { runRule } from './run-rule';
+import {fromType} from '../config/serializer/serializer';
+import {DeclareRule} from '../core/declare-rule';
+import {LoadRule} from '../core/load-rule';
+import {RenderRule} from '../core/render-rule';
+import {BuiltInRootType} from '../core/root-type';
+import {RuleType} from '../core/rule-type';
+import {$fs} from '../external/fs';
+import {ROOT_FILE_NAME} from '../project/find-root';
+import {addGlobHandler, mockGlob} from '../testing/fake-glob';
+import {mockProcess} from '../testing/fake-process';
+
+
+import {RULE_FILE_NAME} from './read-rule';
+import {runRule} from './run-rule';
 
 
 test('@hive/util/run-rule', init => {
-  init(() => {
-    mockFs();
+  const _ = init(() => {
+    const fakeFs = new FakeFs();
+    const vine = new Vine({
+      appName: 'test',
+      overrides: [
+        {override: $fs, withValue: fakeFs},
+      ],
+    });
     mockProcess();
     mockGlob();
-    return {};
+    return {fakeFs, vine};
   });
 
-  should(`run load rules correctly`, () => {
+  should('run load rules correctly', () => {
     const contentC = 'contentC';
-    addFile('/a/b/c.txt', {content: contentC});
+    _.fakeFs.addFile('/a/b/c.txt', {content: contentC});
 
     const contentD = 'contentD';
-    addFile('/a/b/d.txt', {content: contentD});
+    _.fakeFs.addFile('/a/b/d.txt', {content: contentD});
 
     const contentE = 'contentE';
-    addFile('/a/b/e.txt', {content: contentE});
+    _.fakeFs.addFile('/a/b/e.txt', {content: contentE});
 
     addGlobHandler('a/b/*.txt', '/', observableOf(['/a/b/c.txt', '/a/b/d.txt', '/a/b/e.txt']));
 
@@ -47,18 +57,18 @@ test('@hive/util/run-rule', init => {
     };
 
     const cwd = 'cwd';
-    assert(runRule(rule, cwd)).to.emitSequence([
+    assert(runRule(_.vine, rule, cwd)).to.emitSequence([
       arrayThat<string>().haveExactElements([contentC, contentD, contentE]),
     ]);
   });
 
-  should(`run declare rules correctly`, () => {
+  should('run declare rules correctly', () => {
     const configContent = JSON.stringify({outdir: 'out'});
-    addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
+    _.fakeFs.addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
 
     // tslint:disable-next-line: no-invalid-template-strings
     const content = 'output(a + b)';
-    addFile('/a/b.js', {content});
+    _.fakeFs.addFile('/a/b.js', {content});
 
     const rule: DeclareRule = {
       type: RuleType.DECLARE,
@@ -72,13 +82,13 @@ test('@hive/util/run-rule', init => {
     };
 
     const cwd = 'cwd';
-    assert(runRule(rule, cwd).pipe(map(({fn}) => fn(new Map([['a', 1], ['b', 2]])))))
+    assert(runRule(_.vine, rule, cwd).pipe(map(({fn}) => fn(_.vine, new Map([['a', 1], ['b', 2]])))))
         .to.emitSequence([3]);
   });
 
-  should(`run render rules correctly`, () => {
+  should('run render rules correctly', () => {
     const configContent = JSON.stringify({outdir: '/out'});
-    addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
+    _.fakeFs.addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
 
     const declarationContent = `
     declare({
@@ -91,10 +101,10 @@ test('@hive/util/run-rule', init => {
       output: as.number,
     });
     `;
-    addFile(path.join('/src/declarations', RULE_FILE_NAME), {content: declarationContent});
+    _.fakeFs.addFile(path.join('/src/declarations', RULE_FILE_NAME), {content: declarationContent});
 
-    const processorContent = `output(a + b)`;
-    addFile('/src/processors/plus.js', {content: processorContent});
+    const processorContent = 'output(a + b)';
+    _.fakeFs.addFile('/src/processors/plus.js', {content: processorContent});
 
     const rule: RenderRule = {
       name: 'renderRule',
@@ -116,7 +126,7 @@ test('@hive/util/run-rule', init => {
     };
 
     const cwd = 'cwd';
-    assert(runRule(rule, cwd)).to.emitSequence([
+    assert(runRule(_.vine, rule, cwd)).to.emitSequence([
       mapThat<string, number>().haveExactElements(new Map([
         ['/out/0_0.txt', 0],
         ['/out/0_3.txt', 3],

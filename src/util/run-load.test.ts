@@ -1,27 +1,35 @@
-import { arrayThat, assert, should, test } from 'gs-testing';
-import { stringType } from 'gs-types';
-import { of as observableOf } from 'rxjs';
+import {Vine} from 'grapevine';
+import {arrayThat, assert, should, test} from 'gs-testing';
+import {FakeFs} from 'gs-testing/export/fake';
+import {stringType} from 'gs-types';
+import {of as observableOf} from 'rxjs';
 
-import { fromType } from '../config/serializer/serializer';
-import { LoadRule } from '../core/load-rule';
-import { BuiltInRootType } from '../core/root-type';
-import { RuleType } from '../core/rule-type';
-import { addFile, mockFs } from '../testing/fake-fs';
-import { addGlobHandler, mockGlob } from '../testing/fake-glob';
+import {fromType} from '../config/serializer/serializer';
+import {LoadRule} from '../core/load-rule';
+import {BuiltInRootType} from '../core/root-type';
+import {RuleType} from '../core/rule-type';
+import {$fs} from '../external/fs';
+import {addGlobHandler, mockGlob} from '../testing/fake-glob';
 
-import { runRule } from './run-rule';
+import {runRule} from './run-rule';
 
 
 test('@hive/util/run-load', init => {
-  init(() => {
-    mockFs();
+  const _ = init(() => {
+    const fakeFs = new FakeFs();
+    const vine = new Vine({
+      appName: 'test',
+      overrides: [
+        {override: $fs, withValue: fakeFs},
+      ],
+    });
     mockGlob();
-    return {};
+    return {fakeFs, vine};
   });
 
-  should(`emit content of file if file ref was given`, () => {
+  should('emit content of file if file ref was given', () => {
     const content = 'content';
-    addFile('/a/b/c.txt', {content});
+    _.fakeFs.addFile('/a/b/c.txt', {content});
 
     const rule: LoadRule = {
       name: 'loadRule',
@@ -31,18 +39,18 @@ test('@hive/util/run-load', init => {
     };
 
     const cwd = 'cwd';
-    assert(runRule(rule, cwd)).to.emitSequence([arrayThat<string>().haveExactElements([content])]);
+    assert(runRule(_.vine, rule, cwd)).to.emitSequence([arrayThat<string>().haveExactElements([content])]);
   });
 
-  should(`emit content of all matching files if glob ref was given`, () => {
+  should('emit content of all matching files if glob ref was given', () => {
     const contentC = 'contentC';
-    addFile('/a/b/c.txt', {content: contentC});
+    _.fakeFs.addFile('/a/b/c.txt', {content: contentC});
 
     const contentD = 'contentD';
-    addFile('/a/b/d.txt', {content: contentD});
+    _.fakeFs.addFile('/a/b/d.txt', {content: contentD});
 
     const contentE = 'contentE';
-    addFile('/a/b/e.txt', {content: contentE});
+    _.fakeFs.addFile('/a/b/e.txt', {content: contentE});
 
     addGlobHandler('a/b/*.txt', '/', observableOf(['/a/b/c.txt', '/a/b/d.txt', '/a/b/e.txt']));
 
@@ -54,7 +62,7 @@ test('@hive/util/run-load', init => {
     };
 
     const cwd = 'cwd';
-    assert(runRule(rule, cwd)).to.emitSequence([
+    assert(runRule(_.vine, rule, cwd)).to.emitSequence([
       arrayThat<string>().haveExactElements([contentC, contentD, contentE]),
     ]);
   });

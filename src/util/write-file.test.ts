@@ -1,24 +1,32 @@
-import { assert, should, test } from 'gs-testing';
+import {Vine} from 'grapevine';
+import {assert, should, test} from 'gs-testing';
+import {FakeFs} from 'gs-testing/export/fake';
 
-import { getFile, hasDir, mockFs } from '../testing/fake-fs';
+import {$fs} from '../external/fs';
 
-import { writeFile } from './write-file';
+import {writeFile} from './write-file';
 
 
 test('@hive/util/write-file', init => {
-  init(() => {
-    mockFs();
-    return {};
+  const _ = init(() => {
+    const fakeFs = new FakeFs();
+    const vine = new Vine({
+      appName: 'test',
+      overrides: [
+        {override: $fs, withValue: fakeFs},
+      ],
+    });
+    return {fakeFs, vine};
   });
 
-  should(`write the file correctly`, () => {
+  should('write the file correctly', () => {
     const dir = 'dir';
     const path = `${dir}/path`;
     const content = 'content';
 
-    writeFile(path, content).subscribe();
+    writeFile(_.vine, path, content).subscribe();
 
-    assert(getFile(path)!.content).to.equal(content);
-    assert(hasDir(dir)).to.beTrue();
+    assert(_.fakeFs.getFile(path)!.content).to.equal(content);
+    assert(_.fakeFs.hasDir(dir)).to.beTrue();
   });
 });

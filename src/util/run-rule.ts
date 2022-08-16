@@ -1,3 +1,4 @@
+import {Vine} from 'grapevine';
 import {Observable} from 'rxjs';
 
 import {DeclareRule} from '../core/declare-rule';
@@ -14,18 +15,19 @@ import {RunRuleFn} from './run-rule-fn';
 
 
 export function runRule(
+    vine: Vine,
     renderRule: RenderRule,
     cwd: string,
 ): Observable<ReadonlyMap<string, unknown>>;
-export function runRule(declareRule: DeclareRule, cwd: string): Observable<Processor>;
-export function runRule(loadRule: LoadRule, cwd: string): Observable<string|string[]>;
-export function runRule(rule: Rule, cwd: string): Observable<unknown> {
+export function runRule(vine: Vine, declareRule: DeclareRule, cwd: string): Observable<Processor>;
+export function runRule(vine: Vine, loadRule: LoadRule, cwd: string): Observable<string|string[]>;
+export function runRule(vine: Vine, rule: Rule, cwd: string): Observable<unknown> {
   switch (rule.type) {
     case RuleType.DECLARE:
-      return runDeclare(rule, cwd);
+      return runDeclare(vine, rule, cwd);
     case RuleType.LOAD:
-      return runLoad(rule, cwd);
+      return runLoad(vine, rule, cwd);
     case RuleType.RENDER:
-      return runRender(rule, runRule as RunRuleFn, cwd);
+      return runRender(vine, rule, runRule as RunRuleFn, cwd);
   }
 }

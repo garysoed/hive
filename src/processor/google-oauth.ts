@@ -1,17 +1,19 @@
-import { Credentials, OAuth2Client } from 'google-auth-library';
-import { google } from 'googleapis';
-import { cache } from 'gs-tools/export/data';
-import { assertNonNull } from 'gs-tools/export/rxjs';
 import * as path from 'path';
 import * as process from 'process';
 import * as readline from 'readline';
-import { BehaviorSubject, from as observableFrom, Observable, of as observableOf, ReplaySubject, SchedulerLike, Subject } from 'rxjs';
-import { bufferTime, catchError, filter, map, mapTo, skipUntil, switchMap, take, tap, withLatestFrom } from 'rxjs/operators';
-import { Logger } from 'santa';
 
-import { getProjectTmpDir } from '../project/get-project-tmp-dir';
-import { readFile } from '../util/read-file';
-import { writeFile } from '../util/write-file';
+import {Credentials, OAuth2Client} from 'google-auth-library';
+import {google} from 'googleapis';
+import {source, Vine} from 'grapevine';
+import {cache} from 'gs-tools/export/data';
+import {assertNonNull} from 'gs-tools/export/rxjs';
+import {BehaviorSubject, from as observableFrom, Observable, of, ReplaySubject, Subject} from 'rxjs';
+import {bufferTime, catchError, filter, map, mapTo, skipUntil, switchMap, take, tap, withLatestFrom} from 'rxjs/operators';
+import {Logger} from 'santa';
+
+import {getProjectTmpDir} from '../project/get-project-tmp-dir';
+import {readFile} from '../util/read-file';
+import {writeFile} from '../util/write-file';
 
 
 const REDIRECT_URI = 'urn:ietf:wg:oauth:2.0:oob';
@@ -27,8 +29,8 @@ export interface GoogleAuth {
 }
 
 type OauthClientFactory = (clientId: string, clientSecret: string) => OAuth2Client;
-const DEFAULT_OAUTH_FACTORY = (clientId: string, clientSecret: string) =>
-    new google.auth.OAuth2(clientId, clientSecret, REDIRECT_URI);
+const DEFAULT_OAUTH_FACTORY = (clientId: string, clientSecret: string): OAuth2Client =>
+  new google.auth.OAuth2(clientId, clientSecret, REDIRECT_URI);
 
 export interface CredentialsFile extends Credentials {
   scope: string;
@@ -42,14 +44,15 @@ export class GoogleOauth {
   private readonly onUpdateTmpDir$ = new Subject<Credentials>();
 
   constructor(
+      vine: Vine,
       clientId: string,
       clientSecret: string,
       createOauth2Client: OauthClientFactory = DEFAULT_OAUTH_FACTORY,
   ) {
     this.oauth2Client = createOauth2Client(clientId, clientSecret);
-    this.initializeAddedScopes();
+    this.initializeAddedScopes(vine);
     this.setupOnScopeChange();
-    this.setupOnUpdateTmpDir();
+    this.setupOnUpdateTmpDir(vine);
   }
 
   addScope(scope: string): void {
@@ -63,16 +66,16 @@ export class GoogleOauth {
     );
   }
 
-  private initializeAddedScopes(): void {
-    getProjectTmpDir()
+  private initializeAddedScopes(vine: Vine): void {
+    getProjectTmpDir(vine)
         .pipe(
             switchMap(tmpDir => {
               if (!tmpDir) {
-                return observableOf(null);
+                return of(null);
               }
 
-              return readFile(path.join(tmpDir, OAUTH_FILE)).pipe(
-                  catchError(() => observableOf(null)),
+              return readFile(vine, path.join(tmpDir, OAUTH_FILE)).pipe(
+                  catchError(() => of(null)),
               );
             }),
         )
@@ -108,13 +111,13 @@ export class GoogleOauth {
             scope: [...newScopes],
           });
 
-          LOGGER.info(`Please visit:`);
-          LOGGER_AUTH_URL.info(`\n`);
-          LOGGER_AUTH_URL.info(`\n`);
+          LOGGER.info('Please visit:');
+          LOGGER_AUTH_URL.info('\n');
+          LOGGER_AUTH_URL.info('\n');
           LOGGER_AUTH_URL.info(authUrl);
-          LOGGER_AUTH_URL.info(`\n`);
-          LOGGER_AUTH_URL.info(`\n`);
-          LOGGER.info(`and paste the auth code below:`);
+          LOGGER_AUTH_URL.info('\n');
+          LOGGER_AUTH_URL.info('\n');
+          LOGGER.info('and paste the auth code below:');
 
           const readlineInterface = readline.createInterface({
             input: process.stdin,
@@ -126,31 +129,31 @@ export class GoogleOauth {
               subscriber.complete();
             });
           })
-          .pipe(
-              switchMap(code => observableFrom(this.oauth2Client.getToken(code))),
-              map(response => response.tokens),
-              tap(tokens => {
-                this.onUpdateTmpDir$.next(tokens);
-                this.oauth2Client.setCredentials(tokens);
-              }),
-              mapTo(newScopes),
-          );
+              .pipe(
+                  switchMap(code => observableFrom(this.oauth2Client.getToken(code))),
+                  map(response => response.tokens),
+                  tap(tokens => {
+                    this.onUpdateTmpDir$.next(tokens);
+                    this.oauth2Client.setCredentials(tokens);
+                  }),
+                  mapTo(newScopes),
+              );
         }),
         withLatestFrom(this.addedScopes$),
     )
-    .subscribe(([newScopes, addedScopes]) => {
-      this.addedScopes$.next(new Set([...newScopes, ...addedScopes]));
-    });
+        .subscribe(([newScopes, addedScopes]) => {
+          this.addedScopes$.next(new Set([...newScopes, ...addedScopes]));
+        });
   }
 
-  private setupOnUpdateTmpDir(): void {
+  private setupOnUpdateTmpDir(vine: Vine): void {
     this.onUpdateTmpDir$
         .pipe(
             switchMap(tokens => {
-              return getProjectTmpDir().pipe(
+              return getProjectTmpDir(vine).pipe(
                   assertNonNull('Root project cannot be found'),
                   switchMap(tmpDir => {
-                    return writeFile(path.join(tmpDir, OAUTH_FILE), JSON.stringify(tokens));
+                    return writeFile(vine, path.join(tmpDir, OAUTH_FILE), JSON.stringify(tokens));
                   }),
                   take(1),
               );
@@ -161,5 +164,6 @@ export class GoogleOauth {
 }
 
 export type GoogleOauthFactory = (clientId: string, clientSecret: string) => GoogleOauth;
-export const DEFAULT_GOOGLE_OAUTH_FACTORY: GoogleOauthFactory =
-    (clientId, clientSecret) => new GoogleOauth(clientId, clientSecret);
+export const $googleOauthFactory = source<GoogleOauthFactory>(vine => {
+  return (clientId, clientSecret) => new GoogleOauth(vine, clientId, clientSecret);
+});

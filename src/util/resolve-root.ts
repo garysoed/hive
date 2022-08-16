@@ -1,5 +1,6 @@
 import * as path from 'path';
 
+import {Vine} from 'grapevine';
 import {assertNonNull} from 'gs-tools/export/rxjs';
 import {combineLatest, Observable, of as observableOf} from 'rxjs';
 import {map} from 'rxjs/operators';
@@ -9,14 +10,14 @@ import {findRoot} from '../project/find-root';
 import {loadProjectConfig} from '../project/load-project-config';
 
 
-export function resolveRoot(rootType: RootType, cwd: string): Observable<string> {
+export function resolveRoot(vine: Vine, rootType: RootType, cwd: string): Observable<string> {
   switch (rootType) {
     case BuiltInRootType.CURRENT_DIR:
       return observableOf(cwd);
     case BuiltInRootType.OUT_DIR:
       return combineLatest([
-        loadProjectConfig(),
-        findRoot(),
+        loadProjectConfig(vine),
+        findRoot(vine),
       ])
           .pipe(
               map(([config, root]) => {
@@ -27,11 +28,11 @@ export function resolveRoot(rootType: RootType, cwd: string): Observable<string>
               }),
           );
     case BuiltInRootType.PROJECT_ROOT:
-      return findRoot().pipe(assertNonNull('Cannot find project root'));
+      return findRoot(vine).pipe(assertNonNull('Cannot find project root'));
     case BuiltInRootType.SYSTEM_ROOT:
       return observableOf('/');
     default:
-      return loadProjectConfig().pipe(
+      return loadProjectConfig(vine).pipe(
           map(config => config.roots.get(rootType) || null),
           assertNonNull(`Cannot find root type: ${rootType}`),
       );

@@ -1,4 +1,5 @@
 import * as commandLineArgs from 'command-line-args';
+import {Vine} from 'grapevine';
 import {EMPTY, Observable, Subject} from 'rxjs';
 import {catchError, takeUntil} from 'rxjs/operators';
 import {Logger, ON_LOG_$} from 'santa';
@@ -32,15 +33,16 @@ const options = commandLineArgs.default(OPTIONS, {stopAtFirstUnknown: true});
  * Completes whenever running is done.
  */
 function run(): Observable<unknown> {
+  const vine = new Vine({appName: 'hive-cli'});
   switch (options[COMMAND_OPTION]) {
     case CommandType.ANALYZE:
-      return analyze(options._unknown || []);
+      return analyze(vine, options._unknown || []);
     case CommandType.HELP:
       return help(options._unknown || []);
     // case CommandType.INIT:
     //   return init(options._unknown || []);
     case CommandType.RENDER:
-      return render(options._unknown || []);
+      return render(vine, options._unknown || []);
     default:
       return printSummary(CLI);
   }

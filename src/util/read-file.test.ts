@@ -1,45 +1,53 @@
-import { assert, should, test } from 'gs-testing';
-import { ReplaySubject } from 'rxjs';
+import {Vine} from 'grapevine';
+import {assert, should, test} from 'gs-testing';
+import {FakeFs} from 'gs-testing/export/fake';
+import {ReplaySubject} from 'rxjs';
 
-import { addFile, getWatcherSubject, mockFs } from '../testing/fake-fs';
+import {$fs} from '../external/fs';
 
-import { readFile } from './read-file';
+import {readFile} from './read-file';
 
 
 test('@hive/util/read-file', init => {
-  init(() => {
-    mockFs();
-    return {};
+  const _ = init(() => {
+    const fakeFs = new FakeFs();
+    const vine = new Vine({
+      appName: 'test',
+      overrides: [
+        {override: $fs, withValue: fakeFs},
+      ],
+    });
+    return {fakeFs, vine};
   });
 
-  should(`emit the file content`, () => {
+  should('emit the file content', () => {
     const path = 'path';
     const content = 'content';
 
-    addFile(path, {content});
+    _.fakeFs.addFile(path, {content});
 
-    assert(readFile(path)).to.emitSequence([content]);
+    assert(readFile(_.vine, path)).to.emitSequence([content]);
   });
 
-  should(`emit the file content on changes`, () => {
+  should('emit the file content on changes', () => {
     const path = 'path';
     const content = 'content';
 
-    addFile(path, {content});
+    _.fakeFs.addFile(path, {content});
 
     const content$ = new ReplaySubject<string>(2);
-    readFile(path).subscribe(content$);
+    readFile(_.vine, path).subscribe(content$);
 
     // Change the content
     const content2 = 'content2';
-    addFile(path, {content: content2});
+    _.fakeFs.addFile(path, {content: content2});
 
-    getWatcherSubject(path).next();
+    _.fakeFs.simulateChange(path);
 
     assert(content$).to.emitSequence([content, content2]);
   });
 
-  should(`emit error on error`, () => {
-    assert(readFile('path')).to.emitErrorWithMessage(/not found/);
+  should('emit error on error', () => {
+    assert(readFile(_.vine, 'path')).to.emitErrorWithMessage(/not found/);
   });
 });

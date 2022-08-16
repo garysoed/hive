@@ -1,13 +1,19 @@
-import * as fs from 'fs';
 import * as path from 'path';
 import * as process from 'process';
-import { concat, fromEventPattern, Observable } from 'rxjs';
-import { find, map, share, take } from 'rxjs/operators';
+
+import {Vine} from 'grapevine';
+import {FsLike} from 'gs-testing/export/fake';
+import {concat, fromEventPattern, Observable} from 'rxjs';
+import {find, map, share, take} from 'rxjs/operators';
+
+import {$fs} from '../external/fs';
 
 
 export const ROOT_FILE_NAME = 'hive_project.json';
 
-export function findRoot(): Observable<string|null> {
+export function findRoot(vine: Vine): Observable<string|null> {
+  const fs = $fs.get(vine);
+
   // Generate the paths to the root.
   let curr = process.cwd();
   const dirs: string[] = [curr];
@@ -16,7 +22,7 @@ export function findRoot(): Observable<string|null> {
     dirs.push(curr);
   }
 
-  const hasConfigs = dirs.map(dir => hasProjectConfig(dir).pipe(map(has => has ? dir : null)));
+  const hasConfigs = dirs.map(dir => hasProjectConfig(fs, dir).pipe(map(has => has ? dir : null)));
   return concat(...hasConfigs)
       .pipe(
           find(dir => !!dir),
@@ -25,7 +31,7 @@ export function findRoot(): Observable<string|null> {
       );
 }
 
-function hasProjectConfig(dir: string): Observable<boolean> {
+function hasProjectConfig(fs: FsLike, dir: string): Observable<boolean> {
   return fromEventPattern<{}>(
       handler => fs.access(
           path.join(dir, ROOT_FILE_NAME),
@@ -33,8 +39,8 @@ function hasProjectConfig(dir: string): Observable<boolean> {
           err => handler(err),
       ),
   )
-  .pipe(
-      map(err => !err),
-      take(1),
-  );
+      .pipe(
+          map(err => !err),
+          take(1),
+      );
 }

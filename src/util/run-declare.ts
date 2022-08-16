@@ -1,19 +1,20 @@
-import { Observable } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import {Vine} from 'grapevine';
+import {Observable} from 'rxjs';
+import {map, switchMap} from 'rxjs/operators';
 
-import { DeclareRule } from '../core/declare-rule';
-import { OutputFn } from '../core/output-fn';
-import { Processor } from '../core/processor';
+import {DeclareRule} from '../core/declare-rule';
+import {OutputFn} from '../core/output-fn';
+import {Processor} from '../core/processor';
 
-import { readFile } from './read-file';
-import { resolveFileRef } from './resolve-file-ref';
+import {readFile} from './read-file';
+import {resolveFileRef} from './resolve-file-ref';
 
 
-export function runDeclare(rule: DeclareRule, cwd: string): Observable<Processor> {
+export function runDeclare(vine: Vine, rule: DeclareRule, cwd: string): Observable<Processor> {
   const sortedInputArgs = [...rule.inputs.keys()].sort();
-  return resolveFileRef(rule.processor, cwd).pipe(
+  return resolveFileRef(vine, rule.processor, cwd).pipe(
       switchMap(filePath => {
-        return readFile(filePath).pipe(
+        return readFile(vine, filePath).pipe(
             map(fileContent => {
               return (...args: unknown[]) => {
                 let returnValue: unknown;
@@ -28,7 +29,7 @@ export function runDeclare(rule: DeclareRule, cwd: string): Observable<Processor
         );
       }),
       map(processorFn => {
-        const fn = (inputs: ReadonlyMap<string, unknown>) => {
+        const fn = (vine: Vine, inputs: ReadonlyMap<string, unknown>): unknown => {
           const inputsValues = sortedInputArgs.map(key => inputs.get(key));
           return processorFn(...inputsValues);
         };

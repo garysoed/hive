@@ -1,14 +1,16 @@
 import * as path from 'path';
-import { Observable } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
-import { Logger } from 'santa';
 
-import { parseConfig } from '../config/parse-config';
-import { Rule } from '../core/rule';
-import { RuleRef } from '../core/rule-ref';
+import {Vine} from 'grapevine';
+import {Observable} from 'rxjs';
+import {map, switchMap} from 'rxjs/operators';
+import {Logger} from 'santa';
 
-import { readFile } from './read-file';
-import { resolveFileRef } from './resolve-file-ref';
+import {parseConfig} from '../config/parse-config';
+import {Rule} from '../core/rule';
+import {RuleRef} from '../core/rule-ref';
+
+import {readFile} from './read-file';
+import {resolveFileRef} from './resolve-file-ref';
 
 
 export const RULE_FILE_NAME = 'hive.js';
@@ -19,11 +21,11 @@ export interface RulesWithPath {
   readonly rules: readonly Rule[];
 }
 
-export function readRules(ref: RuleRef, cwd: string): Observable<RulesWithPath> {
-  return resolveFileRef(ref, cwd).pipe(
+export function readRules(vine: Vine, ref: RuleRef, cwd: string): Observable<RulesWithPath> {
+  return resolveFileRef(vine, ref, cwd).pipe(
       switchMap(resolvedFileRef => {
         LOGGER.progress(`Reading: ${resolvedFileRef}:${ref.ruleName}`);
-        return readFile(path.join(resolvedFileRef, RULE_FILE_NAME)).pipe(
+        return readFile(vine, path.join(resolvedFileRef, RULE_FILE_NAME)).pipe(
             map(fileContent => parseConfig(fileContent)),
             map(config => {
               if (ref.ruleName === '*') {

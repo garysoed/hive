@@ -8,6 +8,7 @@ declare({
       'devbase',
       'gs-testing',
       'gs-types',
+      'grapevine',
     ],
   }),
 });

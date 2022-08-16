@@ -1,24 +1,33 @@
-import { anyThat, arrayThat, assert, objectThat, should, test } from 'gs-testing';
 import * as path from 'path';
 
-import { Serializer } from '../config/serializer/serializer';
-import { FileRef } from '../core/file-ref';
-import { LoadRule } from '../core/load-rule';
-import { BuiltInRootType } from '../core/root-type';
-import { addFile, mockFs } from '../testing/fake-fs';
-import { mockProcess, setCwd } from '../testing/fake-process';
+import {Vine} from 'grapevine';
+import {anyThat, arrayThat, assert, objectThat, should, test} from 'gs-testing';
+import {FakeFs} from 'gs-testing/export/fake';
 
-import { readRule, RULE_FILE_NAME, RuleWithPath } from './read-rule';
+import {Serializer} from '../config/serializer/serializer';
+import {FileRef} from '../core/file-ref';
+import {LoadRule} from '../core/load-rule';
+import {BuiltInRootType} from '../core/root-type';
+import {$fs} from '../external/fs';
+import {mockProcess, setCwd} from '../testing/fake-process';
+
+import {readRule, RuleWithPath, RULE_FILE_NAME} from './read-rule';
 
 
 test('@hive/util/read-rule', init => {
-  init(() => {
-    mockFs();
+  const _ = init(() => {
+    const fakeFs = new FakeFs();
+    const vine = new Vine({
+      appName: 'test',
+      overrides: [
+        {override: $fs, withValue: fakeFs},
+      ],
+    });
     mockProcess();
-    return {};
+    return {vine, fakeFs};
   });
 
-  should(`emit the correct rule`, () => {
+  should('emit the correct rule', () => {
     const content = `
       load({
         name: 'rule',
@@ -29,9 +38,10 @@ test('@hive/util/read-rule', init => {
 
     const cwd = 'cwd';
     setCwd(cwd);
-    addFile(path.join(cwd, 'a/b', RULE_FILE_NAME), {content});
+    _.fakeFs.addFile(path.join(cwd, 'a/b', RULE_FILE_NAME), {content});
 
     const result$ = readRule(
+        _.vine,
         {path: 'a/b', rootType: BuiltInRootType.CURRENT_DIR, ruleName: 'rule'},
         cwd,
     );
@@ -56,7 +66,7 @@ test('@hive/util/read-rule', init => {
         ]);
   });
 
-  should(`throw if the rule cannot be found`, () => {
+  should('throw if the rule cannot be found', () => {
     const content = `
       load({
         name: 'rule',
@@ -67,9 +77,10 @@ test('@hive/util/read-rule', init => {
 
     const cwd = 'cwd';
     setCwd(cwd);
-    addFile(path.join(cwd, 'a/b', RULE_FILE_NAME), {content});
+    _.fakeFs.addFile(path.join(cwd, 'a/b', RULE_FILE_NAME), {content});
 
     const result$ = readRule(
+        _.vine,
         {path: 'a/b', rootType: BuiltInRootType.CURRENT_DIR, ruleName: 'otherRule'},
         cwd,
     );
