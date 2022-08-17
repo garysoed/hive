@@ -1,5 +1,4 @@
 import * as path from 'path';
-import * as process from 'process';
 
 import {Vine} from 'grapevine';
 import {FsLike} from 'gs-testing/export/fake';
@@ -7,12 +6,14 @@ import {concat, fromEventPattern, Observable} from 'rxjs';
 import {find, map, share, take} from 'rxjs/operators';
 
 import {$fs} from '../external/fs';
+import {$process} from '../external/process';
 
 
 export const ROOT_FILE_NAME = 'hive_project.json';
 
 export function findRoot(vine: Vine): Observable<string|null> {
   const fs = $fs.get(vine);
+  const process = $process.get(vine);
 
   // Generate the paths to the root.
   let curr = process.cwd();

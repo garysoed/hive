@@ -2,12 +2,12 @@ import * as path from 'path';
 
 import {Vine} from 'grapevine';
 import {assert, should, test} from 'gs-testing';
-import {FakeFs} from 'gs-testing/export/fake';
+import {FakeFs, FakeProcess} from 'gs-testing/export/fake';
 
 import {BuiltInRootType} from '../core/root-type';
 import {$fs} from '../external/fs';
+import {$process} from '../external/process';
 import {ROOT_FILE_NAME} from '../project/find-root';
-import {mockProcess, setCwd} from '../testing/fake-process';
 
 import {resolveRoot} from './resolve-root';
 
@@ -15,25 +15,26 @@ import {resolveRoot} from './resolve-root';
 test('@hive/util/resolve-root', init => {
   const _ = init(() => {
     const fakeFs = new FakeFs();
+    const fakeProcess = new FakeProcess();
     const vine = new Vine({
       appName: 'test',
       overrides: [
         {override: $fs, withValue: fakeFs},
+        {override: $process, withValue: fakeProcess},
       ],
     });
-    mockProcess();
-    return {fakeFs, vine};
+    return {fakeFs, fakeProcess, vine};
   });
 
   should('emit the current directory if root type is CURRENT_DIR', () => {
     const cwd = 'cwd';
-    setCwd(cwd);
+    _.fakeProcess.setCwd(cwd);
 
     assert(resolveRoot(_.vine, BuiltInRootType.CURRENT_DIR, cwd)).to.emitSequence([cwd]);
   });
 
   should('emit the out directory if the root type is OUT_DIR', () => {
-    setCwd('/a/b/c');
+    _.fakeProcess.setCwd('/a/b/c');
 
     const outdir = '/outdir';
     _.fakeFs.addFile(path.join('/a', ROOT_FILE_NAME), {content: JSON.stringify({outdir})});
@@ -43,7 +44,7 @@ test('@hive/util/resolve-root', init => {
   });
 
   should('emit the out directory relative to the root directory the root type is OUT_DIR', () => {
-    setCwd('/a/b/c');
+    _.fakeProcess.setCwd('/a/b/c');
 
     const outdir = 'outdir';
     _.fakeFs.addFile(path.join('/a', ROOT_FILE_NAME), {content: JSON.stringify({outdir})});
@@ -54,7 +55,7 @@ test('@hive/util/resolve-root', init => {
 
   should('emit the project root if the root type is PROJECT_ROOT', () => {
     const projectRoot = '/a';
-    setCwd('/a/b/c');
+    _.fakeProcess.setCwd('/a/b/c');
 
     _.fakeFs.addFile(path.join(projectRoot, ROOT_FILE_NAME), {content: 'outdir: \'/\''});
 
@@ -74,7 +75,7 @@ test('@hive/util/resolve-root', init => {
   });
 
   should('emit custom root if specified', () => {
-    setCwd('/a/b/c');
+    _.fakeProcess.setCwd('/a/b/c');
 
     const outdir = '/outdir';
     const custom = '/path/to/custom';
@@ -89,7 +90,7 @@ test('@hive/util/resolve-root', init => {
   });
 
   should('emit error if the custom root is not specified', () => {
-    setCwd('/a/b/c');
+    _.fakeProcess.setCwd('/a/b/c');
 
     const outdir = '/outdir';
     const content = JSON.stringify({outdir});

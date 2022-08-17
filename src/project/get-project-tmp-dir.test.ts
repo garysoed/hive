@@ -3,10 +3,10 @@ import * as path from 'path';
 
 import {Vine} from 'grapevine';
 import {assert, should, test} from 'gs-testing';
-import {FakeFs} from 'gs-testing/export/fake';
+import {FakeFs, FakeProcess} from 'gs-testing/export/fake';
 
 import {$fs} from '../external/fs';
-import {mockProcess, setCwd} from '../testing/fake-process';
+import {$process} from '../external/process';
 
 import {ROOT_FILE_NAME} from './find-root';
 import {getProjectTmpDir, TMP_DIR_NAME} from './get-project-tmp-dir';
@@ -15,14 +15,15 @@ import {getProjectTmpDir, TMP_DIR_NAME} from './get-project-tmp-dir';
 test('@hive/project/get-project-tmp-dir', init => {
   const _ = init(() => {
     const fakeFs = new FakeFs();
+    const fakeProcess = new FakeProcess();
     const vine = new Vine({
       appName: 'test',
       overrides: [
         {override: $fs, withValue: fakeFs},
+        {override: $process, withValue: fakeProcess},
       ],
     });
-    mockProcess();
-    return {fakeFs, vine};
+    return {fakeFs, fakeProcess, vine};
   });
 
   should('emit the correct path', () => {
@@ -32,7 +33,7 @@ test('@hive/project/get-project-tmp-dir', init => {
     outdir: out/
     `;
     _.fakeFs.addFile(path.join(root, ROOT_FILE_NAME), {content});
-    setCwd(root);
+    _.fakeProcess.setCwd(root);
 
     assert(getProjectTmpDir(_.vine)).to.emitSequence([path.join(root, TMP_DIR_NAME)]);
   });

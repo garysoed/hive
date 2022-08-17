@@ -2,10 +2,10 @@ import * as path from 'path';
 
 import {Vine} from 'grapevine';
 import {assert, should, test} from 'gs-testing';
-import {FakeFs} from 'gs-testing/export/fake';
+import {FakeFs, FakeProcess} from 'gs-testing/export/fake';
 
 import {$fs} from '../external/fs';
-import {mockProcess, setCwd} from '../testing/fake-process';
+import {$process} from '../external/process';
 
 import {findRoot, ROOT_FILE_NAME} from './find-root';
 
@@ -13,18 +13,19 @@ import {findRoot, ROOT_FILE_NAME} from './find-root';
 test('@hive/project/find-root', init => {
   const _ = init(() => {
     const fakeFs = new FakeFs();
+    const fakeProcess = new FakeProcess();
     const vine = new Vine({
       appName: 'test',
       overrides: [
         {override: $fs, withValue: fakeFs},
+        {override: $process, withValue: fakeProcess},
       ],
     });
-    mockProcess();
-    return {fakeFs, vine};
+    return {fakeFs, fakeProcess, vine};
   });
 
   should('return the correct project root', () => {
-    setCwd('/a/cwd');
+    _.fakeProcess.setCwd('/a/cwd');
 
     _.fakeFs.addFile(path.join('/a', ROOT_FILE_NAME), {content: ''});
 
@@ -32,7 +33,7 @@ test('@hive/project/find-root', init => {
   });
 
   should('handle current directory', () => {
-    setCwd('/a');
+    _.fakeProcess.setCwd('/a');
 
     _.fakeFs.addFile(path.join('/a', ROOT_FILE_NAME), {content: ''});
 
@@ -40,7 +41,7 @@ test('@hive/project/find-root', init => {
   });
 
   should('return the inner project root if two exists', () => {
-    setCwd('/a/cwd');
+    _.fakeProcess.setCwd('/a/cwd');
 
     _.fakeFs.addFile(path.join('/a/cwd', ROOT_FILE_NAME), {content: ''});
     _.fakeFs.addFile(path.join('/a', ROOT_FILE_NAME), {content: ''});
@@ -49,7 +50,7 @@ test('@hive/project/find-root', init => {
   });
 
   should('return null if there are no project roots', () => {
-    setCwd('/a/cwd');
+    _.fakeProcess.setCwd('/a/cwd');
 
     assert(findRoot(_.vine)).to.emitSequence([null]);
   });

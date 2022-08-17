@@ -5,13 +5,13 @@ import {GenerateAuthUrlOpts, GetTokenResponse} from 'google-auth-library/build/s
 import {OAuth2Client} from 'googleapis-common';
 import {Vine} from 'grapevine';
 import {arrayThat, assert, createSpyObject, fake, mockTime, objectThat, resetCalls, setThat, should, Spy, spy, test} from 'gs-testing';
-import {FakeFs} from 'gs-testing/export/fake';
+import {FakeFs, FakeProcess} from 'gs-testing/export/fake';
 import {of as observableOf, ReplaySubject} from 'rxjs';
 
 import {$fs} from '../external/fs';
+import {$process} from '../external/process';
 import {ROOT_FILE_NAME} from '../project/find-root';
 import {TMP_DIR_NAME} from '../project/get-project-tmp-dir';
-import {mockProcess, setCwd} from '../testing/fake-process';
 
 import {CredentialsFile, GoogleAuth, GoogleOauth, OAUTH_FILE} from './google-oauth';
 
@@ -32,16 +32,17 @@ test('@hive/processor/google-oauth', init => {
 
   const _ = init(() => {
     const fakeFs = new FakeFs();
+    const fakeProcess = new FakeProcess();
     const vine = new Vine({
       appName: 'test',
       overrides: [
         {override: $fs, withValue: fakeFs},
+        {override: $process, withValue: fakeProcess},
       ],
     });
-    mockProcess();
 
     // Create root project.
-    setCwd(ROOT_DIR);
+    fakeProcess.setCwd(ROOT_DIR);
     const content = `
     globals:
     outdir: out/

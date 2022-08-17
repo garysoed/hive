@@ -4,7 +4,7 @@ import {Vine} from 'grapevine';
 import {arrayThat, assert, mapThat, should, test} from 'gs-testing';
 import {FakeFs} from 'gs-testing/export/fake';
 import {numberType, stringType} from 'gs-types';
-import {of as observableOf} from 'rxjs';
+import {of} from 'rxjs';
 import {map} from 'rxjs/operators';
 
 import {fromType} from '../config/serializer/serializer';
@@ -16,7 +16,6 @@ import {RuleType} from '../core/rule-type';
 import {$fs} from '../external/fs';
 import {ROOT_FILE_NAME} from '../project/find-root';
 import {addGlobHandler, mockGlob} from '../testing/fake-glob';
-import {mockProcess} from '../testing/fake-process';
 
 
 import {RULE_FILE_NAME} from './read-rule';
@@ -32,7 +31,6 @@ test('@hive/util/run-rule', init => {
         {override: $fs, withValue: fakeFs},
       ],
     });
-    mockProcess();
     mockGlob();
     return {fakeFs, vine};
   });
@@ -47,7 +45,7 @@ test('@hive/util/run-rule', init => {
     const contentE = 'contentE';
     _.fakeFs.addFile('/a/b/e.txt', {content: contentE});
 
-    addGlobHandler('a/b/*.txt', '/', observableOf(['/a/b/c.txt', '/a/b/d.txt', '/a/b/e.txt']));
+    addGlobHandler('a/b/*.txt', '/', of(['/a/b/c.txt', '/a/b/d.txt', '/a/b/e.txt']));
 
     const rule: LoadRule = {
       name: 'loadRule',

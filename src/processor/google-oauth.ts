@@ -1,6 +1,4 @@
 import * as path from 'path';
-import * as process from 'process';
-import * as readline from 'readline';
 
 import {Credentials, OAuth2Client} from 'google-auth-library';
 import {google} from 'googleapis';
@@ -11,6 +9,8 @@ import {BehaviorSubject, from as observableFrom, Observable, of, ReplaySubject, 
 import {bufferTime, catchError, filter, map, mapTo, skipUntil, switchMap, take, tap, withLatestFrom} from 'rxjs/operators';
 import {Logger} from 'santa';
 
+import {$process} from '../external/process';
+import {$readline} from '../external/readline';
 import {getProjectTmpDir} from '../project/get-project-tmp-dir';
 import {readFile} from '../util/read-file';
 import {writeFile} from '../util/write-file';
@@ -44,7 +44,7 @@ export class GoogleOauth {
   private readonly onUpdateTmpDir$ = new Subject<Credentials>();
 
   constructor(
-      vine: Vine,
+      private readonly vine: Vine,
       clientId: string,
       clientSecret: string,
       createOauth2Client: OauthClientFactory = DEFAULT_OAUTH_FACTORY,
@@ -119,6 +119,8 @@ export class GoogleOauth {
           LOGGER_AUTH_URL.info('\n');
           LOGGER.info('and paste the auth code below:');
 
+          const process = $process.get(this.vine);
+          const readline = $readline.get(this.vine);
           const readlineInterface = readline.createInterface({
             input: process.stdin,
           });

@@ -2,14 +2,13 @@ import * as path from 'path';
 
 import {Vine} from 'grapevine';
 import {anyThat, arrayThat, assert, objectThat, should, test} from 'gs-testing';
-import {FakeFs} from 'gs-testing/export/fake';
+import {FakeFs, FakeProcess} from 'gs-testing/export/fake';
 
 import {Serializer} from '../config/serializer/serializer';
 import {FileRef} from '../core/file-ref';
 import {LoadRule} from '../core/load-rule';
 import {BuiltInRootType} from '../core/root-type';
 import {$fs} from '../external/fs';
-import {mockProcess, setCwd} from '../testing/fake-process';
 
 import {RULE_FILE_NAME} from './read-rule';
 import {readRules, RulesWithPath} from './read-rules';
@@ -18,14 +17,14 @@ import {readRules, RulesWithPath} from './read-rules';
 test('@hive/util/read-rule', init => {
   const _ = init(() => {
     const fakeFs = new FakeFs();
+    const fakeProcess = new FakeProcess();
     const vine = new Vine({
       appName: 'test',
       overrides: [
         {override: $fs, withValue: fakeFs},
       ],
     });
-    mockProcess();
-    return {fakeFs, vine};
+    return {fakeFs, fakeProcess, vine};
   });
 
   should('emit rule with matching name', () => {
@@ -38,7 +37,7 @@ test('@hive/util/read-rule', init => {
     `;
 
     const cwd = 'cwd';
-    setCwd(cwd);
+    _.fakeProcess.setCwd(cwd);
     _.fakeFs.addFile(path.join(cwd, 'a/b', RULE_FILE_NAME), {content});
 
     const result$ = readRules(
@@ -85,7 +84,7 @@ test('@hive/util/read-rule', init => {
     `;
 
     const cwd = 'cwd';
-    setCwd(cwd);
+    _.fakeProcess.setCwd(cwd);
     _.fakeFs.addFile(path.join(cwd, 'a/b', RULE_FILE_NAME), {content});
 
     const result$ = readRules(
@@ -133,7 +132,7 @@ test('@hive/util/read-rule', init => {
     const content = '';
 
     const cwd = 'cwd';
-    setCwd(cwd);
+    _.fakeProcess.setCwd(cwd);
     _.fakeFs.addFile(path.join(cwd, 'a/b', RULE_FILE_NAME), {content});
 
     const result$ = readRules(
