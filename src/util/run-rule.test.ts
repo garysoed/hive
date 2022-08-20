@@ -2,9 +2,9 @@ import * as path from 'path';
 
 import {Vine} from 'grapevine';
 import {arrayThat, assert, mapThat, should, test} from 'gs-testing';
-import {FakeFs} from 'gs-testing/export/fake';
+import {FakeFs, FakeGlobFactory} from 'gs-testing/export/fake';
 import {numberType, stringType} from 'gs-types';
-import {of} from 'rxjs';
+import {BehaviorSubject} from 'rxjs';
 import {map} from 'rxjs/operators';
 
 import {fromType} from '../config/serializer/serializer';
@@ -14,8 +14,8 @@ import {RenderRule} from '../core/render-rule';
 import {BuiltInRootType} from '../core/root-type';
 import {RuleType} from '../core/rule-type';
 import {$fs} from '../external/fs';
+import {$glob} from '../external/glob';
 import {ROOT_FILE_NAME} from '../project/find-root';
-import {addGlobHandler, mockGlob} from '../testing/fake-glob';
 
 
 import {RULE_FILE_NAME} from './read-rule';
@@ -25,14 +25,15 @@ import {runRule} from './run-rule';
 test('@hive/util/run-rule', init => {
   const _ = init(() => {
     const fakeFs = new FakeFs();
+    const fakeGlobFactory = new FakeGlobFactory();
     const vine = new Vine({
       appName: 'test',
       overrides: [
         {override: $fs, withValue: fakeFs},
+        {override: $glob, withValue: fakeGlobFactory.glob.bind(fakeGlobFactory)},
       ],
     });
-    mockGlob();
-    return {fakeFs, vine};
+    return {fakeFs, fakeGlobFactory, vine};
   });
 
   should('run load rules correctly', () => {
@@ -45,7 +46,11 @@ test('@hive/util/run-rule', init => {
     const contentE = 'contentE';
     _.fakeFs.addFile('/a/b/e.txt', {content: contentE});
 
-    addGlobHandler('a/b/*.txt', '/', of(['/a/b/c.txt', '/a/b/d.txt', '/a/b/e.txt']));
+    _.fakeGlobFactory.setGlobHandler(
+        'a/b/*.txt',
+        '/',
+        new BehaviorSubject(['/a/b/c.txt', '/a/b/d.txt', '/a/b/e.txt']),
+    );
 
     const rule: LoadRule = {
       name: 'loadRule',

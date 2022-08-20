@@ -1,4 +1,4 @@
-import { enumType, stringType, Type, unionType } from 'gs-types';
+import {enumType, stringType, Type, unionType} from 'gs-types';
 
 export enum BuiltInRootType {
   CURRENT_DIR = 1,

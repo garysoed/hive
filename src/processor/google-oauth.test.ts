@@ -1,15 +1,15 @@
 import * as path from 'path';
-import * as readline from 'readline';
 
 import {GenerateAuthUrlOpts, GetTokenResponse} from 'google-auth-library/build/src/auth/oauth2client';
 import {OAuth2Client} from 'googleapis-common';
 import {Vine} from 'grapevine';
-import {arrayThat, assert, createSpyObject, fake, mockTime, objectThat, resetCalls, setThat, should, Spy, spy, test} from 'gs-testing';
-import {FakeFs, FakeProcess} from 'gs-testing/export/fake';
+import {arrayThat, assert, createSpyObject, fake, mockTime, objectThat, resetCalls, setThat, should, Spy, test} from 'gs-testing';
+import {FakeFs, FakeProcess, FakeReadline} from 'gs-testing/export/fake';
 import {of as observableOf, ReplaySubject} from 'rxjs';
 
 import {$fs} from '../external/fs';
 import {$process} from '../external/process';
+import {$readline} from '../external/readline';
 import {ROOT_FILE_NAME} from '../project/find-root';
 import {TMP_DIR_NAME} from '../project/get-project-tmp-dir';
 
@@ -33,11 +33,13 @@ test('@hive/processor/google-oauth', init => {
   const _ = init(() => {
     const fakeFs = new FakeFs();
     const fakeProcess = new FakeProcess();
+    const fakeReadline = new FakeReadline();
     const vine = new Vine({
       appName: 'test',
       overrides: [
         {override: $fs, withValue: fakeFs},
         {override: $process, withValue: fakeProcess},
+        {override: $readline, withValue: fakeReadline},
       ],
     });
 
@@ -47,7 +49,7 @@ test('@hive/processor/google-oauth', init => {
     globals:
     outdir: out/
     `;
-    _.fakeFs.addFile(path.join(ROOT_DIR, ROOT_FILE_NAME), {content});
+    fakeFs.addFile(path.join(ROOT_DIR, ROOT_FILE_NAME), {content});
 
     const fakeTime = mockTime(global);
     const mockOauthClient = createSpyObject<OAuth2Client>(
@@ -59,7 +61,7 @@ test('@hive/processor/google-oauth', init => {
         ],
     );
 
-    return {fakeFs, fakeTime, mockOauthClient, vine};
+    return {fakeFs, fakeReadline, fakeTime, mockOauthClient, vine};
   });
 
   test('initializeAddedScopes', () => {
@@ -119,15 +121,6 @@ test('@hive/processor/google-oauth', init => {
       const oauth = createOauth(_.vine);
       oauth.auth.subscribe(auth$);
 
-      const mockReadlineInterface = createSpyObject<readline.Interface>(
-          'ReadlineInterface',
-          ['question'],
-      );
-      const code = 'code';
-      fake(mockReadlineInterface.question).always().call((_question, callback) => {
-        callback(code);
-      });
-      fake(spy(readline, 'createInterface')).always().return(mockReadlineInterface);
 
       const scope1 = 'scope1';
       const scope2 = 'scope2';
@@ -135,6 +128,9 @@ test('@hive/processor/google-oauth', init => {
       oauth.addScope(scope2);
 
       _.fakeTime.tick(50);
+
+      const code = 'code';
+      _.fakeReadline.getLastQuestion()!.answer(code);
 
       assert(auth$).to.emitSequence([objectThat<GoogleAuth>().haveProperties({
         client: _.mockOauthClient,
@@ -187,20 +183,13 @@ test('@hive/processor/google-oauth', init => {
       const oauth = createOauth(_.vine);
       oauth.auth.subscribe(auth$);
 
-      const mockReadlineInterface = createSpyObject<readline.Interface>(
-          'ReadlineInterface',
-          ['question'],
-      );
-      const code = 'code';
-      fake(mockReadlineInterface.question).always().call((_question, callback) => {
-        callback(code);
-      });
-      fake(spy(readline, 'createInterface')).always().return(mockReadlineInterface);
-
       const scope = 'scope';
       oauth.addScope(scope);
 
       _.fakeTime.tick(50);
+
+      const code = 'code';
+      _.fakeReadline.getLastQuestion()!.answer(code);
 
       const oauthContent = _.fakeFs.getFile(path.join(ROOT_DIR, TMP_DIR_NAME, OAUTH_FILE))!.content;
       assert(oauthContent).to.equal(JSON.stringify(tokens));

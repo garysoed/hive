@@ -1,7 +1,7 @@
-import { assert, should, test } from 'gs-testing';
-import { numberType, stringType } from 'gs-types';
+import {assert, should, test} from 'gs-testing';
+import {numberType, stringType} from 'gs-types';
 
-import { ProcessorSpec } from './processor-spec';
+import {ProcessorSpec} from './processor-spec';
 
 
 test('@hive/processor/processor-spec', init => {
@@ -11,14 +11,14 @@ test('@hive/processor/processor-spec', init => {
   });
 
   test('checkInputs', () => {
-    should(`output the inputs as objects`, () => {
+    should('output the inputs as objects', () => {
       const inputs = new Map<string, unknown>([['a', 123], ['b', 'abc']]);
       const obj = _.spec.checkInputs(inputs);
 
       assert(obj).to.haveProperties({a: 123, b: 'abc'});
     });
 
-    should(`throw error if one of the inputs is invalid`, () => {
+    should('throw error if one of the inputs is invalid', () => {
       const inputs = new Map<string, unknown>([['a', 123], ['b', 345]]);
 
       assert(() => {
@@ -26,7 +26,7 @@ test('@hive/processor/processor-spec', init => {
       }).to.throwErrorWithMessage(/is not of type/);
     });
 
-    should(`throw error if one of the inputs is missing`, () => {
+    should('throw error if one of the inputs is missing', () => {
       const inputs = new Map<string, unknown>([['a', 123]]);
 
       assert(() => {

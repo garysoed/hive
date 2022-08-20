@@ -1,7 +1,7 @@
-import { stringType } from 'gs-types';
+import {stringType} from 'gs-types';
 
-import { GlobRef } from '../../core/glob-ref';
-import { parseGlobRef } from '../parse/parse-glob-ref';
+import {GlobRef} from '../../core/glob-ref';
+import {parseGlobRef} from '../parse/parse-glob-ref';
 
 export function glob(args: unknown): GlobRef {
   stringType.assert(args);

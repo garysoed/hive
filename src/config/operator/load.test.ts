@@ -1,18 +1,18 @@
-import { anyThat, arrayThat, assert, objectThat, should, test } from 'gs-testing';
-import { arrayOfType, numberType } from 'gs-types';
+import {anyThat, arrayThat, assert, objectThat, should, test} from 'gs-testing';
+import {arrayOfType, numberType} from 'gs-types';
 
-import { FileRef } from '../../core/file-ref';
-import { GlobRef } from '../../core/glob-ref';
-import { LoadRule } from '../../core/load-rule';
-import { BuiltInRootType } from '../../core/root-type';
-import { fromType, Serializer } from '../serializer/serializer';
+import {FileRef} from '../../core/file-ref';
+import {GlobRef} from '../../core/glob-ref';
+import {LoadRule} from '../../core/load-rule';
+import {BuiltInRootType} from '../../core/root-type';
+import {fromType, Serializer} from '../serializer/serializer';
 
-import { glob } from './glob';
-import { load } from './load';
+import {glob} from './glob';
+import {load} from './load';
 
 
 test('@hive/config/operator/load', () => {
-  should(`parse load rule with glob ref correctly`, () => {
+  should('parse load rule with glob ref correctly', () => {
     const ruleName = 'ruleName';
     const globRef = glob('/glob/pattern');
     const config = {
@@ -31,7 +31,7 @@ test('@hive/config/operator/load', () => {
     }));
   });
 
-  should(`parse load rule with file ref correctly`, () => {
+  should('parse load rule with file ref correctly', () => {
     const ruleName = 'ruleName';
     const config = {
       name: ruleName,

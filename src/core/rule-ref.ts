@@ -1,6 +1,6 @@
-import { hasPropertiesType, intersectType, stringType, Type } from 'gs-types';
+import {hasPropertiesType, intersectType, stringType, Type} from 'gs-types';
 
-import { FILE_REF_TYPE, FileRef } from './file-ref';
+import {FILE_REF_TYPE, FileRef} from './file-ref';
 
 
 export interface RuleRef extends FileRef {

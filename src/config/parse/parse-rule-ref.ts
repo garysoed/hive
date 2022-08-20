@@ -1,6 +1,6 @@
-import { RuleRef } from '../../core/rule-ref';
+import {RuleRef} from '../../core/rule-ref';
 
-import { parseFileRef } from './parse-file-ref';
+import {parseFileRef} from './parse-file-ref';
 
 export function parseRuleRef(raw: string): RuleRef {
   const fileRef = parseFileRef(raw.trim());

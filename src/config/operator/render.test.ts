@@ -1,16 +1,16 @@
-import { assert, mapThat, objectThat, setThat, should, test } from 'gs-testing';
+import {assert, mapThat, objectThat, setThat, should, test} from 'gs-testing';
 
-import { FilePattern } from '../../core/file-pattern';
-import { RenderInput } from '../../core/render-input';
-import { RenderRule } from '../../core/render-rule';
-import { BuiltInRootType } from '../../core/root-type';
-import { RuleRef } from '../../core/rule-ref';
+import {FilePattern} from '../../core/file-pattern';
+import {RenderInput} from '../../core/render-input';
+import {RenderRule} from '../../core/render-rule';
+import {BuiltInRootType} from '../../core/root-type';
+import {RuleRef} from '../../core/rule-ref';
 
-import { render } from './render';
+import {render} from './render';
 
 
 test('@hive/config/operator/render', () => {
-  should(`return correct render object`, () => {
+  should('return correct render object', () => {
     const ruleName = 'ruleName';
     const config = {
       inputs: {inputA: 1, inputB: 'two'},
@@ -39,7 +39,7 @@ test('@hive/config/operator/render', () => {
     }));
   });
 
-  should(`handle empty inputs`, () => {
+  should('handle empty inputs', () => {
     const ruleName = 'ruleName';
     const config = {
       inputs: {},

@@ -1,8 +1,8 @@
 import * as path from 'path';
 
 import {Vine} from 'grapevine';
-import {combineLatest, from as observableFrom, NEVER, Observable, of as observableOf, throwError} from 'rxjs';
-import {catchError, map, mapTo, switchMap, tap} from 'rxjs/operators';
+import {combineLatest, from, NEVER, Observable, of, throwError} from 'rxjs';
+import {catchError, map, switchMap, tap} from 'rxjs/operators';
 import {Logger} from 'santa';
 
 import {Processor} from '../core/processor';
@@ -57,12 +57,12 @@ export function runRender(
                   .map(runSpec => {
                     const resultRaw = declaration.fn(vine, runSpec.inputs);
                     const result$ = resultRaw instanceof Promise
-                      ? observableFrom(resultRaw) : observableOf(resultRaw);
+                      ? from(resultRaw) : of(resultRaw);
                     return result$.pipe(
                         switchMap(result => {
                           return writeFile(vine, runSpec.outputPath, declaration.output.write(result)).pipe(
                               tap(() => LOGGER.success(`Updated: ${runSpec.outputPath}`)),
-                              mapTo([runSpec.outputPath, result] as [string, unknown]),
+                              map(() => [runSpec.outputPath, result] as [string, unknown]),
                           );
                         }),
                     );
@@ -70,7 +70,7 @@ export function runRender(
 
               if (results.length === 0) {
                 LOGGER.warning(`No results found for ${rule.name}`);
-                return observableOf(new Map());
+                return of(new Map());
               }
 
               return combineLatest(results).pipe(
@@ -106,8 +106,8 @@ function getProcessor(
 
   const builtInProcessor = BUILT_IN_PROCESSOR_MAP.get(processorSpec);
   if (!builtInProcessor) {
-    return throwError(new Error(`Invalid built in processor: ${processorSpec}`));
+    return throwError(() => new Error(`Invalid built in processor: ${processorSpec}`));
   }
 
-  return observableOf(builtInProcessor);
+  return of(builtInProcessor);
 }

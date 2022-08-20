@@ -1,6 +1,6 @@
-import { hasPropertiesType, setOfType, stringType } from 'gs-types';
+import {hasPropertiesType, setOfType, stringType} from 'gs-types';
 
-import { ROOT_TYPE_TYPE, RootType } from './root-type';
+import {ROOT_TYPE_TYPE, RootType} from './root-type';
 
 
 export interface FilePattern {

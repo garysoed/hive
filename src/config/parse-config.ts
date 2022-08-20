@@ -1,16 +1,16 @@
-import { arrayOfType, booleanType, equalType, hasPropertiesType, instanceofType, intersectType, iterableOfType, mapOfType, nullType, numberType, setOfType, stringType, undefinedType, unionType, unknownType } from 'gs-types';
+import {arrayOfType, booleanType, equalType, hasPropertiesType, instanceofType, intersectType, iterableOfType, mapOfType, nullType, numberType, setOfType, stringType, undefinedType, unionType, unknownType} from 'gs-types';
 
-import { ConfigFile } from '../core/config-file';
-import { Rule } from '../core/rule';
-import { GOOGLE_SHEETS_METADATA_TYPE } from '../thirdparty/google-sheets-metadata';
+import {ConfigFile} from '../core/config-file';
+import {Rule} from '../core/rule';
+import {GOOGLE_SHEETS_METADATA_TYPE} from '../thirdparty/google-sheets-metadata';
 
-import { declare } from './operator/declare';
-import { glob } from './operator/glob';
-import { load } from './operator/load';
-import { render } from './operator/render';
-import { fromItemType } from './serializer/array-serializer';
-import { fromType } from './serializer/serializer';
-import { StringSerializer } from './serializer/string-serializer';
+import {declare} from './operator/declare';
+import {glob} from './operator/glob';
+import {load} from './operator/load';
+import {render} from './operator/render';
+import {fromItemType} from './serializer/array-serializer';
+import {fromType} from './serializer/serializer';
+import {StringSerializer} from './serializer/string-serializer';
 
 
 export function parseConfig(content: string): ConfigFile {

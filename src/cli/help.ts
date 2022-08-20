@@ -1,9 +1,10 @@
 import * as commandLineArgs from 'command-line-args';
-import { Observable } from 'rxjs';
+import * as commandLineUsage from 'command-line-usage';
+import {Observable} from 'rxjs';
 
-import { CommandType } from './command-type';
-import { printSummary } from './print-summary';
-import { CLI as RENDER_CLI } from './render';
+import {CommandType} from './command-type';
+import {printSummary} from './print-summary';
+import {CLI as RENDER_CLI} from './render';
 
 const COMMAND_OPTION = 'command';
 const OPTIONS = [
@@ -15,7 +16,7 @@ const OPTIONS = [
 
 export const CLI = {
   title: 'Hive: Help',
-  body: () => ([
+  body: (): readonly commandLineUsage.Section[] => ([
     {
       header: 'COMMANDS',
       content: [

@@ -1,6 +1,6 @@
-import { arrayThat, assert, mapThat, MatcherType, objectThat, should, test } from 'gs-testing';
+import {arrayThat, assert, mapThat, MatcherType, objectThat, should, test} from 'gs-testing';
 
-import { generateRunSpecs, RunSpec } from './generate-run-specs';
+import {generateRunSpecs, RunSpec} from './generate-run-specs';
 
 
 function matchRunSpec(inputs: Map<string, unknown>, outputPath: string): MatcherType<RunSpec> {
@@ -11,7 +11,7 @@ function matchRunSpec(inputs: Map<string, unknown>, outputPath: string): Matcher
 }
 
 test('@hive/util/generate-run-specs', () => {
-  should(`handle repeated keys correctly`, () => {
+  should('handle repeated keys correctly', () => {
     const inputs = new Map<string, unknown>([
       ['a', [1, 2, 3]],
       ['b', ['a', 'b']],
@@ -28,7 +28,7 @@ test('@hive/util/generate-run-specs', () => {
     ]);
   });
 
-  should(`handle non repeated keys correctly`, () => {
+  should('handle non repeated keys correctly', () => {
     const inputs = new Map<string, unknown>([
       ['a', [1, 2, 3]],
       ['b', ['a', 'b']],
@@ -46,7 +46,7 @@ test('@hive/util/generate-run-specs', () => {
     ]);
   });
 
-  should(`throw error if a repeated key's value isn't an array`, () => {
+  should('throw error if a repeated key\'s value isn\'t an array', () => {
     const inputs = new Map<string, unknown>([
       ['a', 123],
       ['b', ['a', 'b']],

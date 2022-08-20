@@ -1,6 +1,6 @@
-import { FilePattern } from '../../core/file-pattern';
+import {FilePattern} from '../../core/file-pattern';
 
-import { parseFileRef } from './parse-file-ref';
+import {parseFileRef} from './parse-file-ref';
 
 export function parseFilePattern(raw: string): FilePattern {
   const fileRef = parseFileRef(raw.trim());
@@ -17,9 +17,9 @@ function getSubstitutionKeys(pattern: string): Set<string> {
   const SUBSTITUTION_KEY_REGEXP = /\{([^{}]*)\}/g;
   const keys = new Set<string>();
   for (
-      let result = SUBSTITUTION_KEY_REGEXP.exec(pattern);
-      !!result;
-      result = SUBSTITUTION_KEY_REGEXP.exec(pattern)) {
+    let result = SUBSTITUTION_KEY_REGEXP.exec(pattern);
+    result;
+    result = SUBSTITUTION_KEY_REGEXP.exec(pattern)) {
     keys.add(result[1]);
   }
 

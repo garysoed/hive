@@ -1,6 +1,6 @@
-import { hasPropertiesType, mapOfType, stringType, Type } from 'gs-types';
+import {hasPropertiesType, mapOfType, stringType, Type} from 'gs-types';
 
-import { RENDER_INPUT_TYPE, RenderInput } from '../core/render-input';
+import {RENDER_INPUT_TYPE, RenderInput} from '../core/render-input';
 
 
 export interface ProjectConfig {

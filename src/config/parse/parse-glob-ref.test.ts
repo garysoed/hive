@@ -1,12 +1,12 @@
-import { assert, objectThat, should, test } from 'gs-testing';
+import {assert, objectThat, should, test} from 'gs-testing';
 
-import { GlobRef } from '../../core/glob-ref';
-import { BuiltInRootType } from '../../core/root-type';
+import {GlobRef} from '../../core/glob-ref';
+import {BuiltInRootType} from '../../core/root-type';
 
-import { parseGlobRef } from './parse-glob-ref';
+import {parseGlobRef} from './parse-glob-ref';
 
 test('@hive/config/parse/parse-glob-ref', () => {
-  should(`parse correctly`, () => {
+  should('parse correctly', () => {
     assert(parseGlobRef('@out/glob/path/*.txt')).to
         .equal(objectThat<GlobRef>().haveProperties({
           rootType: BuiltInRootType.OUT_DIR,
@@ -14,15 +14,15 @@ test('@hive/config/parse/parse-glob-ref', () => {
         }));
   });
 
-  should(`throw error if value is missing`, () => {
+  should('throw error if value is missing', () => {
     assert(() => parseGlobRef('')).to.throwErrorWithMessage(/is empty/);
   });
 
-  should(`handle white spaces`, () => {
+  should('handle white spaces', () => {
     assert(parseGlobRef('@out/glob/path/*.txt\n   ')).to
         .equal(objectThat<GlobRef>().haveProperties({
           rootType: BuiltInRootType.OUT_DIR,
           globPattern: 'glob/path/*.txt',
-      }));
+        }));
   });
 });

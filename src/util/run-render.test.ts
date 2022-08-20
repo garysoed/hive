@@ -1,9 +1,9 @@
 import * as path from 'path';
 
 import {Vine} from 'grapevine';
-import {assert, mapThat, should, test} from 'gs-testing';
+import {assert, mapThat, objectThat, should, test} from 'gs-testing';
 import {FakeFs} from 'gs-testing/export/fake';
-import {ReplaySubject} from 'rxjs';
+import {ReplaySubject, firstValueFrom} from 'rxjs';
 
 import {RenderRule} from '../core/render-rule';
 import {BuiltInRootType} from '../core/root-type';
@@ -126,8 +126,8 @@ test('@hive/util/run-render', init => {
     };
 
     const cwd = 'cwd';
-    const resultsMap$ = runRule(_.vine, rule, cwd);
-    assert(resultsMap$).to.emitWith(mapThat<string, unknown>().haveExactElements(new Map(
+    const resultsMap = await firstValueFrom(runRule(_.vine, rule, cwd));
+    assert(resultsMap).to.equal(mapThat<string, unknown>().haveExactElements(new Map(
         [
           ['/out/0_0.txt', 0],
           ['/out/0_3.txt', 3],
@@ -189,12 +189,12 @@ test('@hive/util/run-render', init => {
     const resultsMap$ = runRule(_.vine, rule, cwd);
     assert(resultsMap$).to.emitWith(mapThat<string, unknown>().haveExactElements(new Map(
         [
-          ['/out/0_0.txt', 0],
-          ['/out/0_3.txt', 3],
-          ['/out/1_0.txt', 1],
-          ['/out/1_3.txt', 4],
-          ['/out/2_0.txt', 2],
-          ['/out/2_3.txt', 5],
+          ['/out/0_0.txt', objectThat().haveProperties({result: 0})],
+          ['/out/0_3.txt', objectThat().haveProperties({result: 3})],
+          ['/out/1_0.txt', objectThat().haveProperties({result: 1})],
+          ['/out/1_3.txt', objectThat().haveProperties({result: 4})],
+          ['/out/2_0.txt', objectThat().haveProperties({result: 2})],
+          ['/out/2_3.txt', objectThat().haveProperties({result: 5})],
         ],
     )));
 

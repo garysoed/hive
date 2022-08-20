@@ -1,8 +1,8 @@
-import { enumType, Type } from 'gs-types';
+import {enumType, Type} from 'gs-types';
 
-import { Processor } from '../core/processor';
+import {Processor} from '../core/processor';
 
-import { LOAD_GOOGLE_SHEETS } from './load-google-sheets';
+import {LOAD_GOOGLE_SHEETS} from './load-google-sheets';
 
 
 export enum BuiltInProcessorId {

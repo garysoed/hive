@@ -1,15 +1,15 @@
 import {Vine} from 'grapevine';
 import {arrayThat, assert, should, test} from 'gs-testing';
-import {FakeFs} from 'gs-testing/export/fake';
+import {FakeFs, FakeGlobFactory} from 'gs-testing/export/fake';
 import {stringType} from 'gs-types';
-import {of as observableOf} from 'rxjs';
+import {BehaviorSubject} from 'rxjs';
 
 import {fromType} from '../config/serializer/serializer';
 import {LoadRule} from '../core/load-rule';
 import {BuiltInRootType} from '../core/root-type';
 import {RuleType} from '../core/rule-type';
 import {$fs} from '../external/fs';
-import {addGlobHandler, mockGlob} from '../testing/fake-glob';
+import {$glob} from '../external/glob';
 
 import {runRule} from './run-rule';
 
@@ -17,14 +17,15 @@ import {runRule} from './run-rule';
 test('@hive/util/run-load', init => {
   const _ = init(() => {
     const fakeFs = new FakeFs();
+    const fakeGlobFactory = new FakeGlobFactory();
     const vine = new Vine({
       appName: 'test',
       overrides: [
         {override: $fs, withValue: fakeFs},
+        {override: $glob, withValue: fakeGlobFactory.glob.bind(fakeGlobFactory)},
       ],
     });
-    mockGlob();
-    return {fakeFs, vine};
+    return {fakeFs, fakeGlobFactory, vine};
   });
 
   should('emit content of file if file ref was given', () => {
@@ -52,7 +53,11 @@ test('@hive/util/run-load', init => {
     const contentE = 'contentE';
     _.fakeFs.addFile('/a/b/e.txt', {content: contentE});
 
-    addGlobHandler('a/b/*.txt', '/', observableOf(['/a/b/c.txt', '/a/b/d.txt', '/a/b/e.txt']));
+    _.fakeGlobFactory.setGlobHandler(
+        'a/b/*.txt',
+        '/',
+        new BehaviorSubject(['/a/b/c.txt', '/a/b/d.txt', '/a/b/e.txt']),
+    );
 
     const rule: LoadRule = {
       name: 'loadRule',

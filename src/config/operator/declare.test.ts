@@ -1,16 +1,16 @@
-import { assert, mapThat, objectThat, should, test } from 'gs-testing';
-import { arrayOfType, booleanType, numberType, Type } from 'gs-types';
+import {assert, mapThat, objectThat, should, test} from 'gs-testing';
+import {arrayOfType, booleanType, numberType, Type} from 'gs-types';
 
-import { DeclareRule } from '../../core/declare-rule';
-import { FileRef } from '../../core/file-ref';
-import { BuiltInRootType } from '../../core/root-type';
-import { fromType } from '../serializer/serializer';
+import {DeclareRule} from '../../core/declare-rule';
+import {FileRef} from '../../core/file-ref';
+import {BuiltInRootType} from '../../core/root-type';
+import {fromType} from '../serializer/serializer';
 
-import { declare } from './declare';
+import {declare} from './declare';
 
 
 test('@hive/config/operator/declare', () => {
-  should(`return the correct declare object`, () => {
+  should('return the correct declare object', () => {
     const ruleName = 'ruleName';
     const processor = '/path';
     const inputs = {
@@ -33,7 +33,7 @@ test('@hive/config/operator/declare', () => {
     }));
   });
 
-  should(`handle empty inputs`, () => {
+  should('handle empty inputs', () => {
     const ruleName = 'ruleName';
     const processor = '/path';
     const declareRule = declare({

@@ -1,9 +1,10 @@
-import { $asMap, $map, $recordToMap } from 'gs-tools/export/collect';
-import { hasPropertiesType, instanceofType, stringType, Type, undefinedType, unionType } from 'gs-types';
 import * as path from 'path';
-import {$pipe} from 'gs-tools/export/typescript';
 
-import { PROJECT_CONFIG_TYPE, ProjectConfig } from './project-config';
+import {$asMap, $map, $recordToMap} from 'gs-tools/export/collect';
+import {$pipe} from 'gs-tools/export/typescript';
+import {hasPropertiesType, instanceofType, stringType, Type} from 'gs-types';
+
+import {ProjectConfig, PROJECT_CONFIG_TYPE} from './project-config';
 
 
 interface ProjectConfigJson {
@@ -12,11 +13,14 @@ interface ProjectConfigJson {
   readonly roots?: {};
 }
 
-const PROJECT_CONFIG_JSON_TYPE: Type<ProjectConfigJson> = hasPropertiesType({
-  globals: unionType([instanceofType(Object), undefinedType]),
-  outdir: stringType,
-  roots: unionType([instanceofType(Object), undefinedType]),
-});
+const PROJECT_CONFIG_JSON_TYPE: Type<ProjectConfigJson> = hasPropertiesType(
+    {
+      outdir: stringType,
+    },
+    {
+      globals: instanceofType(Object),
+      roots: instanceofType(Object),
+    });
 
 export function parseProject(content: string, cwd: string): ProjectConfig {
   const json = JSON.parse(content);

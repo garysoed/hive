@@ -1,6 +1,6 @@
-import { GlobRef } from '../../core/glob-ref';
+import {GlobRef} from '../../core/glob-ref';
 
-import { parseFileRef } from './parse-file-ref';
+import {parseFileRef} from './parse-file-ref';
 
 export function parseGlobRef(raw: string): GlobRef {
   if (!raw) {

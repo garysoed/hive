@@ -1,6 +1,6 @@
-import { arrayOfType, booleanType, instanceofType, numberType, stringType, Type, unionType } from 'gs-types';
+import {arrayOfType, booleanType, instanceofType, numberType, stringType, Type, unionType} from 'gs-types';
 
-import { RULE_REF_TYPE, RuleRef } from './rule-ref';
+import {RULE_REF_TYPE, RuleRef} from './rule-ref';
 
 export type RenderInput = boolean|number|string|Function|object|
     boolean[]|number[]|string[]|Function[]|object[]|RuleRef;

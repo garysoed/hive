@@ -1,6 +1,6 @@
-import { identity } from 'nabu';
+import {identity} from 'nabu';
 
-import { Serializer } from './serializer';
+import {Serializer} from './serializer';
 
 export class StringSerializer extends Serializer<string> {
   constructor() {

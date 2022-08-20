@@ -1,4 +1,4 @@
-import { Type } from 'gs-types';
+import {Type} from 'gs-types';
 
 type SpecOf<O extends {}> = {[K in keyof O]: Type<O[K]>};
 

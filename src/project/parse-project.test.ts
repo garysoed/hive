@@ -1,14 +1,15 @@
-import { assert, mapThat, objectThat, should, test } from 'gs-testing';
 import * as path from 'path';
 
-import { RenderInput } from '../core/render-input';
+import {assert, mapThat, objectThat, should, test} from 'gs-testing';
 
-import { parseProject } from './parse-project';
-import { ProjectConfig } from './project-config';
+import {RenderInput} from '../core/render-input';
+
+import {parseProject} from './parse-project';
+import {ProjectConfig} from './project-config';
 
 
 test('@hive/project/parse-project', () => {
-  should(`parse the config correctly`, () => {
+  should('parse the config correctly', () => {
     const outdir = 'file/outdir';
     const rootA = 'path/root/a';
     const rootB = 'path/root/b';
@@ -38,7 +39,7 @@ test('@hive/project/parse-project', () => {
     }));
   });
 
-  should(`parse the config correctly if globals and roots are not specified`, () => {
+  should('parse the config correctly if globals and roots are not specified', () => {
     const outdir = 'file/outdir';
     const content = JSON.stringify({outdir});
 
@@ -48,7 +49,7 @@ test('@hive/project/parse-project', () => {
     }));
   });
 
-  should(`throw error if globals is not an object`, () => {
+  should('throw error if globals is not an object', () => {
     assert(() => {
       const content = JSON.stringify({outdir: 'outdir', globals: 1});
       const cwd = 'cwd';
@@ -56,7 +57,7 @@ test('@hive/project/parse-project', () => {
     }).to.throwErrorWithMessage(/TypeAssertionError/);
   });
 
-  should(`throw error if config is invalid`, () => {
+  should('throw error if config is invalid', () => {
     assert(() => {
       const cwd = 'cwd';
       parseProject('a: b', cwd);

@@ -1,2 +1,2 @@
-export { OutputFn } from '../src/core/output-fn';
+export {OutputFn} from '../src/core/output-fn';
 

@@ -1,4 +1,4 @@
-import { hasPropertiesType, stringType, Type } from 'gs-types';
+import {hasPropertiesType, stringType, Type} from 'gs-types';
 
 export interface GoogleSheetsMetadata {
   doc_id: string;
