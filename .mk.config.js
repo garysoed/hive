@@ -28,7 +28,7 @@ declare({
   name: 'commit',
   as: serial({
     cmds: [
-      shell(({vars}) => ({bin: 'eslint', flags: ['**/*.ts', '--fix', '--ignore-pattern', 'out']})),
+      shell(() => ({bin: 'eslint', flags: ['**/*.ts', '--fix', '--ignore-pattern', 'out']})),
       shell({bin: 'webpack'}),
       shell({
         bin: 'node',

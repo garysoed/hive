@@ -1,9 +1,6 @@
 import * as commandLineUsage from 'command-line-usage';
 import {EMPTY, Observable} from 'rxjs';
-import {Logger} from 'santa';
 
-
-const LOGGER = new Logger('@hive/cli/print-summary');
 
 export interface CliSummary {
   readonly summary: string;
@@ -24,7 +21,8 @@ export function printSummary(summary: CliSummary): Observable<unknown> {
     ...summary.body(),
   ];
 
-  LOGGER.info(message);
+  // eslint-disable-next-line no-console
+  console.log(commandLineUsage.default(message));
 
   return EMPTY;
 }
