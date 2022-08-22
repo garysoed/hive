@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import {Vine} from 'grapevine';
-import {assert, should, test} from 'gs-testing';
+import {assert, should, test, setup} from 'gs-testing';
 import {FakeFs} from 'gs-testing/export/fake';
 import {numberType} from 'gs-types';
 import {map} from 'rxjs/operators';
@@ -16,8 +16,8 @@ import {ROOT_FILE_NAME} from '../project/find-root';
 import {runRule} from './run-rule';
 
 
-test('@hive/util/run-declare', init => {
-  const _ = init(() => {
+test('@hive/util/run-declare', () => {
+  const _ = setup(() => {
     const fakeFs = new FakeFs();
     const vine = new Vine({
       appName: 'test',

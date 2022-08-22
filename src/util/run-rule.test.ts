@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import {Vine} from 'grapevine';
-import {arrayThat, assert, mapThat, should, test} from 'gs-testing';
+import {arrayThat, assert, mapThat, should, test, setup} from 'gs-testing';
 import {FakeFs, FakeGlobFactory} from 'gs-testing/export/fake';
 import {numberType, stringType} from 'gs-types';
 import {BehaviorSubject} from 'rxjs';
@@ -22,8 +22,8 @@ import {RULE_FILE_NAME} from './read-rule';
 import {runRule} from './run-rule';
 
 
-test('@hive/util/run-rule', init => {
-  const _ = init(() => {
+test('@hive/util/run-rule', () => {
+  const _ = setup(() => {
     const fakeFs = new FakeFs();
     const fakeGlobFactory = new FakeGlobFactory();
     const vine = new Vine({

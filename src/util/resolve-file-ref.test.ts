@@ -1,7 +1,7 @@
 import * as nodePath from 'path';
 
 import {Vine} from 'grapevine';
-import {assert, should, test} from 'gs-testing';
+import {assert, should, test, setup} from 'gs-testing';
 import {FakeFs, FakeProcess} from 'gs-testing/export/fake';
 
 import {BuiltInRootType} from '../core/root-type';
@@ -13,8 +13,8 @@ import {ROOT_FILE_NAME} from '../project/find-root';
 import {resolveFileRef} from './resolve-file-ref';
 
 
-test('@hive/util/resolve-file-ref', init => {
-  const _ = init(() => {
+test('@hive/util/resolve-file-ref', () => {
+  const _ = setup(() => {
     const fakeFs = new FakeFs();
     const fakeProcess = new FakeProcess();
     const vine = new Vine({

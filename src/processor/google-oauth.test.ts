@@ -3,7 +3,7 @@ import * as path from 'path';
 import {GenerateAuthUrlOpts, GetTokenResponse} from 'google-auth-library/build/src/auth/oauth2client';
 import {OAuth2Client} from 'googleapis-common';
 import {Vine} from 'grapevine';
-import {arrayThat, assert, createSpyObject, fake, mockTime, objectThat, resetCalls, setThat, should, Spy, test} from 'gs-testing';
+import {arrayThat, assert, createSpyObject, fake, mockTime, objectThat, resetCalls, setThat, should, Spy, test, setup} from 'gs-testing';
 import {FakeFs, FakeProcess, FakeReadline} from 'gs-testing/export/fake';
 import {of as observableOf, ReplaySubject} from 'rxjs';
 
@@ -16,7 +16,7 @@ import {TMP_DIR_NAME} from '../project/get-project-tmp-dir';
 import {CredentialsFile, GoogleAuth, GoogleOauth, OAUTH_FILE} from './google-oauth';
 
 
-test('@hive/processor/google-oauth', init => {
+test('@hive/processor/google-oauth', () => {
   const ROOT_DIR = '/';
   const CLIENT_ID = 'clientId';
   const CLIENT_SECRET = 'clientSecret';
@@ -30,7 +30,7 @@ test('@hive/processor/google-oauth', init => {
     );
   }
 
-  const _ = init(() => {
+  const _ = setup(() => {
     const fakeFs = new FakeFs();
     const fakeProcess = new FakeProcess();
     const fakeReadline = new FakeReadline();

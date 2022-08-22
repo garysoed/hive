@@ -1,11 +1,11 @@
-import {assert, should, test} from 'gs-testing';
+import {assert, should, test, setup} from 'gs-testing';
 import {numberType, stringType} from 'gs-types';
 
 import {ProcessorSpec} from './processor-spec';
 
 
-test('@hive/processor/processor-spec', init => {
-  const _ = init(() => {
+test('@hive/processor/processor-spec', () => {
+  const _ = setup(() => {
     const spec = new ProcessorSpec({a: numberType, b: stringType});
     return {spec};
   });

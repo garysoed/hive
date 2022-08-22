@@ -1,5 +1,5 @@
 import {Vine} from 'grapevine';
-import {assert, should, test} from 'gs-testing';
+import {assert, should, test, setup} from 'gs-testing';
 import {FakeFs} from 'gs-testing/export/fake';
 import {ReplaySubject} from 'rxjs';
 
@@ -8,8 +8,8 @@ import {$fs} from '../external/fs';
 import {readFile} from './read-file';
 
 
-test('@hive/util/read-file', init => {
-  const _ = init(() => {
+test('@hive/util/read-file', () => {
+  const _ = setup(() => {
     const fakeFs = new FakeFs();
     const vine = new Vine({
       appName: 'test',

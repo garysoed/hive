@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import {Vine} from 'grapevine';
-import {anyThat, arrayThat, assert, objectThat, should, test} from 'gs-testing';
+import {anyThat, arrayThat, assert, objectThat, should, test, setup} from 'gs-testing';
 import {FakeFs, FakeProcess} from 'gs-testing/export/fake';
 
 import {Serializer} from '../config/serializer/serializer';
@@ -13,8 +13,8 @@ import {$fs} from '../external/fs';
 import {readRule, RuleWithPath, RULE_FILE_NAME} from './read-rule';
 
 
-test('@hive/util/read-rule', init => {
-  const _ = init(() => {
+test('@hive/util/read-rule', () => {
+  const _ = setup(() => {
     const fakeFs = new FakeFs();
     const fakeProcess = new FakeProcess();
     const vine = new Vine({

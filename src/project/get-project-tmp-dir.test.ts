@@ -2,7 +2,7 @@ import * as path from 'path';
 
 
 import {Vine} from 'grapevine';
-import {assert, should, test} from 'gs-testing';
+import {assert, should, test, setup} from 'gs-testing';
 import {FakeFs, FakeProcess} from 'gs-testing/export/fake';
 
 import {$fs} from '../external/fs';
@@ -12,8 +12,8 @@ import {ROOT_FILE_NAME} from './find-root';
 import {getProjectTmpDir, TMP_DIR_NAME} from './get-project-tmp-dir';
 
 
-test('@hive/project/get-project-tmp-dir', init => {
-  const _ = init(() => {
+test('@hive/project/get-project-tmp-dir', () => {
+  const _ = setup(() => {
     const fakeFs = new FakeFs();
     const fakeProcess = new FakeProcess();
     const vine = new Vine({

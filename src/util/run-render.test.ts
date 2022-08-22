@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import {Vine} from 'grapevine';
-import {assert, mapThat, objectThat, should, test} from 'gs-testing';
+import {assert, mapThat, objectThat, should, test, setup} from 'gs-testing';
 import {FakeFs} from 'gs-testing/export/fake';
 import {ReplaySubject, firstValueFrom} from 'rxjs';
 
@@ -15,8 +15,8 @@ import {RULE_FILE_NAME} from './read-rule';
 import {runRule} from './run-rule';
 
 
-test('@hive/util/run-render', init => {
-  const _ = init(() => {
+test('@hive/util/run-render', () => {
+  const _ = setup(() => {
     const fakeFs = new FakeFs();
     const vine = new Vine({
       appName: 'test',

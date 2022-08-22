@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import {Vine} from 'grapevine';
-import {arrayThat, assert, createSpy, fake, mapThat, should, test} from 'gs-testing';
+import {arrayThat, assert, createSpy, fake, mapThat, should, test, setup} from 'gs-testing';
 import {FakeFs} from 'gs-testing/export/fake';
 import {Observable, of} from 'rxjs';
 
@@ -18,7 +18,7 @@ import {RULE_FILE_NAME} from './read-rule';
 import {resolveInputs} from './resolve-inputs';
 
 
-test('@hive/util/resolve-inputs', init => {
+test('@hive/util/resolve-inputs', () => {
   function fakeRunRule(vine: Vine, renderRule: RenderRule): Observable<ReadonlyMap<string, string>>;
   function fakeRunRule(vine: Vine, declareRule: DeclareRule): Observable<Processor>;
   function fakeRunRule(vine: Vine, loadRule: LoadRule): Observable<string[]>;
@@ -26,7 +26,7 @@ test('@hive/util/resolve-inputs', init => {
     return _.mockResolveRule(rule);
   }
 
-  const _ = init(() => {
+  const _ = setup(() => {
     const fakeFs = new FakeFs();
     const vine = new Vine({
       appName: 'test',

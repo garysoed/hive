@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import {Vine} from 'grapevine';
-import {assert, objectThat, should, test} from 'gs-testing';
+import {assert, objectThat, should, test, setup} from 'gs-testing';
 import {FakeFs, FakeProcess} from 'gs-testing/export/fake';
 
 import {$fs} from '../external/fs';
@@ -12,8 +12,8 @@ import {loadProjectConfig} from './load-project-config';
 import {ProjectConfig} from './project-config';
 
 
-test('@hive/project/load-project-config', init => {
-  const _ =init(() => {
+test('@hive/project/load-project-config', () => {
+  const _ = setup(() => {
     const fakeFs = new FakeFs();
     const fakeProcess = new FakeProcess();
     const vine = new Vine({
