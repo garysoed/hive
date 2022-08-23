@@ -5,20 +5,28 @@ import {google} from 'googleapis';
 import {source, Vine} from 'grapevine';
 import {cache} from 'gs-tools/export/data';
 import {assertNonNull} from 'gs-tools/export/rxjs';
-import {BehaviorSubject, from as observableFrom, Observable, of, ReplaySubject, Subject} from 'rxjs';
-import {bufferTime, catchError, filter, map, mapTo, skipUntil, switchMap, take, tap, withLatestFrom} from 'rxjs/operators';
+import {hasPropertiesType, stringType} from 'gs-types';
+import {BehaviorSubject, from, Observable, of, ReplaySubject, Subject, throwError} from 'rxjs';
+import {bufferTime, catchError, filter, map, skipUntil, switchMap, take, tap, withLatestFrom} from 'rxjs/operators';
 import {Logger} from 'santa';
 
-import {$process} from '../external/process';
-import {$readline} from '../external/readline';
+import {$express} from '../external/express';
 import {getProjectTmpDir} from '../project/get-project-tmp-dir';
 import {readFile} from '../util/read-file';
 import {writeFile} from '../util/write-file';
 
 
-const REDIRECT_URI = 'urn:ietf:wg:oauth:2.0:oob';
+const PORT = 8800;
+const REDIRECT_URI = `http://localhost:${PORT}`;
 const SCOPE_CHANGE_DEBOUNCE_MS = 50;
 export const OAUTH_FILE = 'google_oauth.json';
+
+interface Query {
+  readonly code: string;
+}
+const QUERY_TYPE = hasPropertiesType<Query>({
+  code: stringType,
+});
 
 const LOGGER = new Logger('@hive/processor/google-oauth');
 const LOGGER_AUTH_URL = new Logger('authurl');
@@ -117,29 +125,41 @@ export class GoogleOauth {
           LOGGER_AUTH_URL.info(authUrl);
           LOGGER_AUTH_URL.info('\n');
           LOGGER_AUTH_URL.info('\n');
-          LOGGER.info('and paste the auth code below:');
+          LOGGER.info('and Hive will retrieve the code');
 
-          const process = $process.get(this.vine);
-          const readline = $readline.get(this.vine);
-          const readlineInterface = readline.createInterface({
-            input: process.stdin,
+          const code$ = new Subject<string>();
+          const app = $express.get(this.vine);
+          app.get('/', (req, resp) => {
+            const query = req.query;
+            if (!QUERY_TYPE.check(query)) {
+              resp.send(`
+              <h1>Retrieving code failed</h1>
+              <p>Google did not send the correct URL. <code>code</code> param not found.</p>
+              `);
+              code$.error(throwError(() => new Error('Query code not found')));
+              return;
+            }
+            const code = (req.query as any).code as string;
+            resp.send(`
+            <h1>Retrieving code successful</h1>
+            <p>You may now close this window</p>
+            `);
+            code$.next(code);
           });
+          const server = app.listen(PORT);
 
-          return new Observable<string>(subscriber => {
-            readlineInterface.question('', code => {
-              subscriber.next(code);
-              subscriber.complete();
-            });
-          })
-              .pipe(
-                  switchMap(code => observableFrom(this.oauth2Client.getToken(code))),
-                  map(response => response.tokens),
-                  tap(tokens => {
-                    this.onUpdateTmpDir$.next(tokens);
-                    this.oauth2Client.setCredentials(tokens);
-                  }),
-                  mapTo(newScopes),
-              );
+          return code$.pipe(
+              tap(() => {
+                server.close();
+              }),
+              switchMap(code => from(this.oauth2Client.getToken(code))),
+              map(response => response.tokens),
+              tap(tokens => {
+                this.onUpdateTmpDir$.next(tokens);
+                this.oauth2Client.setCredentials(tokens);
+              }),
+              map(() => newScopes),
+          );
         }),
         withLatestFrom(this.addedScopes$),
     )

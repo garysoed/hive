@@ -3,13 +3,13 @@ import * as path from 'path';
 import {GenerateAuthUrlOpts, GetTokenResponse} from 'google-auth-library/build/src/auth/oauth2client';
 import {OAuth2Client} from 'googleapis-common';
 import {Vine} from 'grapevine';
-import {arrayThat, assert, createSpyObject, fake, mockTime, objectThat, resetCalls, setThat, should, Spy, test, setup} from 'gs-testing';
-import {FakeFs, FakeProcess, FakeReadline} from 'gs-testing/export/fake';
+import {arrayThat, assert, createSpyObject, fake, mockTime, objectThat, resetCalls, setThat, setup, should, Spy, test} from 'gs-testing';
+import {FakeExpress, FakeFs, FakeProcess} from 'gs-testing/export/fake';
 import {of as observableOf, ReplaySubject} from 'rxjs';
 
+import {$express} from '../external/express';
 import {$fs} from '../external/fs';
 import {$process} from '../external/process';
-import {$readline} from '../external/readline';
 import {ROOT_FILE_NAME} from '../project/find-root';
 import {TMP_DIR_NAME} from '../project/get-project-tmp-dir';
 
@@ -33,13 +33,13 @@ test('@hive/processor/google-oauth', () => {
   const _ = setup(() => {
     const fakeFs = new FakeFs();
     const fakeProcess = new FakeProcess();
-    const fakeReadline = new FakeReadline();
+    const fakeExpressApp = new FakeExpress().default();
     const vine = new Vine({
       appName: 'test',
       overrides: [
         {override: $fs, withValue: fakeFs},
         {override: $process, withValue: fakeProcess},
-        {override: $readline, withValue: fakeReadline},
+        {override: $express, withValue: fakeExpressApp},
       ],
     });
 
@@ -61,7 +61,7 @@ test('@hive/processor/google-oauth', () => {
         ],
     );
 
-    return {fakeFs, fakeReadline, fakeTime, mockOauthClient, vine};
+    return {fakeExpressApp, fakeFs, fakeTime, mockOauthClient, vine};
   });
 
   test('initializeAddedScopes', () => {
@@ -130,8 +130,9 @@ test('@hive/processor/google-oauth', () => {
       _.fakeTime.tick(50);
 
       const code = 'code';
-      _.fakeReadline.getLastQuestion()!.answer(code);
+      const response = _.fakeExpressApp.simulateRequest({path: '/', query: {code}});
 
+      assert(response!.sentContent).to.match(/code successful/);
       assert(auth$).to.emitSequence([objectThat<GoogleAuth>().haveProperties({
         client: _.mockOauthClient,
         scopes: setThat<string>().haveExactElements(new Set([scope1, scope2])),
@@ -189,7 +190,7 @@ test('@hive/processor/google-oauth', () => {
       _.fakeTime.tick(50);
 
       const code = 'code';
-      _.fakeReadline.getLastQuestion()!.answer(code);
+      _.fakeExpressApp.simulateRequest({path: '/', query: {code}});
 
       const oauthContent = _.fakeFs.getFile(path.join(ROOT_DIR, TMP_DIR_NAME, OAUTH_FILE))!.content;
       assert(oauthContent).to.equal(JSON.stringify(tokens));
