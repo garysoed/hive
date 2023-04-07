@@ -9,7 +9,7 @@ import {analyze} from './cli/analyze';
 import {CommandType} from './cli/command-type';
 import {CLI as HELP_CLI, help} from './cli/help';
 import {printSummary} from './cli/print-summary';
-import {render} from './cli/render';
+import {run as runRule} from './cli/run';
 
 
 const LOGGER = new Logger('@hive/main');
@@ -41,8 +41,8 @@ function run(): Observable<unknown> {
       return help(options._unknown || []);
     // case CommandType.INIT:
     //   return init(options._unknown || []);
-    case CommandType.RENDER:
-      return render(vine, options._unknown || []);
+    case CommandType.RUN:
+      return runRule(vine, options._unknown || []);
     default:
       return printSummary(CLI);
   }

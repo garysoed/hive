@@ -4,7 +4,7 @@ import {Observable} from 'rxjs';
 
 import {CommandType} from './command-type';
 import {printSummary} from './print-summary';
-import {CLI as RENDER_CLI} from './render';
+import {CLI as RUN_CLI} from './run';
 
 const COMMAND_OPTION = 'command';
 const OPTIONS = [
@@ -21,7 +21,7 @@ export const CLI = {
       header: 'COMMANDS',
       content: [
         {name: CommandType.HELP, summary: CLI.summary},
-        {name: CommandType.RENDER, summary: RENDER_CLI.summary},
+        {name: CommandType.RUN, summary: RUN_CLI.summary},
       ],
     },
   ]),
@@ -38,8 +38,8 @@ export function help(argv: string[]): Observable<unknown> {
       return printSummary(CLI);
     // case CommandType.INIT:
     //   return printSummary(INIT_CLI);
-    case CommandType.RENDER:
-      return printSummary(RENDER_CLI);
+    case CommandType.RUN:
+      return printSummary(RUN_CLI);
     default:
       return printSummary(CLI);
   }

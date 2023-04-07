@@ -2,7 +2,7 @@ import * as commandLineArgs from 'command-line-args';
 import * as commandLineUsage from 'command-line-usage';
 import {Vine} from 'grapevine';
 import {EMPTY, merge, Observable, throwError} from 'rxjs';
-import {mapTo, switchMap} from 'rxjs/operators';
+import {map, switchMap} from 'rxjs/operators';
 
 import {parseRuleRef} from '../config/parse/parse-rule-ref';
 import {RuleType} from '../core/rule-type';
@@ -21,23 +21,23 @@ const OPTIONS = [
 ];
 
 export const CLI = {
-  title: 'Hive: Render',
+  title: 'Hive: Run',
   body: (): readonly commandLineUsage.Section[] => ([
     {
       header: 'OPTIONS',
       content: [
         {
-          name: 'path_to_render_rule',
-          description: 'Path to the rule to be rendered. E.g.: @out/path/to:render_rule',
+          name: 'path_to_rule',
+          description: 'Path to the rule to be rendered. E.g.: @out/path/to:rule',
         },
       ],
     },
   ]),
   summary: 'Renders the given render rule',
-  synopsis: `$ {bold hive} {underline ${CommandType.RENDER}} <path_to_render_rule>`,
+  synopsis: `$ {bold hive} {underline ${CommandType.RUN}} <path_to_rule>`,
 };
 
-export function render(vine: Vine, argv: string[]): Observable<string> {
+export function run(vine: Vine, argv: string[]): Observable<string> {
   const options = commandLineArgs.default(OPTIONS, {argv, stopAtFirstUnknown: true});
   const rulePath = options[RULE_OPTION];
   if (typeof rulePath !== 'string') {
@@ -58,6 +58,6 @@ export function render(vine: Vine, argv: string[]): Observable<string> {
 
         return merge(...obsList);
       }),
-      mapTo('done'),
+      map(() => 'done'),
   );
 }
