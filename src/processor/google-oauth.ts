@@ -44,7 +44,7 @@ export interface CredentialsFile extends Credentials {
   scope: string;
 }
 
-export class GoogleOauth {
+class GoogleOauthInternal {
   private readonly addedScopes$ = new BehaviorSubject<ReadonlySet<string>>(new Set());
   private readonly oauth2Client: OAuth2Client;
   private readonly onInitialized$ = new ReplaySubject<void>(1);
@@ -184,6 +184,8 @@ export class GoogleOauth {
         .subscribe();
   }
 }
+
+export class GoogleOauth extends GoogleOauthInternal {}
 
 export type GoogleOauthFactory = (clientId: string, clientSecret: string) => GoogleOauth;
 export const $googleOauthFactory = source<GoogleOauthFactory>(vine => {

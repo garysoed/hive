@@ -72,4 +72,5 @@ run()
     )
     .subscribe({complete: () => {
       onDone$.next({});
+      process.exit(0);
     }});
