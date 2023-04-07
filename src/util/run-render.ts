@@ -60,10 +60,15 @@ export function runRender(
                       ? from(resultRaw) : of(resultRaw);
                     return result$.pipe(
                         switchMap(result => {
-                          return writeFile(vine, runSpec.outputPath, declaration.output.write(result)).pipe(
-                              tap(() => LOGGER.success(`Updated: ${runSpec.outputPath}`)),
-                              map(() => [runSpec.outputPath, result] as [string, unknown]),
-                          );
+                          return writeFile(
+                              vine,
+                              runSpec.outputPath,
+                              declaration.output.write(result),
+                          )
+                              .pipe(
+                                  tap(() => LOGGER.success(`Updated: ${runSpec.outputPath}`)),
+                                  map(() => [runSpec.outputPath, result] as [string, unknown]),
+                              );
                         }),
                     );
                   });

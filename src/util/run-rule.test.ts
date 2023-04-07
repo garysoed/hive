@@ -85,7 +85,8 @@ test('@hive/util/run-rule', () => {
     };
 
     const cwd = 'cwd';
-    assert(runRule(_.vine, rule, cwd).pipe(map(({fn}) => fn(_.vine, new Map([['a', 1], ['b', 2]])))))
+    assert(
+        runRule(_.vine, rule, cwd).pipe(map(({fn}) => fn(_.vine, new Map([['a', 1], ['b', 2]])))))
         .to.emitSequence([3]);
   });
 

@@ -50,7 +50,8 @@ test('@hive/util/resolve-root', () => {
     _.fakeFs.addFile(path.join('/a', ROOT_FILE_NAME), {content: JSON.stringify({outdir})});
 
     const cwd = 'cwd';
-    assert(resolveRoot(_.vine, BuiltInRootType.OUT_DIR, cwd)).to.emitSequence([path.join('/a', outdir)]);
+    assert(resolveRoot(_.vine, BuiltInRootType.OUT_DIR, cwd)).to
+        .emitSequence([path.join('/a', outdir)]);
   });
 
   should('emit the project root if the root type is PROJECT_ROOT', () => {

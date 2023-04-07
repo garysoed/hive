@@ -40,7 +40,8 @@ test('@hive/util/run-load', () => {
     };
 
     const cwd = 'cwd';
-    assert(runRule(_.vine, rule, cwd)).to.emitSequence([arrayThat<string>().haveExactElements([content])]);
+    assert(runRule(_.vine, rule, cwd))
+        .to.emitSequence([arrayThat<string>().haveExactElements([content])]);
   });
 
   should('emit content of all matching files if glob ref was given', () => {
