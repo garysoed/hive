@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import {Vine} from 'grapevine';
-import {assert, should, test, setup} from 'gs-testing';
+import {asyncAssert, setup, should, test} from 'gs-testing';
 import {FakeFs, FakeProcess} from 'gs-testing/export/fake';
 
 import {$fs} from '../external/fs';
@@ -15,7 +15,6 @@ test('@hive/project/find-root', () => {
     const fakeFs = new FakeFs();
     const fakeProcess = new FakeProcess();
     const vine = new Vine({
-      appName: 'test',
       overrides: [
         {override: $fs, withValue: fakeFs},
         {override: $process, withValue: fakeProcess},
@@ -24,34 +23,34 @@ test('@hive/project/find-root', () => {
     return {fakeFs, fakeProcess, vine};
   });
 
-  should('return the correct project root', () => {
+  should('return the correct project root', async () => {
     _.fakeProcess.setCwd('/a/cwd');
 
     _.fakeFs.addFile(path.join('/a', ROOT_FILE_NAME), {content: ''});
 
-    assert(findRoot(_.vine)).to.emitSequence(['/a']);
+    await asyncAssert(findRoot(_.vine)).to.emitSequence(['/a']);
   });
 
-  should('handle current directory', () => {
+  should('handle current directory', async () => {
     _.fakeProcess.setCwd('/a');
 
     _.fakeFs.addFile(path.join('/a', ROOT_FILE_NAME), {content: ''});
 
-    assert(findRoot(_.vine)).to.emitSequence(['/a']);
+    await asyncAssert(findRoot(_.vine)).to.emitSequence(['/a']);
   });
 
-  should('return the inner project root if two exists', () => {
+  should('return the inner project root if two exists', async () => {
     _.fakeProcess.setCwd('/a/cwd');
 
     _.fakeFs.addFile(path.join('/a/cwd', ROOT_FILE_NAME), {content: ''});
     _.fakeFs.addFile(path.join('/a', ROOT_FILE_NAME), {content: ''});
 
-    assert(findRoot(_.vine)).to.emitSequence(['/a/cwd']);
+    await asyncAssert(findRoot(_.vine)).to.emitSequence(['/a/cwd']);
   });
 
-  should('return null if there are no project roots', () => {
+  should('return null if there are no project roots', async () => {
     _.fakeProcess.setCwd('/a/cwd');
 
-    assert(findRoot(_.vine)).to.emitSequence([null]);
+    await asyncAssert(findRoot(_.vine)).to.emitSequence([null]);
   });
 });

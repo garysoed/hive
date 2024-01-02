@@ -1,3 +1,12 @@
+const testNode = shell({
+  bin: 'node',
+  flags: [
+    'node_modules/jasmine/bin/jasmine.js',
+    'out/test.js',
+  ],
+});
+const webpack = shell({bin: 'webpack'});
+
 declare({
   name: 'link',
   as: shell({
@@ -14,13 +23,9 @@ declare({
 });
 
 declare({
-  name: 'jasmine',
-  as: shell({
-    bin: 'node',
-    flags: [
-      'node_modules/jasmine/bin/jasmine.js',
-      'out/test.js',
-    ],
+  name: 'test',
+  as: parallel({
+    cmds: [webpack, testNode],
   }),
 });
 
@@ -30,13 +35,7 @@ declare({
     cmds: [
       shell(() => ({bin: 'eslint', flags: ['**/*.ts', '--fix', '--ignore-pattern', 'out']})),
       shell({bin: 'webpack'}),
-      shell({
-        bin: 'node',
-        flags: [
-          'node_modules/jasmine/bin/jasmine.js',
-          'out/test.js',
-        ],
-      }),
+      testNode,
       shell({bin: 'git', flags: ['add', '.']}),
       shell({bin: 'git', flags: ['commit', '-a']}),
     ],

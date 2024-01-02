@@ -1,7 +1,7 @@
 import * as nodePath from 'path';
 
 import {Vine} from 'grapevine';
-import {assert, should, test, setup} from 'gs-testing';
+import {asyncAssert, setup, should, test} from 'gs-testing';
 import {FakeFs, FakeProcess} from 'gs-testing/export/fake';
 
 import {BuiltInRootType} from '../core/root-type';
@@ -18,7 +18,6 @@ test('@hive/util/resolve-file-ref', () => {
     const fakeFs = new FakeFs();
     const fakeProcess = new FakeProcess();
     const vine = new Vine({
-      appName: 'test',
       overrides: [
         {override: $fs, withValue: fakeFs},
         {override: $process, withValue: fakeProcess},
@@ -27,18 +26,18 @@ test('@hive/util/resolve-file-ref', () => {
     return {fakeFs, fakeProcess, vine};
   });
 
-  should('return based on cwd if root type is CURRENT_DIR', () => {
+  should('return based on cwd if root type is CURRENT_DIR', async () => {
     const cwd = 'cwd';
     _.fakeProcess.setCwd(cwd);
 
     const path = 'path';
-    assert(resolveFileRef(_.vine, {rootType: BuiltInRootType.CURRENT_DIR, path}, cwd))
+    await asyncAssert(resolveFileRef(_.vine, {rootType: BuiltInRootType.CURRENT_DIR, path}, cwd))
         .to.emitSequence([
           nodePath.join(cwd, path),
         ]);
   });
 
-  should('return based on the out dir if root type is OUT_DIR', () => {
+  should('return based on the out dir if root type is OUT_DIR', async () => {
     _.fakeProcess.setCwd('/a/b/c');
 
     const outdir = '/outdir';
@@ -46,12 +45,11 @@ test('@hive/util/resolve-file-ref', () => {
 
     const path = 'path';
     const cwd = 'cwd';
-    assert(resolveFileRef(_.vine, {rootType: BuiltInRootType.OUT_DIR, path}, cwd)).to.emitSequence([
-      nodePath.join(outdir, path),
-    ]);
+    await asyncAssert(resolveFileRef(_.vine, {rootType: BuiltInRootType.OUT_DIR, path}, cwd)).to
+        .emitSequence([nodePath.join(outdir, path)]);
   });
 
-  should('return based on project root if root type is PROJECT_ROOT', () => {
+  should('return based on project root if root type is PROJECT_ROOT', async () => {
     const projectRoot = '/a';
     _.fakeProcess.setCwd('/a/b/c');
 
@@ -62,25 +60,25 @@ test('@hive/util/resolve-file-ref', () => {
 
     const path = 'path';
     const cwd = 'cwd';
-    assert(resolveFileRef(_.vine, {rootType: BuiltInRootType.PROJECT_ROOT, path}, cwd))
+    await asyncAssert(resolveFileRef(_.vine, {rootType: BuiltInRootType.PROJECT_ROOT, path}, cwd))
         .to.emitSequence([
           nodePath.join(projectRoot, path),
         ]);
   });
 
-  should('return based on system root if root type is SYSTEM_ROOT', () => {
+  should('return based on system root if root type is SYSTEM_ROOT', async () => {
     const path = 'path';
     const cwd = 'cwd';
-    assert(resolveFileRef(_.vine, {rootType: BuiltInRootType.SYSTEM_ROOT, path}, cwd))
+    await asyncAssert(resolveFileRef(_.vine, {rootType: BuiltInRootType.SYSTEM_ROOT, path}, cwd))
         .to.emitSequence([
           nodePath.join('/', path),
         ]);
   });
 
-  should('throw error if root type is PROJECT_ROOT but no project root is found', () => {
+  should('throw error if root type is PROJECT_ROOT but no project root is found', async () => {
     const path = 'path';
     const cwd = 'cwd';
-    assert(resolveFileRef(_.vine, {rootType: BuiltInRootType.PROJECT_ROOT, path}, cwd)).to
-        .emitErrorWithMessage(/Cannot find project root/);
+    await asyncAssert(resolveFileRef(_.vine, {rootType: BuiltInRootType.PROJECT_ROOT, path}, cwd))
+        .to.emitErrorWithMessage(/Cannot find project root/);
   });
 });

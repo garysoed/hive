@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import {Vine} from 'grapevine';
-import {assert, mapThat, objectThat, should, test, setup} from 'gs-testing';
+import {assert, mapThat, objectThat, should, test, setup, asyncAssert} from 'gs-testing';
 import {FakeFs} from 'gs-testing/export/fake';
 import {ReplaySubject, firstValueFrom} from 'rxjs';
 
@@ -19,7 +19,6 @@ test('@hive/util/run-render', () => {
   const _ = setup(() => {
     const fakeFs = new FakeFs();
     const vine = new Vine({
-      appName: 'test',
       overrides: [
         {override: $fs, withValue: fakeFs},
       ],
@@ -27,7 +26,7 @@ test('@hive/util/run-render', () => {
     return {fakeFs, vine};
   });
 
-  should('emit map of file names to their content', () => {
+  should('emit map of file names to their content', async () => {
     const configContent = JSON.stringify({outdir: '/out', globals: {a: 10, g: 4}});
     _.fakeFs.addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
 
@@ -68,7 +67,7 @@ test('@hive/util/run-render', () => {
     };
 
     const cwd = 'cwd';
-    assert(runRule(_.vine, rule, cwd)).to.emitSequence([
+    await asyncAssert(runRule(_.vine, rule, cwd)).to.emitSequence([
       mapThat<string, number>().haveExactElements(new Map([
         ['/out/0_0.txt', 4],
         ['/out/0_3.txt', 7],
@@ -187,7 +186,7 @@ test('@hive/util/run-render', () => {
 
     const cwd = 'cwd';
     const resultsMap$ = runRule(_.vine, rule, cwd);
-    assert(resultsMap$).to.emitWith(mapThat<string, unknown>().haveExactElements(new Map(
+    await asyncAssert(resultsMap$).to.emitWith(mapThat<string, unknown>().haveExactElements(new Map(
         [
           ['/out/0_0.txt', objectThat().haveProperties({result: 0})],
           ['/out/0_3.txt', objectThat().haveProperties({result: 3})],
@@ -206,7 +205,7 @@ test('@hive/util/run-render', () => {
     assert(_.fakeFs.getFile('/out/2_3.txt')!.content).to.equal(JSON.stringify({result: 5}));
   });
 
-  should('emit error if the processor is not a declare rule', () => {
+  should('emit error if the processor is not a declare rule', async () => {
     const configContent = JSON.stringify({outdir: '/out'});
     _.fakeFs.addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
 
@@ -239,10 +238,11 @@ test('@hive/util/run-render', () => {
     };
 
     const cwd = 'cwd';
-    assert(runRule(_.vine, rule, cwd)).to.emitErrorWithMessage(/should be a declare rule/);
+    await asyncAssert(runRule(_.vine, rule, cwd)).to
+        .emitErrorWithMessage(/should be a declare rule/);
   });
 
-  should('continue processing if the processor throws', () => {
+  should('continue processing if the processor throws', async () => {
     const configContent = JSON.stringify({outdir: '/out', globals: {}});
     _.fakeFs.addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
 
@@ -286,7 +286,7 @@ test('@hive/util/run-render', () => {
     _.fakeFs.addFile('/src/processors/error.js', {content: 'output(2)'});
     _.fakeFs.simulateChange('/src/processors/error.js');
 
-    assert(output$).to.emitSequence([
+    await asyncAssert(output$).to.emitSequence([
       mapThat<string, number>().haveExactElements(new Map([
         ['/out/out.txt', 2],
       ])),

@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import {Vine} from 'grapevine';
-import {arrayThat, assert, createSpy, fake, mapThat, should, test, setup} from 'gs-testing';
+import {arrayThat, asyncAssert, createSpy, fake, mapThat, setup, should, test} from 'gs-testing';
 import {FakeFs} from 'gs-testing/export/fake';
 import {Observable, of} from 'rxjs';
 
@@ -29,7 +29,6 @@ test('@hive/util/resolve-inputs', () => {
   const _ = setup(() => {
     const fakeFs = new FakeFs();
     const vine = new Vine({
-      appName: 'test',
       overrides: [
         {override: $fs, withValue: fakeFs},
       ],
@@ -38,11 +37,11 @@ test('@hive/util/resolve-inputs', () => {
     return {fakeFs, mockResolveRule, vine};
   });
 
-  should('resolve non rule reference inputs correctly', () => {
+  should('resolve non rule reference inputs correctly', async () => {
     const inputs = new Map<string, RenderInput>([['a', 1], ['b', 'two']]);
 
     const cwd = 'cwd';
-    assert(resolveInputs(_.vine, inputs, fakeRunRule, cwd)).to.emitSequence([
+    await asyncAssert(resolveInputs(_.vine, inputs, fakeRunRule, cwd)).to.emitSequence([
       mapThat<string, ResolvedRenderInput>().haveExactElements(
           new Map<string, ResolvedRenderInput>([
             ['a', 1],
@@ -51,7 +50,7 @@ test('@hive/util/resolve-inputs', () => {
     ]);
   });
 
-  should('resolve single file load rule reference inputs correctly', () => {
+  should('resolve single file load rule reference inputs correctly', async () => {
     fake(_.mockResolveRule).always().call(rule => {
       const loadRule = rule as LoadRule;
       switch (loadRule.output.desc) {
@@ -88,7 +87,7 @@ test('@hive/util/resolve-inputs', () => {
     ]);
 
     const cwd = 'cwd';
-    assert(resolveInputs(_.vine, inputs, fakeRunRule, cwd)).to.emitSequence([
+    await asyncAssert(resolveInputs(_.vine, inputs, fakeRunRule, cwd)).to.emitSequence([
       mapThat<string, ResolvedRenderInput>().haveExactElements(
           new Map<string, ResolvedRenderInput>([
             ['a', 123],
@@ -97,27 +96,29 @@ test('@hive/util/resolve-inputs', () => {
     ]);
   });
 
-  should('emit error if the output is not an array but the sources has multiple contents', () => {
-    fake(_.mockResolveRule).always().call(() => of(['123', '234']));
+  should('emit error if the output is not an array but the sources has multiple contents',
+      async () => {
+        fake(_.mockResolveRule).always().call(() => of(['123', '234']));
 
-    const contentA = `
+        const contentA = `
     load({
       name: 'ruleA',
       srcs: ['/file.txt'],
       output: as.number,
     });
     `;
-    _.fakeFs.addFile(path.join('/a', RULE_FILE_NAME), {content: contentA});
+        _.fakeFs.addFile(path.join('/a', RULE_FILE_NAME), {content: contentA});
 
-    const inputs = new Map<string, RenderInput>([
-      ['a', {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a', ruleName: 'ruleA'}],
-    ]);
+        const inputs = new Map<string, RenderInput>([
+          ['a', {rootType: BuiltInRootType.SYSTEM_ROOT, path: 'a', ruleName: 'ruleA'}],
+        ]);
 
-    const cwd = 'cwd';
-    assert(resolveInputs(_.vine, inputs, fakeRunRule, cwd)).to.emitErrorWithMessage(/non array output/);
-  });
+        const cwd = 'cwd';
+        await asyncAssert(resolveInputs(_.vine, inputs, fakeRunRule, cwd)).to
+            .emitErrorWithMessage(/non array output/);
+      });
 
-  should('resolve glob file load rule reference inputs correctly', () => {
+  should('resolve glob file load rule reference inputs correctly', async () => {
     fake(_.mockResolveRule).always().call(() => {
       return of(['123', '456']);
     });
@@ -136,7 +137,7 @@ test('@hive/util/resolve-inputs', () => {
     ]);
 
     const cwd = 'cwd';
-    assert(resolveInputs(_.vine, inputs, fakeRunRule, cwd)).to.emitSequence([
+    await asyncAssert(resolveInputs(_.vine, inputs, fakeRunRule, cwd)).to.emitSequence([
       mapThat<string, ResolvedRenderInput>().haveExactElements(
           new Map<string, ResolvedRenderInput>([
             ['a', arrayThat().haveExactElements([123, 456])],
@@ -144,7 +145,7 @@ test('@hive/util/resolve-inputs', () => {
     ]);
   });
 
-  should('resolve declare rule reference inputs correctly', () => {
+  should('resolve declare rule reference inputs correctly', async () => {
     const fn = (): undefined => undefined;
     fake(_.mockResolveRule).always().call(() => {
       return of(fn);
@@ -165,7 +166,7 @@ test('@hive/util/resolve-inputs', () => {
     ]);
 
     const cwd = 'cwd';
-    assert(resolveInputs(_.vine, inputs, fakeRunRule, cwd)).to.emitSequence([
+    await asyncAssert(resolveInputs(_.vine, inputs, fakeRunRule, cwd)).to.emitSequence([
       mapThat<string, ResolvedRenderInput>().haveExactElements(
           new Map<string, ResolvedRenderInput>([
             ['a', fn],
@@ -173,7 +174,7 @@ test('@hive/util/resolve-inputs', () => {
     ]);
   });
 
-  should('resolve render rule reference inputs correctly', () => {
+  should('resolve render rule reference inputs correctly', async () => {
     fake(_.mockResolveRule).always().call(() => {
       return of(new Map([['file1', 'content1'], ['file2', 'content2']]));
     });
@@ -193,7 +194,7 @@ test('@hive/util/resolve-inputs', () => {
     ]);
 
     const cwd = 'cwd';
-    assert(resolveInputs(_.vine, inputs, fakeRunRule, cwd)).to.emitSequence([
+    await asyncAssert(resolveInputs(_.vine, inputs, fakeRunRule, cwd)).to.emitSequence([
       mapThat<string, ResolvedRenderInput>().haveExactElements(
           new Map<string, ResolvedRenderInput>([
             ['a', arrayThat().haveExactElements(['content1', 'content2'])],

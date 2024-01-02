@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import {Vine} from 'grapevine';
-import {arrayThat, assert, mapThat, should, test, setup} from 'gs-testing';
+import {arrayThat, asyncAssert, mapThat, setup, should, test} from 'gs-testing';
 import {FakeFs, FakeGlobFactory} from 'gs-testing/export/fake';
 import {numberType, stringType} from 'gs-types';
 import {BehaviorSubject} from 'rxjs';
@@ -27,7 +27,6 @@ test('@hive/util/run-rule', () => {
     const fakeFs = new FakeFs();
     const fakeGlobFactory = new FakeGlobFactory();
     const vine = new Vine({
-      appName: 'test',
       overrides: [
         {override: $fs, withValue: fakeFs},
         {override: $glob, withValue: fakeGlobFactory.glob.bind(fakeGlobFactory)},
@@ -36,7 +35,7 @@ test('@hive/util/run-rule', () => {
     return {fakeFs, fakeGlobFactory, vine};
   });
 
-  should('run load rules correctly', () => {
+  should('run load rules correctly', async () => {
     const contentC = 'contentC';
     _.fakeFs.addFile('/a/b/c.txt', {content: contentC});
 
@@ -60,12 +59,12 @@ test('@hive/util/run-rule', () => {
     };
 
     const cwd = 'cwd';
-    assert(runRule(_.vine, rule, cwd)).to.emitSequence([
+    await asyncAssert(runRule(_.vine, rule, cwd)).to.emitSequence([
       arrayThat<string>().haveExactElements([contentC, contentD, contentE]),
     ]);
   });
 
-  should('run declare rules correctly', () => {
+  should('run declare rules correctly', async () => {
     const configContent = JSON.stringify({outdir: 'out'});
     _.fakeFs.addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
 
@@ -85,12 +84,12 @@ test('@hive/util/run-rule', () => {
     };
 
     const cwd = 'cwd';
-    assert(
+    await asyncAssert(
         runRule(_.vine, rule, cwd).pipe(map(({fn}) => fn(_.vine, new Map([['a', 1], ['b', 2]])))))
         .to.emitSequence([3]);
   });
 
-  should('run render rules correctly', () => {
+  should('run render rules correctly', async () => {
     const configContent = JSON.stringify({outdir: '/out'});
     _.fakeFs.addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
 
@@ -130,7 +129,7 @@ test('@hive/util/run-rule', () => {
     };
 
     const cwd = 'cwd';
-    assert(runRule(_.vine, rule, cwd)).to.emitSequence([
+    await asyncAssert(runRule(_.vine, rule, cwd)).to.emitSequence([
       mapThat<string, number>().haveExactElements(new Map([
         ['/out/0_0.txt', 0],
         ['/out/0_3.txt', 3],

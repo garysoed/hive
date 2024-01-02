@@ -3,9 +3,9 @@ import * as path from 'path';
 import {GenerateAuthUrlOpts, GetTokenResponse} from 'google-auth-library/build/src/auth/oauth2client';
 import {OAuth2Client} from 'googleapis-common';
 import {Vine} from 'grapevine';
-import {arrayThat, assert, createSpyObject, fake, mockTime, objectThat, resetCalls, setThat, setup, should, Spy, test} from 'gs-testing';
+import {Spy, arrayThat, assert, asyncAssert, createSpyObject, fake, mockTime, objectThat, resetCalls, setThat, setup, should, test} from 'gs-testing';
 import {FakeExpress, FakeFs, FakeProcess} from 'gs-testing/export/fake';
-import {of as observableOf, ReplaySubject} from 'rxjs';
+import {ReplaySubject, of as observableOf} from 'rxjs';
 
 import {$express} from '../external/express';
 import {$fs} from '../external/fs';
@@ -35,7 +35,6 @@ test('@hive/processor/google-oauth', () => {
     const fakeProcess = new FakeProcess();
     const fakeExpressApp = new FakeExpress().default();
     const vine = new Vine({
-      appName: 'test',
       overrides: [
         {override: $fs, withValue: fakeFs},
         {override: $process, withValue: fakeProcess},
@@ -65,7 +64,7 @@ test('@hive/processor/google-oauth', () => {
   });
 
   test('initializeAddedScopes', () => {
-    should('initialize using credentials from the oauth file', () => {
+    should('initialize using credentials from the oauth file', async () => {
       const scope1 = 'scope1';
       const scope2 = 'scope2';
       const scope = [scope1, scope2].join(' ');
@@ -76,7 +75,7 @@ test('@hive/processor/google-oauth', () => {
       const auth$ = new ReplaySubject<GoogleAuth>(1);
       createOauth(_.vine).auth.subscribe(auth$);
 
-      assert(auth$).to.emitSequence([objectThat<GoogleAuth>().haveProperties({
+      await asyncAssert(auth$).to.emitSequence([objectThat<GoogleAuth>().haveProperties({
         client: _.mockOauthClient,
         scopes: setThat<string>().haveExactElements(new Set([scope1, scope2])),
       })]);
@@ -86,24 +85,24 @@ test('@hive/processor/google-oauth', () => {
           }));
     });
 
-    should('skip initialization if oauth file cannot be found', () => {
+    should('skip initialization if oauth file cannot be found', async () => {
       const auth$ = new ReplaySubject<GoogleAuth>(1);
       createOauth(_.vine).auth.subscribe(auth$);
 
-      assert(auth$).to.emitSequence([objectThat<GoogleAuth>().haveProperties({
+      await asyncAssert(auth$).to.emitSequence([objectThat<GoogleAuth>().haveProperties({
         client: _.mockOauthClient,
         scopes: setThat<string>().beEmpty(),
       })]);
       assert(_.mockOauthClient.setCredentials).toNot.haveBeenCalled();
     });
 
-    should('skip initialization if tmp dir cannot be found', () => {
+    should('skip initialization if tmp dir cannot be found', async () => {
       _.fakeFs.deleteFile(path.join(ROOT_DIR, ROOT_FILE_NAME));
 
       const auth$ = new ReplaySubject<GoogleAuth>(1);
       createOauth(_.vine).auth.subscribe(auth$);
 
-      assert(auth$).to.emitSequence([objectThat<GoogleAuth>().haveProperties({
+      await asyncAssert(auth$).to.emitSequence([objectThat<GoogleAuth>().haveProperties({
         client: _.mockOauthClient,
         scopes: setThat<string>().beEmpty(),
       })]);
@@ -112,7 +111,7 @@ test('@hive/processor/google-oauth', () => {
   });
 
   test('setupOnScopeChange', () => {
-    should('add the new token and emit if a scope was added', () => {
+    should('add the new token and emit if a scope was added', async () => {
       const tokens = {};
       fake(_.mockOauthClient.getToken as unknown as Spy<Promise<GetTokenResponse>, [string]>)
           .always()
@@ -133,7 +132,7 @@ test('@hive/processor/google-oauth', () => {
       const response = _.fakeExpressApp.simulateRequest({path: '/', query: {code}});
 
       assert(response!.sentContent).to.match(/code successful/);
-      assert(auth$).to.emitSequence([objectThat<GoogleAuth>().haveProperties({
+      await asyncAssert(auth$).to.emitSequence([objectThat<GoogleAuth>().haveProperties({
         client: _.mockOauthClient,
         scopes: setThat<string>().haveExactElements(new Set([scope1, scope2])),
       })]);
@@ -146,7 +145,7 @@ test('@hive/processor/google-oauth', () => {
           }));
     });
 
-    should('not prompt if scope has been added through initialization', () => {
+    should('not prompt if scope has been added through initialization', async () => {
       const scope1 = 'scope1';
       const scope2 = 'scope2';
       const scope = [scope1, scope2].join(' ');
@@ -163,7 +162,7 @@ test('@hive/processor/google-oauth', () => {
       oauth.addScope(scope1);
       _.fakeTime.tick(50);
 
-      assert(auth$).to.emitSequence([objectThat<GoogleAuth>().haveProperties({
+      await asyncAssert(auth$).to.emitSequence([objectThat<GoogleAuth>().haveProperties({
         client: _.mockOauthClient,
         scopes: setThat<string>().haveExactElements(new Set([scope1, scope2])),
       })]);

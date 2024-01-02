@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import {Vine} from 'grapevine';
-import {anyThat, arrayThat, assert, objectThat, should, test, setup} from 'gs-testing';
+import {anyThat, arrayThat, asyncAssert, objectThat, setup, should, test} from 'gs-testing';
 import {FakeFs, FakeProcess} from 'gs-testing/export/fake';
 
 import {Serializer} from '../config/serializer/serializer';
@@ -10,7 +10,7 @@ import {LoadRule} from '../core/load-rule';
 import {BuiltInRootType} from '../core/root-type';
 import {$fs} from '../external/fs';
 
-import {readRule, RuleWithPath, RULE_FILE_NAME} from './read-rule';
+import {RULE_FILE_NAME, RuleWithPath, readRule} from './read-rule';
 
 
 test('@hive/util/read-rule', () => {
@@ -18,7 +18,6 @@ test('@hive/util/read-rule', () => {
     const fakeFs = new FakeFs();
     const fakeProcess = new FakeProcess();
     const vine = new Vine({
-      appName: 'test',
       overrides: [
         {override: $fs, withValue: fakeFs},
       ],
@@ -26,7 +25,7 @@ test('@hive/util/read-rule', () => {
     return {fakeFs, fakeProcess, vine};
   });
 
-  should('emit the correct rule', () => {
+  should('emit the correct rule', async () => {
     const content = `
       load({
         name: 'rule',
@@ -44,7 +43,7 @@ test('@hive/util/read-rule', () => {
         {path: 'a/b', rootType: BuiltInRootType.CURRENT_DIR, ruleName: 'rule'},
         cwd,
     );
-    assert(result$).to
+    await asyncAssert(result$).to
         .emitSequence([
           objectThat<RuleWithPath>().haveProperties({
             rule: objectThat<LoadRule>().haveProperties({
@@ -65,7 +64,7 @@ test('@hive/util/read-rule', () => {
         ]);
   });
 
-  should('throw if the rule cannot be found', () => {
+  should('throw if the rule cannot be found', async () => {
     const content = `
       load({
         name: 'rule',
@@ -84,6 +83,6 @@ test('@hive/util/read-rule', () => {
         cwd,
     );
 
-    assert(result$).to.emitErrorWithMessage(/Cannot find rule/);
+    await asyncAssert(result$).to.emitErrorWithMessage(/Cannot find rule/);
   });
 });

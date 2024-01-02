@@ -2,7 +2,7 @@ import * as path from 'path';
 
 
 import {Vine} from 'grapevine';
-import {assert, should, test, setup} from 'gs-testing';
+import {asyncAssert, setup, should, test} from 'gs-testing';
 import {FakeFs, FakeProcess} from 'gs-testing/export/fake';
 
 import {$fs} from '../external/fs';
@@ -17,7 +17,6 @@ test('@hive/project/get-project-tmp-dir', () => {
     const fakeFs = new FakeFs();
     const fakeProcess = new FakeProcess();
     const vine = new Vine({
-      appName: 'test',
       overrides: [
         {override: $fs, withValue: fakeFs},
         {override: $process, withValue: fakeProcess},
@@ -26,7 +25,7 @@ test('@hive/project/get-project-tmp-dir', () => {
     return {fakeFs, fakeProcess, vine};
   });
 
-  should('emit the correct path', () => {
+  should('emit the correct path', async () => {
     const root = '/path/to/root';
     const content = `
     globals:
@@ -35,10 +34,10 @@ test('@hive/project/get-project-tmp-dir', () => {
     _.fakeFs.addFile(path.join(root, ROOT_FILE_NAME), {content});
     _.fakeProcess.setCwd(root);
 
-    assert(getProjectTmpDir(_.vine)).to.emitSequence([path.join(root, TMP_DIR_NAME)]);
+    await asyncAssert(getProjectTmpDir(_.vine)).to.emitSequence([path.join(root, TMP_DIR_NAME)]);
   });
 
-  should('emit null if root is not found', () => {
-    assert(getProjectTmpDir(_.vine)).to.emitSequence([null]);
+  should('emit null if root is not found', async () => {
+    await asyncAssert(getProjectTmpDir(_.vine)).to.emitSequence([null]);
   });
 });

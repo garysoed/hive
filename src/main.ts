@@ -33,7 +33,7 @@ const options = commandLineArgs.default(OPTIONS, {stopAtFirstUnknown: true});
  * Completes whenever running is done.
  */
 function run(): Observable<unknown> {
-  const vine = new Vine({appName: 'hive-cli'});
+  const vine = new Vine({});
   switch (options[COMMAND_OPTION]) {
     case CommandType.ANALYZE:
       return analyze(vine, options._unknown || []);

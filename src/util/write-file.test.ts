@@ -11,7 +11,6 @@ test('@hive/util/write-file', () => {
   const _ = setup(() => {
     const fakeFs = new FakeFs();
     const vine = new Vine({
-      appName: 'test',
       overrides: [
         {override: $fs, withValue: fakeFs},
       ],

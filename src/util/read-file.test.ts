@@ -1,5 +1,5 @@
 import {Vine} from 'grapevine';
-import {assert, should, test, setup} from 'gs-testing';
+import {asyncAssert, setup, should, test} from 'gs-testing';
 import {FakeFs} from 'gs-testing/export/fake';
 import {ReplaySubject} from 'rxjs';
 
@@ -12,7 +12,6 @@ test('@hive/util/read-file', () => {
   const _ = setup(() => {
     const fakeFs = new FakeFs();
     const vine = new Vine({
-      appName: 'test',
       overrides: [
         {override: $fs, withValue: fakeFs},
       ],
@@ -20,16 +19,16 @@ test('@hive/util/read-file', () => {
     return {fakeFs, vine};
   });
 
-  should('emit the file content', () => {
+  should('emit the file content', async () => {
     const path = 'path';
     const content = 'content';
 
     _.fakeFs.addFile(path, {content});
 
-    assert(readFile(_.vine, path)).to.emitSequence([content]);
+    await asyncAssert(readFile(_.vine, path)).to.emitSequence([content]);
   });
 
-  should('emit the file content on changes', () => {
+  should('emit the file content on changes', async () => {
     const path = 'path';
     const content = 'content';
 
@@ -44,10 +43,10 @@ test('@hive/util/read-file', () => {
 
     _.fakeFs.simulateChange(path);
 
-    assert(content$).to.emitSequence([content, content2]);
+    await asyncAssert(content$).to.emitSequence([content, content2]);
   });
 
-  should('emit error on error', () => {
-    assert(readFile(_.vine, 'path')).to.emitErrorWithMessage(/not found/);
+  should('emit error on error', async () => {
+    await asyncAssert(readFile(_.vine, 'path')).to.emitErrorWithMessage(/not found/);
   });
 });

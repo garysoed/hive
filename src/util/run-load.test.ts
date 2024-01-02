@@ -1,5 +1,5 @@
 import {Vine} from 'grapevine';
-import {arrayThat, assert, should, test, setup} from 'gs-testing';
+import {arrayThat, asyncAssert, setup, should, test} from 'gs-testing';
 import {FakeFs, FakeGlobFactory} from 'gs-testing/export/fake';
 import {stringType} from 'gs-types';
 import {BehaviorSubject} from 'rxjs';
@@ -19,7 +19,6 @@ test('@hive/util/run-load', () => {
     const fakeFs = new FakeFs();
     const fakeGlobFactory = new FakeGlobFactory();
     const vine = new Vine({
-      appName: 'test',
       overrides: [
         {override: $fs, withValue: fakeFs},
         {override: $glob, withValue: fakeGlobFactory.glob.bind(fakeGlobFactory)},
@@ -28,7 +27,7 @@ test('@hive/util/run-load', () => {
     return {fakeFs, fakeGlobFactory, vine};
   });
 
-  should('emit content of file if file ref was given', () => {
+  should('emit content of file if file ref was given', async () => {
     const content = 'content';
     _.fakeFs.addFile('/a/b/c.txt', {content});
 
@@ -40,11 +39,11 @@ test('@hive/util/run-load', () => {
     };
 
     const cwd = 'cwd';
-    assert(runRule(_.vine, rule, cwd))
+    await asyncAssert(runRule(_.vine, rule, cwd))
         .to.emitSequence([arrayThat<string>().haveExactElements([content])]);
   });
 
-  should('emit content of all matching files if glob ref was given', () => {
+  should('emit content of all matching files if glob ref was given', async () => {
     const contentC = 'contentC';
     _.fakeFs.addFile('/a/b/c.txt', {content: contentC});
 
@@ -68,7 +67,7 @@ test('@hive/util/run-load', () => {
     };
 
     const cwd = 'cwd';
-    assert(runRule(_.vine, rule, cwd)).to.emitSequence([
+    await asyncAssert(runRule(_.vine, rule, cwd)).to.emitSequence([
       arrayThat<string>().haveExactElements([contentC, contentD, contentE]),
     ]);
   });

@@ -68,7 +68,6 @@ test('@hive/processor/load-google-sheets', () => {
         .return(observableOf({scopes: new Set([SCOPE]), client: mockClient} as any));
 
     const vine = new Vine({
-      appName: 'test',
       overrides: [
         {override: $googleOauthFactory, withValue: () => mockGoogleOauth},
       ],

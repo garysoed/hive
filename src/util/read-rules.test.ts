@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import {Vine} from 'grapevine';
-import {anyThat, arrayThat, assert, objectThat, should, test, setup} from 'gs-testing';
+import {anyThat, arrayThat, asyncAssert, objectThat, setup, should, test} from 'gs-testing';
 import {FakeFs, FakeProcess} from 'gs-testing/export/fake';
 
 import {Serializer} from '../config/serializer/serializer';
@@ -19,7 +19,6 @@ test('@hive/util/read-rule', () => {
     const fakeFs = new FakeFs();
     const fakeProcess = new FakeProcess();
     const vine = new Vine({
-      appName: 'test',
       overrides: [
         {override: $fs, withValue: fakeFs},
       ],
@@ -27,7 +26,7 @@ test('@hive/util/read-rule', () => {
     return {fakeFs, fakeProcess, vine};
   });
 
-  should('emit rule with matching name', () => {
+  should('emit rule with matching name', async () => {
     const content = `
       load({
         name: 'rule',
@@ -45,7 +44,7 @@ test('@hive/util/read-rule', () => {
         {path: 'a/b', rootType: BuiltInRootType.CURRENT_DIR, ruleName: 'rule'},
         cwd,
     );
-    assert(result$).to
+    await asyncAssert(result$).to
         .emitSequence([
           objectThat<RulesWithPath>().haveProperties({
             rules: arrayThat<LoadRule>().haveExactElements([
@@ -68,7 +67,7 @@ test('@hive/util/read-rule', () => {
         ]);
   });
 
-  should('emit all the rules in the file', () => {
+  should('emit all the rules in the file', async () => {
     const content = `
       load({
         name: 'rule1',
@@ -92,7 +91,7 @@ test('@hive/util/read-rule', () => {
         {path: 'a/b', rootType: BuiltInRootType.CURRENT_DIR, ruleName: '*'},
         cwd,
     );
-    assert(result$).to
+    await asyncAssert(result$).to
         .emitSequence([
           objectThat<RulesWithPath>().haveProperties({
             rules: arrayThat<LoadRule>().haveExactElements([
@@ -128,7 +127,7 @@ test('@hive/util/read-rule', () => {
         ]);
   });
 
-  should('throw if the file is empty', () => {
+  should('throw if the file is empty', async () => {
     const content = '';
 
     const cwd = 'cwd';
@@ -141,6 +140,6 @@ test('@hive/util/read-rule', () => {
         cwd,
     );
 
-    assert(result$).to.emitErrorWithMessage(/Cannot find rules/);
+    await asyncAssert(result$).to.emitErrorWithMessage(/Cannot find rules/);
   });
 });

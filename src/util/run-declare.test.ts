@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import {Vine} from 'grapevine';
-import {assert, should, test, setup} from 'gs-testing';
+import {asyncAssert, setup, should, test} from 'gs-testing';
 import {FakeFs} from 'gs-testing/export/fake';
 import {numberType} from 'gs-types';
 import {map} from 'rxjs/operators';
@@ -20,7 +20,6 @@ test('@hive/util/run-declare', () => {
   const _ = setup(() => {
     const fakeFs = new FakeFs();
     const vine = new Vine({
-      appName: 'test',
       overrides: [
         {override: $fs, withValue: fakeFs},
       ],
@@ -28,7 +27,7 @@ test('@hive/util/run-declare', () => {
     return {fakeFs, vine};
   });
 
-  should('emit function that runs the processor correctly', () => {
+  should('emit function that runs the processor correctly', async () => {
     const configContent = JSON.stringify({outdir: 'out'});
     _.fakeFs.addFile(path.join('/', ROOT_FILE_NAME), {content: configContent});
 
@@ -48,7 +47,7 @@ test('@hive/util/run-declare', () => {
     };
 
     const cwd = 'cwd';
-    assert(
+    await asyncAssert(
         runRule(_.vine, rule, cwd).pipe(map(({fn}) => fn(_.vine, new Map([['a', 1], ['b', 2]])))))
         .to.emitSequence(['3']);
   });

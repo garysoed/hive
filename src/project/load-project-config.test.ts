@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import {Vine} from 'grapevine';
-import {assert, objectThat, should, test, setup} from 'gs-testing';
+import {asyncAssert, objectThat, setup, should, test} from 'gs-testing';
 import {FakeFs, FakeProcess} from 'gs-testing/export/fake';
 
 import {$fs} from '../external/fs';
@@ -17,7 +17,6 @@ test('@hive/project/load-project-config', () => {
     const fakeFs = new FakeFs();
     const fakeProcess = new FakeProcess();
     const vine = new Vine({
-      appName: 'test',
       overrides: [
         {override: $fs, withValue: fakeFs},
         {override: $process, withValue: fakeProcess},
@@ -26,23 +25,23 @@ test('@hive/project/load-project-config', () => {
     return {fakeFs, fakeProcess, vine};
   });
 
-  should('load the project config correctly', () => {
+  should('load the project config correctly', async () => {
     _.fakeProcess.setCwd('/a/b/c');
 
     const dir = 'dir';
     const content = JSON.stringify({outdir: dir});
     _.fakeFs.addFile(path.join('/a', ROOT_FILE_NAME), {content});
 
-    assert(loadProjectConfig(_.vine)).to.emitSequence([
+    await asyncAssert(loadProjectConfig(_.vine)).to.emitSequence([
       objectThat<ProjectConfig>().haveProperties({
         outdir: dir,
       }),
     ]);
   });
 
-  should('emit error if root folder was not found', () => {
+  should('emit error if root folder was not found', async () => {
     _.fakeProcess.setCwd('/a/b/c');
 
-    assert(loadProjectConfig(_.vine)).to.emitErrorWithMessage(/No root folder/);
+    await asyncAssert(loadProjectConfig(_.vine)).to.emitErrorWithMessage(/No root folder/);
   });
 });
