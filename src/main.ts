@@ -1,6 +1,6 @@
 import * as commandLineArgs from 'command-line-args';
 import {Vine} from 'grapevine';
-import {EMPTY, Observable, Subject} from 'rxjs';
+import {EMPTY, Observable, Subject, from} from 'rxjs';
 import {catchError, takeUntil} from 'rxjs/operators';
 import {Logger, ON_LOG_$} from 'santa';
 import {CliDestination} from 'santa/export/cli';
@@ -9,6 +9,7 @@ import {analyze} from './cli/analyze';
 import {CommandType} from './cli/command-type';
 import {CLI as HELP_CLI, help} from './cli/help';
 import {printSummary} from './cli/print-summary';
+import {process as processCli} from './cli/process';
 import {run as runRule} from './cli/run';
 
 
@@ -37,6 +38,8 @@ function run(): Observable<unknown> {
   switch (options[COMMAND_OPTION]) {
     case CommandType.ANALYZE:
       return analyze(vine, options._unknown || []);
+    case CommandType.PROCESS:
+      return from(processCli(vine, options._unknown || []));
     case CommandType.HELP:
       return help(options._unknown || []);
     // case CommandType.INIT:

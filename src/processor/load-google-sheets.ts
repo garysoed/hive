@@ -1,7 +1,7 @@
 import {google} from 'googleapis';
 import {Vine} from 'grapevine';
 import {Merge, RawSheet} from 'gs-tools/export/gapi';
-import {arrayOfType, booleanType, instanceofType, numberType, stringType, Type} from 'gs-types';
+import {arrayOfType, booleanType, hasPropertiesType, instanceofType, numberType, stringType, Type} from 'gs-types';
 import {firstValueFrom, from as observableFrom} from 'rxjs';
 import {filter, map, switchMap} from 'rxjs/operators';
 
@@ -18,7 +18,7 @@ export const SCOPE = 'https://www.googleapis.com/auth/spreadsheets.readonly';
 export async function loadGoogleSheets(
     vine: Vine,
     metadata: GoogleSheetsMetadata,
-    ranges: string[],
+    ranges: readonly string[],
     clientId: string,
     clientSecret: string,
 ): Promise<readonly RawSheet[]> {
@@ -34,7 +34,7 @@ export async function loadGoogleSheets(
                 gSheets.spreadsheets.get({
                   includeGridData: true,
                   spreadsheetId: metadata.doc_id,
-                  ranges,
+                  ranges: [...ranges],
                 }),
             );
           }),
@@ -83,12 +83,13 @@ export async function loadGoogleSheets(
 }
 
 const RANGES_TYPE: Type<readonly string[]> = arrayOfType(stringType);
-const SPEC = new ProcessorSpec({
+const SPEC_RAW = {
   'metadata': GOOGLE_SHEETS_METADATA_TYPE,
   'ranges': RANGES_TYPE,
   'oauth.clientId': stringType,
   'oauth.clientSecret': stringType,
-});
+};
+const SPEC = new ProcessorSpec(SPEC_RAW);
 
 export const LOAD_GOOGLE_SHEETS: Processor = {
   fn: async (vine, inputs) => {
@@ -97,7 +98,7 @@ export const LOAD_GOOGLE_SHEETS: Processor = {
     return loadGoogleSheets(
         vine,
         validatedInputs.metadata,
-        [...validatedInputs.ranges],
+        validatedInputs.ranges,
         validatedInputs['oauth.clientId'],
         validatedInputs['oauth.clientSecret'],
     );
@@ -105,3 +106,40 @@ export const LOAD_GOOGLE_SHEETS: Processor = {
   inputs: SPEC.getInputsMap(),
   output: fromType(instanceofType(Object)),
 };
+
+
+interface OauthSpec {
+  readonly clientId: string;
+  readonly clientSecret: string;
+}
+interface Spec {
+  readonly ranges: readonly string[];
+  readonly oauth: OauthSpec;
+}
+const SPEC_TYPE: Type<Spec> = hasPropertiesType<Spec>({
+  ranges: RANGES_TYPE,
+  oauth: hasPropertiesType<OauthSpec>({
+    clientId: stringType,
+    clientSecret: stringType,
+  }),
+});
+
+export async function loadGoogleSheetsProcessor(
+    vine: Vine,
+    input: string,
+    config: {},
+): Promise<string> {
+  SPEC_TYPE.assert(config);
+
+  const parsedInput = JSON.parse(input);
+  GOOGLE_SHEETS_METADATA_TYPE.assert(parsedInput);
+
+  const rawSheets = loadGoogleSheets(
+      vine,
+      parsedInput,
+      config.ranges,
+      config.oauth.clientId,
+      config.oauth.clientSecret,
+  );
+  return JSON.stringify(rawSheets);
+}

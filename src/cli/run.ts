@@ -1,5 +1,5 @@
-import * as commandLineArgs from 'command-line-args';
-import * as commandLineUsage from 'command-line-usage';
+import commandLineArgs from 'command-line-args';
+import commandLineUsage from 'command-line-usage';
 import {Vine} from 'grapevine';
 import {EMPTY, merge, Observable, throwError} from 'rxjs';
 import {map, switchMap, take} from 'rxjs/operators';
@@ -43,7 +43,7 @@ export const CLI = {
 };
 
 export function run(vine: Vine, argv: string[]): Observable<string> {
-  const options = commandLineArgs.default(OPTIONS, {argv, stopAtFirstUnknown: true});
+  const options = commandLineArgs(OPTIONS, {argv, stopAtFirstUnknown: true});
   const rulePath = options[RULE_OPTION];
   const once = options[ONCE_OPTION] ?? false;
   if (typeof rulePath !== 'string') {
