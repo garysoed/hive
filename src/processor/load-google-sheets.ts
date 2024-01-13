@@ -1,13 +1,13 @@
 import {google} from 'googleapis';
 import {Vine} from 'grapevine';
 import {Merge, RawSheet} from 'gs-tools/export/gapi';
-import {arrayOfType, booleanType, hasPropertiesType, instanceofType, numberType, stringType, Type} from 'gs-types';
-import {firstValueFrom, from as observableFrom} from 'rxjs';
-import {filter, map, switchMap} from 'rxjs/operators';
+import {Type, arrayOfType, booleanType, hasPropertiesType, instanceofType, numberType, stringType} from 'gs-types';
+import {firstValueFrom} from 'rxjs';
+import {filter} from 'rxjs/operators';
 
 import {fromType} from '../config/serializer/serializer';
 import {Processor} from '../core/processor';
-import {GoogleSheetsMetadata, GOOGLE_SHEETS_METADATA_TYPE} from '../thirdparty/google-sheets-metadata';
+import {GOOGLE_SHEETS_METADATA_TYPE, GoogleSheetsMetadata} from '../thirdparty/google-sheets-metadata';
 
 import {$googleOauthFactory} from './google-oauth';
 import {ProcessorSpec} from './processor-spec';
@@ -25,61 +25,53 @@ export async function loadGoogleSheets(
   const googleOauthFactory = $googleOauthFactory.get(vine);
   const oauth = googleOauthFactory(clientId, clientSecret);
   oauth.addScope(SCOPE);
-  return firstValueFrom(oauth.auth
-      .pipe(
-          filter(({scopes}) => scopes.has(SCOPE)),
-          switchMap(({client}) => {
-            const gSheets = google.sheets({version: 'v4', auth: client});
-            return observableFrom(
-                gSheets.spreadsheets.get({
-                  includeGridData: true,
-                  spreadsheetId: metadata.doc_id,
-                  ranges: [...ranges],
-                }),
-            );
-          }),
-          map(({data}) => {
-            return (data.sheets ?? []).map(sheet => {
-              const merges = (sheet.merges ?? [])
-                  .map(merge => {
-                    const {startRowIndex, endRowIndex} = merge;
-                    const {startColumnIndex, endColumnIndex} = merge;
-                    if (!numberType.check(startRowIndex)
-                        || !numberType.check(endRowIndex)
-                        || !numberType.check(startColumnIndex)
-                        || !numberType.check(endColumnIndex)) {
-                      return null;
-                    }
+  const {client} = await firstValueFrom(oauth.auth.pipe(filter(({scopes}) => scopes.has(SCOPE))));
+  const gSheets = google.sheets({version: 'v4', auth: client});
+  const {data} = await gSheets.spreadsheets.get({
+    includeGridData: true,
+    spreadsheetId: metadata.doc_id,
+    ranges: [...ranges],
+  });
 
-                    return {startRowIndex, endRowIndex, startColumnIndex, endColumnIndex};
-                  })
-                  .filter((merge): merge is Merge => !!merge);
+  return (data.sheets ?? []).map(sheet => {
+    const merges = (sheet.merges ?? [])
+        .map(merge => {
+          const {startRowIndex, endRowIndex} = merge;
+          const {startColumnIndex, endColumnIndex} = merge;
+          if (!numberType.check(startRowIndex)
+                  || !numberType.check(endRowIndex)
+                  || !numberType.check(startColumnIndex)
+                  || !numberType.check(endColumnIndex)) {
+            return null;
+          }
 
-              const data = (sheet.data ?? [])
-                  .map(data => {
-                    const rowData = (data.rowData ?? []).map(data => {
-                      const values = (data.values ?? []).map(value => {
-                        const boolValue = value.effectiveValue?.boolValue;
-                        const numberValue = value.effectiveValue?.numberValue;
-                        const stringValue = value.effectiveValue?.stringValue;
-                        const effectiveValue = {
-                          boolValue: booleanType.check(boolValue) ? boolValue : undefined,
-                          numberValue: numberType.check(numberValue) ? numberValue : undefined,
-                          stringValue: stringType.check(stringValue) ? stringValue : undefined,
-                        };
+          return {startRowIndex, endRowIndex, startColumnIndex, endColumnIndex};
+        })
+        .filter((merge): merge is Merge => !!merge);
 
-                        return {effectiveValue};
-                      });
+    const data = (sheet.data ?? [])
+        .map(data => {
+          const rowData = (data.rowData ?? []).map(data => {
+            const values = (data.values ?? []).map(value => {
+              const boolValue = value.effectiveValue?.boolValue;
+              const numberValue = value.effectiveValue?.numberValue;
+              const stringValue = value.effectiveValue?.stringValue;
+              const effectiveValue = {
+                boolValue: booleanType.check(boolValue) ? boolValue : undefined,
+                numberValue: numberType.check(numberValue) ? numberValue : undefined,
+                stringValue: stringType.check(stringValue) ? stringValue : undefined,
+              };
 
-                      return {values};
-                    });
-
-                    return {rowData};
-                  });
-              return {merges, data};
+              return {effectiveValue};
             });
-          }),
-      ));
+
+            return {values};
+          });
+
+          return {rowData};
+        });
+    return {merges, data};
+  });
 }
 
 const RANGES_TYPE: Type<readonly string[]> = arrayOfType(stringType);

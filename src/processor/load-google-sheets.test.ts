@@ -1,13 +1,13 @@
 import {GaxiosResponse} from 'gaxios';
 import {google, sheets_v4} from 'googleapis';
 import {Vine} from 'grapevine';
-import {arrayThat, assert, createSpy, createSpyInstance, createSpyObject, fake, objectThat, should, spy, Spy, test} from 'gs-testing';
+import {Spy, arrayThat, assert, createSpy, createSpyInstance, createSpyObject, fake, objectThat, should, spy, test} from 'gs-testing';
 import {Merge, RawSheet} from 'gs-tools/export/gapi';
 import {CellData, ExtendedValue, GridData, RowData} from 'gs-tools/src/gapi/type/sheets';
-import {Observable, of as observableOf} from 'rxjs';
+import {of as observableOf} from 'rxjs';
 
 import {$googleOauthFactory, GoogleOauth} from './google-oauth';
-import {loadGoogleSheets, SCOPE} from './load-google-sheets';
+import {SCOPE, loadGoogleSheets} from './load-google-sheets';
 
 
 test('@hive/processor/load-google-sheets', () => {
@@ -47,8 +47,8 @@ test('@hive/processor/load-google-sheets', () => {
       ],
     };
     const mockGet = mockSpreadsheets.get as unknown as
-        Spy<Observable<GaxiosResponse<sheets_v4.Schema$Spreadsheet>>, [any]>;
-    fake(mockGet).always().return(observableOf({
+        Spy<Promise<GaxiosResponse<sheets_v4.Schema$Spreadsheet>>, [any]>;
+    fake(mockGet).always().return(Promise.resolve({
       config: {},
       status: 0,
       statusText: '',
